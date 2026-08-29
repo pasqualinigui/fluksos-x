@@ -1,0 +1,41 @@
+🔴 FR-001   repositorio existe e linha principal e main
+           evidencia: nenhum repositorio em /home/pasqua/Documentos/fluksos-x — a fundacao ainda nao foi estabelecida
+🔴 FR-002   linha de integracao develop existe
+           evidencia: sem repositorio
+🔴 FR-003a  identidade de autoria definida em escopo local
+           evidencia: sem repositorio
+✅ FR-003b  escopo global da maquina nao foi alterado
+🔴 FR-004   convencoes declaram os 11 tipos de registro
+           evidencia: CONTRIBUTING.md inexistente
+🔴 FR-005   convencoes declaram escopo opcional e marcacao de incompatibilidade
+           evidencia: CONTRIBUTING.md inexistente
+🔴 FR-006   convencoes declaram formato de nome de linha de funcionalidade
+           evidencia: CONTRIBUTING.md inexistente
+🔴 FR-007   convencoes declaram papeis de main e develop
+           evidencia: CONTRIBUTING.md inexistente
+✅ FR-008a  arquivo de ambiente base e excluido
+✅ FR-008b  variantes de arquivo de ambiente sao excluidas
+✅ FR-009   arquivo-modelo de ambiente permanece versionavel
+✅ FR-010   ambiente virtual e bytecode sao excluidos
+✅ FR-011   caches das ferramentas de qualidade sao excluidos
+✅ FR-012   efemeros do motor excluidos e diretorio-pai preservado
+✅ FR-013   trava de dependencias permanece versionavel
+✅ FR-014   exclusoes geridas pela ferramenta de spec nao sao redeclaradas
+⏭️ FR-012b  camada hermetica e repositorio real concordam sobre as exclusoes
+           evidencia: repositorio ainda nao existe — verificavel a partir do portao verde
+✅ FR-023a  artefatos de integracao de agente permanecem versionaveis
+✅ FR-023b  configuracao local de maquina do agente e excluida
+🔴 FR-015   registro inicial existe e contem plano e pesquisa
+           evidencia: sem repositorio
+🔴 FR-020a  nenhum arquivo proibido consta do indice
+           evidencia: sem repositorio
+🔴 FR-020b  nenhum arquivo proibido consta do historico
+           evidencia: sem repositorio
+🔴 SC-002   todos os registros satisfazem a gramatica de convencao
+           evidencia: sem repositorio
+✅ FR-018   oraculo nao contem construcao nao deterministica
+✅ FR-019   oraculo nao invoca ferramenta fora do permitido
+✅ FR-022   registro de decisoes arquiteturais mapeia specs e itens do plano
+
+Resultado: 14/26 assercoes aprovadas — 11 violacao(oes) (critica: 2, alta: 0, media: 9) — 1 nao aplicaveis — NAO CONFORME
+exit=1
