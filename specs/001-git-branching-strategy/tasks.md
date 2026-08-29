@@ -131,7 +131,7 @@ addendum R2.
 mecanicamente sua categoria e se representa mudança incompatível, sem leitura
 interpretativa.
 
-- [ ] T016 [US3] Criar `CONTRIBUTING.md` na raiz declarando o conjunto fechado dos 11 tipos (`feat`, `fix`, `docs`, `test`, `refactor`, `ci`, `chore`, `perf`, `build`, `style`, `revert`), a gramática do cabeçalho `<tipo>[(<escopo>)][!]: <descrição>`, a marcação de mudança incompatível e o rodapé correspondente, registrando que `perf` e `build` excedem os 7 tipos do §18 do plano por serem exigidos pela classificação automática de releases (FR-004, FR-005, D7, D8)
+- [X] T016 [US3] Criar `CONTRIBUTING.md` na raiz declarando o conjunto fechado dos 11 tipos (`feat`, `fix`, `docs`, `test`, `refactor`, `ci`, `chore`, `perf`, `build`, `style`, `revert`), a gramática do cabeçalho `<tipo>[(<escopo>)][!]: <descrição>`, a marcação de mudança incompatível e o rodapé correspondente, registrando que `perf` e `build` excedem os 7 tipos do §18 do plano por serem exigidos pela classificação automática de releases (FR-004, FR-005, D7, D8)
 
 ---
 
@@ -143,7 +143,7 @@ trabalho apenas pelo nome, sem consultar outra fonte.
 **Independent Test**: apresentar um nome de linha de trabalho a quem nunca viu o
 projeto e verificar se identifica fase, pacote e propósito.
 
-- [ ] T017 [US4] Acrescentar a `CONTRIBUTING.md` a seção de linhas de trabalho: formato `feature/f<fase>-<pacote>-<funcionalidade>` com exemplos do §18 do plano, o papel de `main` como estado estável e de `develop` como linha de integração, e a regra de que linhas de funcionalidade derivam de `develop`; validar contra os exemplos do plano que fase, pacote e propósito são dedutíveis do nome sem consulta externa (FR-006, FR-007, SC-005)
+- [X] T017 [US4] Acrescentar a `CONTRIBUTING.md` a seção de linhas de trabalho: formato `feature/f<fase>-<pacote>-<funcionalidade>` com exemplos do §18 do plano, o papel de `main` como estado estável e de `develop` como linha de integração, e a regra de que linhas de funcionalidade derivam de `develop`; validar contra os exemplos do plano que fase, pacote e propósito são dedutíveis do nome sem consulta externa (FR-006, FR-007, SC-005)
 
 **Checkpoint**: convenções normativas documentadas. O commit inicial já pode
 obedecê-las e contê-las.
@@ -163,11 +163,11 @@ que ela é.
 > Executa por último pelo motivo documentado no topo: o commit inicial precisa
 > conter os deliverables das Phases 1–5.
 
-- [ ] T018 [US1] Em `scripts/` ou por execução direta, detectar se a raiz já contém repositório: ausente → criar com linha principal `main`; presente → verificar o nome da linha principal e renomear para `main` se necessário. **Não** reinicializar às cegas — E8 demonstrou que o parâmetro de nomeação é descartado em silêncio no re-init (FR-001, D6)
-- [ ] T019 [US1] Definir no escopo **local** do repositório a identidade `Guilherme <pasqualini166@gmail.com>` e a preferência de linha principal, e confirmar que o escopo global da máquina permanece sem qualquer entrada escrita por este item (FR-003)
-- [ ] T020 [US1] Antes de registrar, inspecionar exatamente o que será incluído, confirmando que `docs/`, `specs/`, `scripts/`, `.specify/`, `.claude/skills/`, `.gitignore` e `CONTRIBUTING.md` entram e que nenhum arquivo de categoria proibida aparece (SC-001, FR-023)
-- [ ] T021 [US1] Criar o commit inicial contendo o plano, a pesquisa, as specs, o oráculo e as convenções, com mensagem obedecendo à gramática definida em `CONTRIBUTING.md` (FR-015, FR-004, FR-005)
-- [ ] T022 [US1] Criar a linha `develop` a partir de `main`, ambas apontando para o registro inicial (FR-002)
+- [X] T018 [US1] Em `scripts/` ou por execução direta, detectar se a raiz já contém repositório: ausente → criar com linha principal `main`; presente → verificar o nome da linha principal e renomear para `main` se necessário. **Não** reinicializar às cegas — E8 demonstrou que o parâmetro de nomeação é descartado em silêncio no re-init (FR-001, D6)
+- [X] T019 [US1] Definir no escopo **local** do repositório a identidade `Guilherme <pasqualini166@gmail.com>` e a preferência de linha principal, e confirmar que o escopo global da máquina permanece sem qualquer entrada escrita por este item (FR-003)
+- [X] T020 [US1] Antes de registrar, inspecionar exatamente o que será incluído, confirmando que `docs/`, `specs/`, `scripts/`, `.specify/`, `.claude/skills/`, `.gitignore` e `CONTRIBUTING.md` entram e que nenhum arquivo de categoria proibida aparece (SC-001, FR-023)
+- [X] T021 [US1] Criar o commit inicial contendo o plano, a pesquisa, as specs, o oráculo e as convenções, com mensagem obedecendo à gramática definida em `CONTRIBUTING.md` (FR-015, FR-004, FR-005)
+- [X] T022 [US1] Criar a linha `develop` a partir de `main`, ambas apontando para o registro inicial (FR-002)
 
 **Checkpoint**: fundação completa. O oráculo deve agora aprovar.
 
@@ -178,12 +178,12 @@ que ela é.
 **Purpose**: converter a implementação em evidência, e verificar os cenários que
 a pesquisa empírica mostrou serem os pontos de falha reais.
 
-- [ ] T023 🟢 **PORTÃO VERDE** — executar `scripts/verify/f0-001-foundation.sh`, confirmar código de saída `0` e todas as asserções aprovadas, e preservar a saída integral como artefato de evidência do verde, formando com T015 o par vermelho→verde exigido (SC-004, quickstart cenário 2)
-- [ ] T024 Verificar determinismo de `scripts/verify/f0-001-foundation.sh` — duas execuções consecutivas sem alteração de estado produzem saída idêntica, e a execução conclui em menos de 5 segundos (SC-003, FR-018, quickstart cenário 3)
-- [ ] T025 [P] Executar os cenários 4, 5, 6 e 7 do `quickstart.md` contra o repositório real — variantes de arquivo de ambiente invisíveis com o modelo visível, trava de dependências versionável, exclusão parcial de `.fluksos-x/` com o diretório-pai preservado, e habilidades do motor de especificação versionáveis com a configuração local excluída; remover os arquivos-isca ao final (SC-001, FR-008, FR-009, FR-012, FR-013, FR-023a, FR-023b)
-- [ ] T026 [P] Executar o cenário 8 do `quickstart.md` em repositório descartável fora do projeto — registrar um arquivo de ambiente antes de existir regra, acrescentar as regras, e confirmar que `FR-020a` reprova com severidade crítica; um oráculo que aprove este cenário está errado ainda que aprove o repositório real (FR-020, D4)
-- [ ] T027 Executar o cenário 9 do `quickstart.md` — confirmar as duas linhas de trabalho, o registro inicial conforme a gramática, a identidade em escopo local, e o escopo global da máquina sem qualquer entrada escrita por este item (FR-001, FR-002, FR-003)
-- [ ] T028 Conferir a seção Contratos de `spec.md` item a item, confirmando que cada entrega declarada aos itens `003`, `005`, `006`, `007` e `012` está de fato disponível, e que as responsabilidades transferidas aos itens `002` (revalidação retroativa contra a constitution ratificada **e** consumo/retirada do material de referência transitório, ADR-004), `008`, `009` e ao pós-Fase 0 estão registradas por escrito (FR-022, SC-007)
+- [X] T023 🟢 **PORTÃO VERDE** — executar `scripts/verify/f0-001-foundation.sh`, confirmar código de saída `0` e todas as asserções aprovadas, e preservar a saída integral como artefato de evidência do verde, formando com T015 o par vermelho→verde exigido (SC-004, quickstart cenário 2)
+- [X] T024 Verificar determinismo de `scripts/verify/f0-001-foundation.sh` — duas execuções consecutivas sem alteração de estado produzem saída idêntica, e a execução conclui em menos de 5 segundos (SC-003, FR-018, quickstart cenário 3)
+- [X] T025 [P] Executar os cenários 4, 5, 6 e 7 do `quickstart.md` contra o repositório real — variantes de arquivo de ambiente invisíveis com o modelo visível, trava de dependências versionável, exclusão parcial de `.fluksos-x/` com o diretório-pai preservado, e habilidades do motor de especificação versionáveis com a configuração local excluída; remover os arquivos-isca ao final (SC-001, FR-008, FR-009, FR-012, FR-013, FR-023a, FR-023b)
+- [X] T026 [P] Executar o cenário 8 do `quickstart.md` em repositório descartável fora do projeto — registrar um arquivo de ambiente antes de existir regra, acrescentar as regras, e confirmar que `FR-020a` reprova com severidade crítica; um oráculo que aprove este cenário está errado ainda que aprove o repositório real (FR-020, D4)
+- [X] T027 Executar o cenário 9 do `quickstart.md` — confirmar as duas linhas de trabalho, o registro inicial conforme a gramática, a identidade em escopo local, e o escopo global da máquina sem qualquer entrada escrita por este item (FR-001, FR-002, FR-003)
+- [X] T028 Conferir a seção Contratos de `spec.md` item a item, confirmando que cada entrega declarada aos itens `003`, `005`, `006`, `007` e `012` está de fato disponível, e que as responsabilidades transferidas aos itens `002` (revalidação retroativa contra a constitution ratificada **e** consumo/retirada do material de referência transitório, ADR-004), `008`, `009` e ao pós-Fase 0 estão registradas por escrito (FR-022, SC-007)
 
 ---
 
