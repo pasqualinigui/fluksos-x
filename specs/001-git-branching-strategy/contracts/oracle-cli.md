@@ -54,7 +54,7 @@ contagem autoritativa é a da tabela de asserções da seção 4.
            evidencia: .env
               .venv/pyvenv.cfg
 
-Resultado: 25/26 assercoes aprovadas — 1 violacao (critica: 1)
+Resultado: 29/30 assercoes aprovadas — 1 violacao (critica: 1)
 ```
 
 **Regras de formatação**
@@ -77,6 +77,18 @@ são aplicáveis neste estágio e serão ativadas por itens posteriores.
 > deste contrato**: a spec define cada requisito sem decomposição, e aqui ele é
 > quebrado nas asserções mecanicamente verificáveis que o compõem.
 
+> **Fonte única de descrições.** Os identificadores e suas descrições vivem num
+> único mapa dentro do oráculo. `--list` imprime dele, e `FR-017` valida que todo
+> resultado emitido usa exatamente a descrição canônica. Sem isso, uma asserção
+> pode reprovar com texto genérico e a violação fica ilegível — defeito que
+> ocorreu de fato no portão vermelho deste item e escapou ao harness, sendo
+> detectado por leitura humana.
+
+> **Auto-verificação e recursão.** `FR-016` e `FR-021` executam o próprio oráculo
+> para observar códigos de saída e o comportamento sem repositório. A variável
+> `FKX_ORACLE_NESTED=1` marca a execução aninhada, que pula `FR-021` — sem essa
+> guarda a auto-verificação recursaria indefinidamente.
+
 ### Grupo A — Repositório e linhas de trabalho
 
 | ID | Asserção | Severidade se reprovada |
@@ -97,6 +109,7 @@ são aplicáveis neste estágio e serão ativadas por itens posteriores.
 | `FR-005` | Documento declara o formato com escopo opcional e marcação de incompatibilidade | média |
 | `FR-006` | Documento declara o formato de nome de linha de funcionalidade | média |
 | `FR-007` | Documento declara o papel de `main` e de `develop` | média |
+| `FR-006b` | **Conformidade**, não apenas documentação: toda linha de funcionalidade existente obedece ao formato | média |
 
 ### Grupo C — Higiene do histórico (Lei Zero)
 
@@ -156,6 +169,9 @@ são aplicáveis neste estágio e serão ativadas por itens posteriores.
 |---|---|---|
 | `FR-018` | Duas execuções consecutivas sobre o mesmo estado produzem saída idêntica | alta |
 | `FR-019` | Nenhuma ferramenta além do interpretador de shell e do Python da máquina é invocada | alta |
+| `FR-016` | Os três códigos de saída obedecem à semântica desta seção 2 | alta |
+| `FR-017` | Cada resultado emitido usa a **descrição canônica** do seu requisito | alta |
+| `FR-021` | Executado sem repositório, reprova de forma informativa em vez de erro abrupto | alta |
 | `FR-022` | Documento de decisões arquiteturais registra o mapa entre specs e itens do plano | média |
 
 ---

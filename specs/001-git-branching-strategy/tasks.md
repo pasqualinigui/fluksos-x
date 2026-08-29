@@ -181,8 +181,8 @@ a pesquisa empírica mostrou serem os pontos de falha reais.
 - [X] T023 🟢 **PORTÃO VERDE** — executar `scripts/verify/f0-001-foundation.sh`, confirmar código de saída `0` e todas as asserções aprovadas, e preservar a saída integral como artefato de evidência do verde, formando com T015 o par vermelho→verde exigido (SC-004, quickstart cenário 2)
 - [X] T024 Verificar determinismo de `scripts/verify/f0-001-foundation.sh` — duas execuções consecutivas sem alteração de estado produzem saída idêntica, e a execução conclui em menos de 5 segundos (SC-003, FR-018, quickstart cenário 3)
 - [X] T025 [P] Executar os cenários 4, 5, 6 e 7 do `quickstart.md` contra o repositório real — variantes de arquivo de ambiente invisíveis com o modelo visível, trava de dependências versionável, exclusão parcial de `.fluksos-x/` com o diretório-pai preservado, e habilidades do motor de especificação versionáveis com a configuração local excluída; remover os arquivos-isca ao final (SC-001, FR-008, FR-009, FR-012, FR-013, FR-023a, FR-023b)
-- [X] T026 [P] Executar o cenário 8 do `quickstart.md` em repositório descartável fora do projeto — registrar um arquivo de ambiente antes de existir regra, acrescentar as regras, e confirmar que `FR-020a` reprova com severidade crítica; um oráculo que aprove este cenário está errado ainda que aprove o repositório real (FR-020, D4)
-- [X] T027 Executar o cenário 9 do `quickstart.md` — confirmar as duas linhas de trabalho, o registro inicial conforme a gramática, a identidade em escopo local, e o escopo global da máquina sem qualquer entrada escrita por este item (FR-001, FR-002, FR-003)
+- [X] T026 [P] Executar o cenário 9 do `quickstart.md` em repositório descartável fora do projeto — registrar um arquivo de ambiente antes de existir regra, acrescentar as regras, e confirmar que `FR-020a` reprova com severidade crítica; um oráculo que aprove este cenário está errado ainda que aprove o repositório real (FR-020, D4)
+- [X] T027 Executar o cenário 10 do `quickstart.md` — confirmar as duas linhas de trabalho, o registro inicial conforme a gramática, a identidade em escopo local, e o escopo global da máquina sem qualquer entrada escrita por este item (FR-001, FR-002, FR-003)
 - [X] T028 Conferir a seção Contratos de `spec.md` item a item, confirmando que cada entrega declarada aos itens `003`, `005`, `006`, `007` e `012` está de fato disponível, e que as responsabilidades transferidas aos itens `002` (revalidação retroativa contra a constitution ratificada **e** consumo/retirada do material de referência transitório, ADR-004), `008`, `009` e ao pós-Fase 0 estão registradas por escrito (FR-022, SC-007)
 
 ---
@@ -265,3 +265,21 @@ mesmo que os 23 requisitos funcionais estejam satisfeitos.
 
 Concluído isto, o item segue para `/speckit-analyze` e depois
 `/speckit-converge`.
+
+---
+
+## Phase 8: Convergence
+
+Trabalho remanescente identificado por `/speckit-converge` após a execução de
+`/speckit-implement`. Os 23 FR e 7 SC estão **satisfeitos de fato** no estado
+atual do repositório; os itens abaixo são lacunas de **proteção contra
+regressão** — comportamento correto hoje, mas sem asserção que o mantenha.
+
+Ordenados por severidade. Nenhum é CRITICAL: a constitution é template não
+preenchido e a checagem constitucional foi pulada conforme o protocolo.
+
+- [X] T029 Acrescentar a `scripts/verify/f0-001-foundation.sh` asserção de **conformidade** de nome de linha de trabalho, reprovando qualquer `feature/*` que não obedeça a `feature/f<fase>-<pacote>-<funcionalidade>`, e registrar a nova asserção na tabela da seção 4 de `specs/001-git-branching-strategy/contracts/oracle-cli.md` per FR-006 / SC-005 (missing) — comprovado: uma linha `feature/constituicao-errada` passa hoje com código de saída `0`, e a responsabilidade não está transferida a nenhum item
+- [X] T030 Acrescentar a `scripts/verify/f0-001-foundation.sh` asserção verificando que **toda reprovação é identificada nominalmente** pelo requisito e acompanha descrição própria, e registrá-la no contrato per FR-017 (partial) — o defeito que ela previne de fato ocorreu no portão vermelho, quando `FR-004`–`FR-007` exibiam descrição genérica, e foi detectado por leitura humana em vez de por asserção
+- [X] T031 Acrescentar a `scripts/verify/f0-001-foundation.sh` asserção que execute o oráculo num diretório descartável **sem repositório** e confirme reprovação informativa em vez de erro abrupto, e registrá-la no contrato per FR-021 (partial) — com o repositório do projeto já criado, esta condição deixou de ser observável in situ
+- [X] T032 Acrescentar a `scripts/verify/f0-001-foundation.sh` asserção da semântica dos três códigos de saída — `0` conforme, `1` não conforme, `2` erro de uso, mais `--list` retornando `0` — e registrá-la no contrato per FR-016 (partial) — hoje verificada apenas manualmente durante a implementação
+- [X] T033 Sincronizar `specs/001-git-branching-strategy/plan.md` e `specs/001-git-branching-strategy/quickstart.md` com o que foi efetivamente construído: documentar a asserção `FR-012b` e a estratégia de duas camadas do Grupo C, e incluir `evidence/` na árvore de documentação da feature per plan: estrutura e SC-004 (partial) — a emenda `FR-012b` chegou ao oráculo e ao contrato, mas não aos três demais artefatos

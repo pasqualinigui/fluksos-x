@@ -6,6 +6,7 @@
 ✅ FR-005   convencoes declaram escopo opcional e marcacao de incompatibilidade
 ✅ FR-006   convencoes declaram formato de nome de linha de funcionalidade
 ✅ FR-007   convencoes declaram papeis de main e develop
+✅ FR-006b  linhas de funcionalidade obedecem ao formato de nome
 ✅ FR-008a  arquivo de ambiente base e excluido
 ✅ FR-008b  variantes de arquivo de ambiente sao excluidas
 ✅ FR-009   arquivo-modelo de ambiente permanece versionavel
@@ -23,7 +24,10 @@
 ✅ SC-002   todos os registros satisfazem a gramatica de convencao
 ✅ FR-018   oraculo nao contem construcao nao deterministica
 ✅ FR-019   oraculo nao invoca ferramenta fora do permitido
+✅ FR-016   codigos de saida obedecem a semantica do contrato
+✅ FR-021   oraculo reprova informativamente sem repositorio
 ✅ FR-022   registro de decisoes arquiteturais mapeia specs e itens do plano
+✅ FR-017   cada resultado usa a descricao canonica do seu requisito
 
-Resultado: 26/26 assercoes aprovadas — CONFORME
+Resultado: 30/30 assercoes aprovadas — CONFORME
 exit=0

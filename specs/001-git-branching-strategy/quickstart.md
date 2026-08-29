@@ -161,7 +161,26 @@ rm -f .claude/settings.local.json
 
 ---
 
-## Cenário 8 — O falso-negativo que o oráculo precisa detectar (FR-020)
+## Cenário 8 — Configuração da máquina não pode mascarar defeito (FR-012b)
+
+Verifica o **oráculo**, não a fundação. A camada 1 precisa ser hermética: se a
+configuração de exclusão da máquina participasse, um defeito no `.gitignore` do
+projeto seria aprovado pelo motivo errado.
+
+1. Criar uma exclusão global na máquina cobrindo `.env.local`.
+2. Remover `.env.*` do `.gitignore` do projeto, deixando apenas `.env`.
+3. Executar o oráculo.
+
+**Esperado**: `FR-008b` **reprova**, porque a camada 1 neutraliza
+`GIT_CONFIG_GLOBAL` e `GIT_CONFIG_SYSTEM` e avalia somente o `.gitignore` do
+projeto. Se `FR-008b` aprovar, a hermeticidade foi perdida — mesma classe de
+falso-positivo que E7 demonstrou.
+
+> Restaurar a exclusão global e o `.gitignore` ao estado original ao final.
+
+---
+
+## Cenário 9 — O falso-negativo que o oráculo precisa detectar (FR-020)
 
 Este cenário verifica o **oráculo**, não a fundação. Executar em cópia
 descartável, nunca no repositório do projeto.
@@ -179,7 +198,7 @@ aqui, a implementação está errada mesmo tendo aprovado.
 
 ---
 
-## Cenário 9 — Estado final do repositório
+## Cenário 10 — Estado final do repositório
 
 ```bash
 git branch --format='%(refname:short)'      # main, develop
@@ -202,8 +221,9 @@ item (FR-003).
 | 2 | Cenário 2 aprovando integralmente | SC-004 |
 | 3 | Cenário 3 sem diferenças, abaixo de 5 s | SC-003 |
 | 4 | Cenários 4, 5, 6 e 7 conforme o esperado | SC-001, FR-023 |
-| 5 | Cenário 8 detectando o arquivo já rastreado | FR-020 |
-| 6 | Cenário 9 com estado final íntegro e escopo global intacto | FR-001..FR-003 |
+| 5 | Cenário 8 mantendo a reprovação apesar da exclusão global | FR-012b |
+| 6 | Cenário 9 detectando o arquivo já rastreado | FR-020 |
+| 7 | Cenário 10 com estado final íntegro e escopo global intacto | FR-001..FR-003 |
 
-Atendidos os seis, o item está pronto para `/speckit-tasks` → implementação →
+Atendidos os sete, o item está pronto para `/speckit-tasks` → implementação →
 `/speckit-analyze` → `/speckit-converge`.

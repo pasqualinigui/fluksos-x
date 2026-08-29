@@ -38,7 +38,9 @@ pacotes está instalado mas **não é usado** neste item (é o item 003).
 **Storage**: Sistema de arquivos e banco de objetos do git. Sem base de dados.
 
 **Testing**: Oráculo em script, contrato de código de saída (`0` conforme,
-`1` não conforme, `2` erro de uso). Promovido a `pytest` no item 007 — o
+`1` não conforme, `2` erro de uso). As regras de exclusão são verificadas em duas
+camadas — sandbox hermético e repositório real —, que precisam concordar
+(`FR-012b`, decisão D10). Promovido a `pytest` no item 007 — o
 contrato de interface foi desenhado para tornar essa promoção mecânica.
 
 **Target Platform**: Linux (Ubuntu, kernel 7.0.0), git 2.55.0.
@@ -110,6 +112,9 @@ specs/001-git-branching-strategy/
 │   └── oracle-cli.md    # Phase 1 — contrato de interface do oráculo
 ├── checklists/
 │   └── requirements.md  # Concluído (/speckit-specify)
+├── evidence/            # Evidência do ciclo vermelho→verde (SC-004)
+│   ├── t015-red.txt     #   oráculo reprovando, antes da implementação
+│   └── t023-green.txt   #   oráculo aprovando, depois
 └── tasks.md             # Phase 2 (/speckit-tasks — NÃO criado aqui)
 ```
 
@@ -240,6 +245,7 @@ Criar `.gitignore` na raiz:
 | D7 | Convenção validada por expressão regular na stdlib | FR-004, FR-005, SC-002 |
 | D8 | Convenção normativa em `CONTRIBUTING.md`; constitution intocada | FR-004..FR-007 |
 | D9 | Artefatos de integração de agente versionados; configuração local excluída | FR-023 |
+| D10 | Grupo C verificado em **duas camadas** — sandbox hermético e repositório real, que precisam concordar (`FR-012b`) | FR-008..FR-013, FR-023 |
 
 ---
 
@@ -249,6 +255,7 @@ Criar `.gitignore` na raiz:
 |---|---|---|
 | Um item futuro acrescenta `*.lock` ao `.gitignore` e desfaz o controle de cadeia de suprimentos em silêncio | Alto — perda de hash-pinning sem aviso | Asserção **positiva** no oráculo (D3): a trava precisa ser comprovadamente versionável, não apenas não mencionada |
 | Oráculo construído sobre consulta às regras dá falso-negativo com segredo já no índice | Crítico — Lei Zero violada com o oráculo aprovando | D4: listagem do índice. Demonstrado empiricamente em E7 |
+| Configuração de exclusão da máquina mascara defeito no `.gitignore` do projeto | Crítico — asserção aprova pelo motivo errado, mesma classe de E7 | D10: camada 1 hermética (`GIT_CONFIG_GLOBAL` e `GIT_CONFIG_SYSTEM` neutralizados) e `FR-012b` reprovando divergência entre camadas |
 | Variante de arquivo de ambiente escapa da exclusão | Crítico — segredo permanente no histórico | D1, verificado em E5 sobre 5 variantes |
 | Registro inicial criado antes das exclusões | Crítico — irreversível | Fase B precede a Fase D por construção |
 | Fase C pulada, perdendo a prova de test-first | Médio — SC-004 falha silenciosamente | Fase C produz artefato de evidência; sua ausência é detectável |
