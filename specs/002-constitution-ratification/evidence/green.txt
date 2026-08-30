@@ -1,0 +1,36 @@
+✅ FR-001   governanca sem campo de preenchimento remanescente
+✅ FR-002   governanca versionada e ratificacao inaugural e 1.0.0
+✅ FR-003   datas da governanca em formato ISO
+✅ FR-004   dez principios em numeracao romana continua I a X
+✅ FR-005a  cada principio contem verbo normativo
+✅ FR-005b  cada principio declara criterio de violacao
+✅ FR-006   cada principio declara origem
+✅ FR-007   governanca declara emenda versionamento e revisao
+✅ FR-008   registro de impacto presente em ocorrencia unica
+✅ FR-015   governanca declara o ciclo canonico com clarificacao
+✅ FR-009   orientacao existe no local convencional do formato aberto
+✅ FR-010a  porta de entrada contem identidade operacao e ponteiros
+✅ FR-010b  porta de entrada nao reproduz principios nem plano
+✅ FR-011   arquivo do construtor contem a diretiva de importacao
+✅ FR-012   porta de entrada nao duplica prosa entre seus arquivos
+✅ FR-013   arquivo do construtor e regular e nao link simbolico
+✅ FR-014   porta de entrada respeita o orcamento de tamanho
+✅ FR-016a  documento de contribuicao declara o ciclo atualizado
+✅ FR-016b  nenhum documento normativo mantem o ciclo anterior
+✅ FR-017a  veredito retroativo nomeia os 16 artefatos do item 001
+✅ FR-017b  nenhuma nao conformidade retroativa pendente de decisao
+✅ FR-018   derivacao do material transitorio registrada e transcrita
+✅ FR-019a  material de referencia transitorio nao existe mais
+✅ FR-019b  nenhuma regra de exclusao referencia o material transitorio
+✅ SC-008   toda exclusao marcada como transitoria tem alvo existente
+✅ FR-020a  codigos de saida obedecem a semantica do contrato
+✅ FR-020b  parametros --quiet e --list obedecem ao contrato
+✅ FR-020c  duas execucoes produzem saida identica
+✅ FR-021a  oraculo do item anterior permanece integro
+✅ FR-021b  oraculo do item anterior continua aprovando
+✅ FR-022   evidencias vermelha e verde existem e diferem
+✅ FR-023   spec declara contratos entregues e transferidos
+✅ SC-006   oraculo conclui em menos de 5 segundos
+
+Resultado: 33/33 assercoes aprovadas — CONFORME
+exit=0

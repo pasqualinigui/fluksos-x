@@ -178,8 +178,15 @@ ferramentas ainda não existem neste ponto do bootstrap.
 Todo trabalho no motor segue o ciclo determinístico, sem atalho:
 
 ```
-RESEARCH → SPEC → PLAN → TASKS → ANALYZE → TESTS (vermelho) → IMPLEMENT (verde) → CONVERGE
+RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS 🔴 → IMPLEMENT 🟢 → CONVERGE
 ```
+
+> A etapa **CLARIFY** entrou no ciclo a partir do item `002`. Ela existe para
+> fechar ambiguidade **antes** de o planejamento derivar tarefas dela: uma decisão
+> tomada por omissão no plano já nasceu embutida em código, e desfazê-la custa o
+> ciclo inteiro. Na sua estreia ela pegou um limiar de desempenho que havia sido
+> inventado sem fonte — exatamente o tipo de defeito que passa despercebido por
+> parecer preciso.
 
 Regras que sustentam o ciclo:
 
@@ -190,3 +197,11 @@ Regras que sustentam o ciclo:
    conferida contra o registro oficial e a evidência fica em
    `docs/plan/research/`.
 4. **O harness é o oráculo.** Sem saída `0`, não convergiu.
+5. **A spec é insumo do planejamento, nunca sua saída.** Achado descoberto no
+   plano volta à etapa de análise, que o formaliza. Um plano que corrige a spec
+   sozinho faz o defeito desaparecer sem rastro, e a spec passa a concordar com o
+   plano por construção.
+
+> A partir do item `002` a governança em `.specify/memory/constitution.md` está
+> ratificada: as etapas de planejamento e análise julgam contra ela, e violação de
+> princípio é falha **crítica automática**.
