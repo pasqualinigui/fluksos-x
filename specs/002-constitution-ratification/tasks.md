@@ -204,11 +204,11 @@ isoladamente e destrói a única oportunidade de consulta que `FR-018` exige.
 **Purpose**: fechar o ciclo vermelho→verde, provar determinismo e executar o que a
 máquina não decide.
 
-- [ ] T035 🟢 Executar `scripts/verify/f0-002-constitution.sh` e preservar a saída íntegra em `specs/002-constitution-ratification/evidence/green.txt`. Esperado `exit=0` com **33/33** asserções aprovadas (SC-005, FR-022)
-- [ ] T036 Executar o cenário 9 de `quickstart.md`: duas execuções consecutivas produzindo saída **idêntica** e `git status` sem nenhuma alteração provocada pelas execuções — um oráculo que altera o estado que mede não é oráculo (FR-020c)
-- [ ] T037 [P] Executar o cenário 8 de `quickstart.md`: harness acumulado `f0-001` e `f0-002`, ambos `exit=0`, **cada um** abaixo de 5 s. A execução conjunta é a soma; não há teto agregado nesta fase — a decisão foi transferida ao item 008 (SC-006)
-- [ ] T038 [P] Executar os cenários **3 e 6** de `quickstart.md` — os dois que a máquina não decide: dez vereditos de decidibilidade emitidos sem discutir o que o princípio quis dizer (SC-002), e sessão nova do agente construtor carregando a orientação sem ação manual (SC-004)
-- [ ] T039 Registrar o ciclo em commits obedecendo à convenção do próprio item 001 (`CONTRIBUTING.md` §1), separando o vermelho do verde para que o par fique auditável no histórico (`FR-022`, `SC-005`)
+- [X] T035 🟢 Executar `scripts/verify/f0-002-constitution.sh` e preservar a saída íntegra em `specs/002-constitution-ratification/evidence/green.txt`. Esperado `exit=0` com **33/33** asserções aprovadas (SC-005, FR-022)
+- [X] T036 Executar o cenário 9 de `quickstart.md`: duas execuções consecutivas produzindo saída **idêntica** e `git status` sem nenhuma alteração provocada pelas execuções — um oráculo que altera o estado que mede não é oráculo (FR-020c)
+- [X] T037 [P] Executar o cenário 8 de `quickstart.md`: harness acumulado `f0-001` e `f0-002`, ambos `exit=0`, **cada um** abaixo de 5 s. A execução conjunta é a soma; não há teto agregado nesta fase — a decisão foi transferida ao item 008 (SC-006)
+- [X] T038 [P] Executar os cenários **3 e 6** de `quickstart.md` — os dois que a máquina não decide: dez vereditos de decidibilidade emitidos sem discutir o que o princípio quis dizer (SC-002), e sessão nova do agente construtor carregando a orientação sem ação manual (SC-004)
+- [X] T039 Registrar o ciclo em commits obedecendo à convenção do próprio item 001 (`CONTRIBUTING.md` §1), separando o vermelho do verde para que o par fique auditável no histórico (`FR-022`, `SC-005`)
 
 ---
 
