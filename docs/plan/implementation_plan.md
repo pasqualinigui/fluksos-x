@@ -857,10 +857,14 @@ fluksos-x/
 | 0.15 | **Automação de release** — `python-semantic-release`, CHANGELOG, tag, build, publicação no PyPI via **trusted publishing (OIDC)**, SBOM anexado ao release | ✅ | Trusted publishing, ambientes protegidos, `cyclonedx-py`, versionamento a partir de Conventional Commits |
 | 0.16 | **Atualização automática de dependências** — Renovate ou Dependabot, com agrupamento e harness verde obrigatório no merge | ✅ | Agrupamento de atualizações, política de automerge, interação com o lockfile |
 
-**Ordem de execução acordada** (ver ADR-009): `0.13` é executado **imediatamente
-após** o item `0.11`, antes de todos os demais. Os outros três seguem a ordem de
-dependência: `0.14` depois de `0.5`, `0.15` depois de `0.14`, `0.16` depois de
-`0.15`.
+**Ordem de execução acordada** (ver **ADR-011**, que fixa o mapa vigente de 16
+posições): `0.13` é executado **imediatamente após** o item `0.11`, antes de todos
+os demais. Os outros três seguem a ordem de dependência:
+
+- `0.14` depois de `0.5` — precisa das ferramentas de qualidade existindo;
+- `0.15` depois de `0.14` **e de `0.7`** — não se publica no PyPI um pacote que
+  ainda não existe;
+- `0.16` depois de `0.15` — precisa do pipeline completo para validar o que entra.
 
 **Razão da inserção antecipada de `0.13`**: o harness cresce por acréscimo desde o
 item `001`, e a integração contínua precisa crescer junto. Um CI que só chega no

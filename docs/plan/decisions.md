@@ -45,14 +45,15 @@ mapa é a fonte de verdade da correspondência.
 | `006` | **0.3** | MyPy strict | Consome contrato do Ruff: regras que conflitam com tipagem estrita |
 | `007` | **0.12** | pip-audit + Trivy | Precisa existir antes de ser orquestrado |
 | `008` | **0.5** | Lefthook | Orquestra 005, 006, 004 e 007 — só faz sentido depois deles |
-| `013` | **0.13** | CI mínimo | **Executado logo após o `002`** — depende só de shell, git e Python. Ver ADR-009 |
-| `014` | **0.14** | CI completo + branch protection | Depois do `008`: precisa das ferramentas existindo |
-| `015` | **0.15** | Automação de release | Depois do `014`: release exige pipeline verde |
-| `016` | **0.16** | Atualização de dependências | Depois do `015`: precisa do pipeline completo para validar o que entra |
 | `009` | **0.6** | `packages/core` | Primeiro código de produção |
 | `010` | **0.7** | `packages/cli` | Depende de `core` |
 | `011` | **0.8** | docker-compose | Domínio independente (DevOps) |
 | `012` | **0.10** | `docs/tree.md` | Por último: reflete a árvore real resultante |
+
+> ⚠️ **Este mapa foi emendado.** A **ADR-011** o substitui: a Emenda 1 do plano
+> (ADR-009) acrescentou quatro itens à Fase 0, e a inserção deles altera as
+> posições de execução. A tabela acima permanece como registro do estado original
+> de 12 itens; **a fonte de verdade vigente é a ADR-011**.
 
 ### Consequências
 
@@ -381,7 +382,11 @@ As três saídas possíveis colidiam entre si:
 ratificação da governança — é o único dos doze nessa condição, e a ADR-003 já
 registrara essa dívida. A não conformidade é reconhecida, não perdoada.
 
-**2. A cobertura das três lacunas é transferida ao item `004` (0.4 — Pytest).**
+**2. A cobertura das três lacunas é transferida ao item `0.4` do plano — Pytest.**
+
+> **Nota de numeração (ADR-011)**: à época esta ADR chamou o destinatário de
+> "item `004`". Com a renumeração, Pytest passa a ser a spec **`005`**. O item do
+> plano (`0.4`) não mudou e a transferência segue apontando para o mesmo trabalho.
 
 O item `004` já tem, por desenho anterior a este achado, a tarefa de promover cada
 `f0-NNN-*.sh` a módulo de teste equivalente — é a razão de `--list` existir. As
@@ -594,9 +599,13 @@ execução do pipeline que precisa validar dez itens de uma vez.
 O CI mínimo é executável **agora**: depende apenas de shell, git e Python, que já
 existem. É a mesma restrição de dependências dos oráculos `001`–`003`.
 
-**3. Numeração das specs**: `013` a `016`, seguindo a ADR-001. A ordem de execução
-diverge da numeração — como já ocorre desde o item `001` —, e a divergência está
-declarada aqui e no plano.
+**3. Numeração das specs**: ver **ADR-011**.
+
+> ⚠️ **Correção.** Esta ADR atribuiu inicialmente os números de spec `013`–`016`
+> aos quatro itens novos, seguindo a numeração **do plano**. Isso contradiz o
+> invariante da ADR-001, onde o número da spec é a **posição de execução** — e a
+> própria ADR dizia que `0.13` executaria em terceiro. A ADR-011 corrige o mapa e
+> passa a ser a fonte de verdade. Erro apontado pelo mantenedor.
 
 ### Consequência para o método
 
@@ -674,3 +683,88 @@ custa seis asserções e dois arquivos; adiar custa uma dívida permanente.
 O ciclo vermelho→verde do item `002` **não é refeito**: nenhuma asserção nova é
 acrescentada e nenhum requisito muda. É refatoração de rótulo sobre verde
 existente, e o verde é reconfirmado ao final.
+
+---
+
+## ADR-011 — Emenda da ADR-001: mapa de execução com 16 itens
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+**Emenda**: ADR-001 · **Motivo**: Emenda 1 do plano (ADR-009)
+
+### Problema
+
+A ADR-001 fixou um invariante: **o número da spec é a posição de execução**, não o
+número do item no plano. Foi por isso que a spec `001` é o item `0.9` e a `003` é
+o item `0.1`.
+
+A ADR-009 acrescentou quatro itens à Fase 0 e atribuiu a eles os números `013` a
+`016` **pela ordem no plano**, não pela ordem de execução — dizendo ao mesmo tempo
+que o `013` seria executado em terceiro. As duas afirmações se contradizem, e a
+tabela resultante ficava com `013–016` inseridos entre `008` e `009`.
+
+**Segundo defeito, encontrado junto**: a ADR-009 colocou a automação de release
+(`0.15`) logo depois do CI completo (`0.14`). Mas publicar no PyPI exige que o
+pacote exista — `0.15` depende de `0.7` (`packages/cli`), não apenas de `0.14`.
+
+### Decisão
+
+O invariante da ADR-001 é **mantido**: número da spec = posição de execução. O mapa
+é renumerado para acomodar os quatro itens novos.
+
+| Spec | Item do plano | Título | Justificativa da posição |
+|---|---|---|---|
+| `001` | **0.9** | Git + branching strategy | ✅ concluída |
+| `002` | **0.11** | Constitution + porta de entrada | ✅ concluída |
+| `003` | **0.13** | **CI mínimo** | Depende só de shell, git e Python, que já existem. A integração contínua cresce junto com o harness — chegando no fim, dez itens seriam construídos sem rede |
+| `004` | **0.1** | UV workspace monorepo | Base física de todos os pacotes |
+| `005` | **0.4** | Pytest | Habilita TDD real dos itens seguintes; precede Ruff |
+| `006` | **0.2** | Ruff | |
+| `007` | **0.3** | MyPy strict | Consome contrato do Ruff: regras que conflitam com tipagem estrita |
+| `008` | **0.12** | pip-audit + Trivy | Precisa existir antes de ser orquestrado |
+| `009` | **0.5** | Lefthook | Orquestra 005, 006, 007 e 008 |
+| `010` | **0.14** | **CI completo + branch protection** | Precisa das ferramentas existindo. Traz os *required checks* que tornam `--no-verify` inócuo |
+| `011` | **0.6** | `packages/core` | Primeiro código de produção |
+| `012` | **0.7** | `packages/cli` | Depende de `core` |
+| `013` | **0.15** | **Automação de release** | **Depende de `012`**: não se publica um pacote que não existe. E de `010`: release exige pipeline verde |
+| `014` | **0.16** | **Atualização de dependências** | Depois de `013`: precisa do pipeline completo para validar o que entra |
+| `015` | **0.8** | docker-compose | Domínio independente (DevOps) |
+| `016` | **0.10** | `docs/tree.md` | Por último: reflete a árvore real resultante |
+
+### Consequências
+
+- **Nenhuma renomeação de diretório.** Só existem `specs/001-*` e `specs/002-*`,
+  ambas concluídas e com número inalterado. Os demais ainda não foram criados —
+  a renumeração é gratuita **hoje** e cara em qualquer momento posterior.
+- A Fase 0 passa de 12 para **16 itens**. O `progresso` passa a ser medido sobre 16.
+- A próxima spec é a **`003` — CI mínimo**, não mais o UV workspace.
+- Referências cruzadas já escritas nas specs `001` e `002` apontam para itens do
+  plano (`0.4`, `0.5`, `0.12`) e para números de spec. **Os números de spec citados
+  precisam ser relidos por este mapa** — em especial a transferência do item `002`
+  ao "item 004 (Pytest)", que passa a ser a spec **`005`**.
+
+### Correção de rastreabilidade decorrente
+
+A ADR-007 transferiu cinco casos de teste ao "item `004` (0.4 — Pytest)". Com a
+renumeração, **Pytest passa a ser a spec `005`**. O item do plano (`0.4`) não muda.
+A transferência segue válida e apontando para o mesmo trabalho; o que muda é o
+número da spec que a receberá.
+
+Onde o texto disser "item 004" no contexto da dívida do harness, leia-se
+**"item 0.4 do plano, spec `005`"**. As correções de texto estão aplicadas em
+`docs/plan/decisions.md` (ADR-007) e em
+`specs/002-constitution-ratification/spec.md` › Contratos.
+
+### Lição de método registrada
+
+Dois defeitos numa única ADR, ambos de **ordem**, ambos passando por revisão minha
+sem serem notados — e o primeiro foi apontado pelo mantenedor, não pelo processo.
+
+A causa é a mesma nos dois: a ADR-009 raciocinou sobre *"onde isto entra no plano"*
+e não sobre *"o que precisa existir antes disto funcionar"*. São perguntas
+diferentes, e só a segunda produz ordem executável. Foi exatamente o defeito que a
+ADR-001 corrigiu no `§17` original do plano — e que reapareceu ao estender esse
+mesmo plano.
+
+**Nenhum oráculo cobre ordem de execução entre specs.** É candidato a asserção do
+item `003` (CI mínimo): o mapa da ADR vigente é a única fonte, e hoje nada verifica
+se ele é coerente — se cada posição vem depois de tudo de que depende.
