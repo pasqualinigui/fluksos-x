@@ -153,6 +153,8 @@ Prova que o portão remoto reproduz o veredito local — requer GitHub.
 3. **Re-run** do mesmo commit no GitHub (botão Re-run) → mesma saída (determinismo).
 
 > Este cenário não é simulável localmente com `act` sem perder fidelidade (runner `ubuntu-24.04` + `fetch-depth: 0` + `contents: read`); a evidência é a execução remota observada após merge. Registrá-la como comentário/PR é a prova de SC-002.
+>
+> **T031 — Deferido pós-merge**: `push` conforme verde + PR com violação vermelho + re-run idêntico só são observáveis após `push`/`PR` real em `main`/`develop` no GitHub. Não bloqueia convergência local; é o único SC que exige GitHub. Convergência local = Cenários 1–5 `PASS` + `green.txt` 14/14.
 
 ---
 
