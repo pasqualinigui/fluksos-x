@@ -373,6 +373,12 @@ fkx interview --export json   # Exporta para JSON (uso programático)
 | 9 | **Deploy target?** Cloud, self-hosted, edge, mobile | Infraestrutura |
 | 10 | **Behavioral Rules?** Como o sistema deve "agir"? | Tom, lógica de negócio |
 
+> **Estas dez não são um formulário** (ADR-013). São as **sementes da árvore de
+> decisão**, distribuídas em rodadas conforme as dependências entre elas: a
+> resposta da 6 (*stack*) muda o que faz sentido perguntar na 7 (*integrações*) e
+> na 9 (*deploy target*). Perguntadas em bloco, ou o usuário responde no vácuo, ou
+> o motor reinterpreta respostas dadas sob premissas que mudaram depois.
+
 **Output:** Gera um arquivo `discovery.json` + `discovery.md` na pasta `.fluksos-x/` que alimenta a **Constitution** e as **Specs** subsequentes.
 
 **Integração no ciclo determinístico:**
@@ -919,7 +925,7 @@ O CI mínimo depende apenas de shell, git e Python, que já existem.
 | # | Item | Pesquisa Prévia |
 |---|------|----------------|
 | 4.1 | Todos os comandos CLI finalizados | Typer subcommand patterns |
-| 4.2 | `fkx interview` (Discovery Interview) | Interview UX patterns |
+| 4.2 | `fkx interview` (Discovery Interview) — **rodadas por fronteira, ver ADR-013** | Algoritmo de fronteira sobre árvore de decisão; taxonomia fixa de cobertura; formato do PRD de saída |
 | 4.3 | TUI interativo (Textual) | Textual CSS, screens, widgets |
 | 4.4 | Sistema de temas | TOML theme format, Rich/Textual theming |
 | 4.5 | `fkx doctor` | System checks, dependency verification |

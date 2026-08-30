@@ -845,3 +845,92 @@ exatamente o que o princípio **IV** proíbe.
 - O ciclo do motor e o ciclo do bootstrap ficam **idênticos no núcleo SDD**, com o
   ciclo do motor acrescentando as etapas que só fazem sentido com agentes
   (`HARNESS`, `QA`, `DEVOPS`, `COMMIT`) e a entrevista inicial.
+
+---
+
+## ADR-013 — Algoritmo de fronteira para o `fkx interview`
+
+**Data**: 2026-08-30 · **Destino**: item **4.2** do plano · **Estado**: aceita
+**Fonte externa**: `mattpocock/skills`, skill `grilling` — MIT, verificada em 2026-08-30
+
+### Contexto
+
+O item `4.2` (`fkx interview`) é a etapa de descoberta que abre o ciclo do motor
+para qualquer projeto que ele construa. O plano a define como **dez perguntas**
+(`§` da entrevista), feitas de uma vez.
+
+Perguntar as dez juntas tem um defeito concreto: a resposta da pergunta 6
+(*stack preferida, ou o motor decide?*) **muda o que faz sentido perguntar** na 7
+(*integrações externas*) e na 9 (*deploy target*). Perguntadas em bloco, ou o
+usuário responde no vácuo, ou o motor precisa reinterpretar respostas dadas sob
+premissas que mudaram depois.
+
+### Fonte verificada
+
+Repositório `mattpocock/skills`, licença MIT. Estrutura real conferida por
+download direto, não por memória:
+
+| Arquivo | Tamanho | Papel |
+|---|---|---|
+| `skills/productivity/grill-me/SKILL.md` | 157 B | Apenas delega — invoca a primitiva |
+| `skills/productivity/grilling/SKILL.md` | 1987 B | **A primitiva**, reutilizada por 5 skills do repositório |
+| `skills/engineering/grill-with-docs/SKILL.md` | 247 B | Compõe `grilling` + `domain-modeling` |
+
+### O que é adotado
+
+**1. Rodadas por fronteira.** A *fronteira* é o conjunto de decisões cujos
+pré-requisitos já estão resolvidos — as perguntas respondíveis **agora** sem
+supor respostas ainda não ouvidas. Pergunta-se a fronteira inteira numa rodada,
+cada item numerado e com recomendação. As respostas reformam a árvore e empurram
+a fronteira. Uma pergunta cuja resposta depende de outra ainda aberta pertence a
+uma rodada **posterior**.
+
+**2. Separação de responsabilidade, normativa.** Encontrar **fato** é trabalho do
+motor: se a pergunta depende do ambiente, o motor vai olhar em vez de perguntar.
+**Decisão** é do mantenedor: apresentar e esperar.
+
+Isto coincide com o princípio **VIII** (*pesquisa é verificação, não memória*) e
+com `FR-017b` do item `002` (*o mantenedor é a autoridade de decisão*). A
+coincidência é a razão de a adoção ser barata: não introduz regra nova, dá forma
+executável a duas que já existem.
+
+**3. Critério de parada mecânico.** A sessão termina quando a fronteira esvazia —
+e não numa cota de perguntas. Isto **corrige um defeito do nosso próprio ciclo**:
+`speckit-clarify` para em "até 5 perguntas", que é número sem fundamento — a mesma
+classe do `SC-006` com "10 segundos" que o próprio `CLARIFY` pegou no item `002`.
+
+### O que **não** é adotado, e por quê
+
+| Não adotado | Motivo |
+|---|---|
+| O arquivo da skill | Depende do `Skill` tool e de sub-agentes do Claude Code. O `fkx interview` é código Python que roda sob qualquer agente. Copiar traria acoplamento sem trazer valor — o valor está no algoritmo, reimplementável em poucas dezenas de linhas |
+| Terminação **apenas** por fronteira vazia | A árvore é construída pelo modelo: duas execuções sobre a mesma entrada geram árvores diferentes, e a fronteira pode não convergir. Viola o princípio **I** |
+| Ausência de artefato | A primitiva termina em "entendimento compartilhado". Nosso ciclo exige artefato versionado em toda etapa: sem PRD em disco, o harness não tem o que asserir e a sessão seguinte recomeça do zero |
+
+### Desenho resultante do item 4.2
+
+| Componente | Origem |
+|---|---|
+| Rodadas por fronteira; pergunta numerada com recomendação | `grilling` (MIT, atribuído) |
+| **Taxonomia fixa de categorias**, varrida em toda sessão | `speckit-clarify`, que já usa 10 categorias — é a garantia de auditoria que a árvore sozinha não dá |
+| Saída em **PRD versionado**, com todas as perguntas e respostas registradas | Ciclo do motor: toda etapa produz artefato |
+| **Parada**: fronteira vazia **E** toda categoria resolvida ou deferida | As duas condições, nunca uma. A fronteira garante ordem; a taxonomia garante cobertura |
+
+As dez perguntas já redigidas no plano permanecem — deixam de ser um formulário e
+passam a ser **as sementes da árvore**, distribuídas por rodadas conforme as
+dependências entre elas.
+
+### Nota sobre a fonte
+
+O README do repositório posiciona-se explicitamente contra o Spec-Kit, dizendo que
+abordagens assim *"assumem o processo e tiram seu controle"*. Este projeto escolheu
+o Spec-Kit deliberadamente. A discordância é legítima e **ortogonal**: `grilling` é
+mecanismo de entrevista, usável independentemente da filosofia de processo em volta.
+
+Registrado para que a adoção não seja lida como adesão à crítica.
+
+### Atribuição
+
+Algoritmo derivado da skill `grilling` de Matt Pocock (`mattpocock/skills`),
+licença MIT, Copyright (c) 2026 Matt Pocock. Reimplementado, não copiado. A
+atribuição acompanha o código do item `4.2`.
