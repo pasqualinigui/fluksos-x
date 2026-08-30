@@ -389,13 +389,45 @@ três asserções faltantes entram **como casos de teste novos**, em arquivo nov
 | `SC-003` determinismo empírico | caso que executa duas vezes e compara a saída byte a byte |
 | `SC-004` par vermelho→verde | caso que exige `evidence/t015-red.txt` e `t023-green.txt` presentes e distintos |
 | `SC-007` contratos declarados | caso que exige a seção Contratos da spec do item `001` |
+| **`FR-001` mede HEAD, não a linha principal** *(achado posterior, ver abaixo)* | caso que exija a **existência** de `refs/heads/main`, permitindo trabalho em linha de funcionalidade |
 
 **3. `scripts/verify/f0-001-foundation.sh` permanece intocado.** É isto que torna
 a saída C compatível com a ADR-002: a cobertura é acrescentada **ao lado**, nunca
 dentro. O resumo `63412ca7…5a6bbf22` continua válido e asserido.
 
 **4. A exceção expira quando o item `004` convergir.** Não é indefinida. Se o item
-`004` convergir sem cobrir as quatro lacunas, o achado reabre.
+`004` convergir sem cobrir as lacunas, o achado reabre.
+
+### Achado posterior — quinta lacuna, mesma classe
+
+Ainda na Fase 9 do item `002`, ao registrar os commits numa linha de
+funcionalidade, `FR-001` do item `001` reprovou:
+
+```
+🔴 FR-001  repositorio existe e linha principal e main
+           evidencia: linha atual: feature/f0-constitution-ratification
+```
+
+**A asserção mede a linha apontada por HEAD, não a existência da linha
+principal.** Enunciado e implementação divergem: *"a linha principal é `main`"* é
+propriedade do repositório; *"estou em `main` agora"* é propriedade da sessão de
+trabalho. `refs/heads/main` existia o tempo todo.
+
+A consequência é concreta: **o harness reprova em qualquer linha de
+funcionalidade** — exatamente o fluxo que o `CONTRIBUTING.md` §2 deste projeto
+prescreve. Um item futuro que siga a convenção de ramificação documentada não
+consegue rodar o harness até integrar.
+
+Mesma classe das outras quatro, mesma resolução: **transferida ao item `004`**
+como caso de teste novo, sem tocar em `f0-001-foundation.sh`. Até lá, o registro
+de commits do bootstrap permanece em `main` — que é o que o item `001` de fato
+fez, verificável em `git log`.
+
+**Nota de método**: as quatro primeiras lacunas vieram de comparação sistemática
+entre critérios e asserções. Esta veio de **usar** o harness num fluxo que ele
+nunca tinha visto. As duas formas de achado são necessárias e nenhuma substitui a
+outra — a primeira encontra o que foi esquecido, a segunda encontra o que foi
+entendido errado.
 
 ### Por que C e não A
 
@@ -407,10 +439,11 @@ quando a correção é legítima.
 
 ### Consequências
 
-- O princípio VI permanece íntegro e já provou seu valor: encontrou uma lacuna
-  real que a revisão humana do item `001` não pegou.
+- O princípio VI permanece íntegro e já provou seu valor: encontrou **cinco**
+  lacunas reais que a revisão humana do item `001` não pegou — quatro por
+  comparação sistemática, uma pelo uso.
 - A ADR-002 permanece íntegra e mecanicamente verificável.
-- O item `004` herda quatro casos de teste nomeados, com origem registrada.
+- O item `004` herda **cinco** casos de teste nomeados, com origem registrada.
 - Fica estabelecido o **primeiro precedente** do motor para conflito entre
   governança e trabalho já convergido: reconhecer, registrar, transferir a item
   nomeado com prazo — nunca reescrever o passado nem enfraquecer a regra.
