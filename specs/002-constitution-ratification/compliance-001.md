@@ -246,12 +246,39 @@ um script não observa o contexto carregado por outro processo (research E6).
 `FR-011` verde assere que a diretiva `@AGENTS.md` está no lugar documentado pelo
 fornecedor — o mecanismo, nunca o efeito.
 
-> **Registro a preencher pelo mantenedor** (T042)
->
-> Procedimento: abrir sessão nova do agente construtor na raiz do projeto e
-> perguntar algo que só a porta de entrada responde — por exemplo, qual é a etapa
-> do ciclo canônico entre especificação e planejamento (resposta esperada:
-> **CLARIFY**).
->
-> **Resultado observado**:
-> **Data**:
+### Registro do mantenedor (T042) — ✅ APROVADO
+
+**Procedimento executado**: sessão nova do agente construtor na raiz do projeto,
+pergunta *"qual é a etapa do ciclo canônico entre especificação e planejamento?"*
+
+**Resultado observado**: resposta correta — **CLARIFY**. O agente citou
+`AGENTS.md` **pelo nome**, reproduziu a sequência canônica completa
+`RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS 🔴 → IMPLEMENT 🟢 → CONVERGE`
+e explicou o propósito da etapa — *"fechar ambiguidades antes de o planejamento
+derivar tarefas dela"*. Nenhuma ação manual de carregamento foi necessária.
+
+**Data**: 2026-08-30 · **Executado por**: mantenedor
+
+### O que este resultado prova, e o que não prova
+
+**Prova** o efeito que `FR-011` não alcança: a orientação foi carregada
+automaticamente ao início da sessão. `SC-004` satisfeito.
+
+**Prova também a cadeia de importação de C4.** O agente construtor lê `CLAUDE.md`,
+não o arquivo do formato aberto — e ainda assim atribuiu o conteúdo ao
+`AGENTS.md`. A diretiva `@AGENTS.md` fez o trabalho: fonte única, sem duplicação,
+e o agente enxerga a fonte, não o importador. Era exatamente esta a razão de o
+link simbólico ter sido rejeitado em C5.
+
+**Não prova** que o comportamento se mantém se a documentação do fornecedor mudar.
+Se algum dia `FR-011` ficar verde e este cenário falhar, o defeito estará na
+asserção mecânica — que precisará ser revista, nunca contornada.
+
+## Estado final da revalidação retroativa
+
+| Critério | Estado |
+|---|---|
+| `SC-007` — 16/16 artefatos com veredito | ✅ |
+| `SC-002` — dez princípios decidíveis (cenário 3) | ✅ 9 de 10 sem interpretação; princípio VII encaminhado por ADR-008 |
+| `SC-004` — carregamento automático (cenário 6) | ✅ verificado pelo mantenedor |
+| Não conformidade encontrada | 1, decidida pela saída C (ADR-007) |
