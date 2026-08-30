@@ -28,7 +28,7 @@ Um arquivo por item, nomeado pela posição na ordem de execução:
 scripts/verify/
 ├── README.md                  # este arquivo
 ├── f0-001-foundation.sh       # item 001 (0.9) — git, exclusões, convenções
-├── f0-002-constitution.sh     # item 002 (0.11) — a criar
+├── f0-002-constitution.sh     # item 002 (0.11) — governança, porta de entrada
 ├── f0-003-uv-workspace.sh     # item 003 (0.1)  — a criar
 └── ...                        # até f0-012
 ```
@@ -90,6 +90,33 @@ for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done
 # enumerar asserções sem executar
 scripts/verify/f0-001-foundation.sh --list
 ```
+
+## O que cada oráculo verifica
+
+| Oráculo | Asserções | Cobre |
+|---|---|---|
+| `f0-001-foundation.sh` | 30 | repositório e linhas de trabalho, convenções de registro, higiene do histórico (Lei Zero, duas camadas), estado do índice |
+| `f0-002-constitution.sh` | 33 | governança ratificada (10 princípios com critério de violação e origem), porta de entrada e seu orçamento, ciclo canônico, obrigações herdadas do item 001, **integridade do oráculo anterior** |
+
+### Integridade por resumo criptográfico (item 002, ADR-006)
+
+A regra 1 acima — *um item nunca modifica o oráculo de um item anterior* — deixou
+de ser acordo verificado por leitura de diff. A partir do item `002`, cada item
+**fixa o resumo SHA-256** do oráculo anterior e o assere:
+
+```
+FR-021a  integridade  — o resumo de f0-001-foundation.sh bate com o valor fixado
+FR-021b  aprovação    — f0-001-foundation.sh --quiet sai com 0
+```
+
+São duas perguntas distintas. Executar o oráculo anterior e obter `0` prova que
+ele **aprova**, não que está **íntegro**: um item futuro poderia trocar uma
+asserção real por uma tautologia e continuar saindo `0`. Nenhuma execução
+detectaria.
+
+**Divergência de resumo sobe para decisão explícita, nunca para atualização do
+valor fixado.** Atualizar o número para fazer a asserção passar é a forma exata de
+derrotá-la.
 
 ## Promoção a pytest (item 004)
 

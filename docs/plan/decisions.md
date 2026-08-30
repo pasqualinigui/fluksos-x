@@ -219,3 +219,198 @@ Excluir até estar preenchida. Rejeitada porque produziria um histórico onde o
 portão constitucional aparece já satisfeito, apagando o registro de que os itens
 `001` e `002` operaram sob um portão substituto — que é exatamente a dívida que a
 ADR-003 e o contrato com o item `002` existem para tornar visível.
+
+---
+
+## ADR-006 — Integridade do harness por resumo criptográfico e convenção de exclusão transitória
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+
+### Contexto
+
+A ADR-002 estabeleceu que **um item nunca modifica o oráculo de um item
+anterior**, e que conflito de asserção sobe para decisão explícita em vez de
+edição silenciosa. Até aqui essa regra era um acordo verificado por leitura de
+diff — isto é, por julgamento humano, que é precisamente o que o harness existe
+para substituir.
+
+A pesquisa técnica do item `002` (`specs/002-constitution-ratification/research.md`,
+E2) mostrou o buraco: executar o oráculo do item `001` e obter código de saída `0`
+prova que ele **aprova**, não que está **íntegro**. Um item futuro poderia
+enfraquecer uma asserção — trocar uma verificação real por uma tautologia — e o
+oráculo continuaria saindo `0`. Nenhuma execução detectaria.
+
+### Decisão
+
+**1. O resumo criptográfico de cada oráculo concluído é fixado pelo item
+seguinte.**
+
+```
+scripts/verify/f0-001-foundation.sh
+sha256 = 63412ca7a9ada4af0e435db89fdbb649423b56005dfd2908c59ba2745a6bbf22
+```
+
+O oráculo do item `002` assere esse valor (`FR-021a`) e, separadamente, que o
+oráculo do item `001` continua aprovando (`FR-021b`). São duas perguntas
+distintas e ambas precisam de resposta.
+
+**2. Divergência de resumo sobe para decisão, nunca para atualização do valor.**
+
+Atualizar o número fixado para fazer a asserção passar é a forma exata de
+derrotá-la. Se um oráculo anterior **precisa** mudar, isso é conflito de contrato
+entre specs: a mudança e o novo resumo entram por ADR própria, com o motivo
+registrado.
+
+**3. Exclusão transitória carrega marcador legível por máquina.**
+
+```gitignore
+# transitorio: <motivo> — remover em <item>
+<padrao>
+```
+
+O oráculo exige que todo alvo assim marcado **exista**. Alvo marcado e ausente é
+regra órfã e reprova (`SC-008`).
+
+### Por que o marcador é necessário
+
+A pesquisa E3 mediu o `.gitignore` vigente:
+
+```
+padrões literais (sem curinga, sem negação, sem comentário): 80
+  alvo existente em disco:  1
+  alvo INEXISTENTE:        79
+```
+
+**Apontar para alvo inexistente é o comportamento correto de uma regra de
+exclusão.** Ela existe para preceder o arquivo que impede de entrar no histórico —
+foi essa a ordem normativa do item `001` (exclusões vigentes antes do registro
+inicial, porque o histórico é irreversível). Um critério que reprovasse regra sem
+alvo reprovaria 79 regras corretas, e um oráculo assim seria desabilitado na
+primeira semana. Oráculo desabilitado é pior que oráculo ausente, porque o
+repositório continua parecendo verificado.
+
+O marcador separa as duas populações: regra permanente aponta para o futuro por
+construção; regra transitória que perdeu o alvo é lixo.
+
+### Derivação dos princípios a partir do material de referência transitório
+
+`docs/AGENTS-EXAMPLE.md` foi consultado ao redigir a governança e **removido ao
+fim do item `002`** (ADR-004, `FR-019`). Os trechos abaixo estão **transcritos**,
+não referenciados: um ponteiro para o arquivo seria referência morta no instante
+seguinte à remoção, e a rastreabilidade dos princípios derivados morreria junto.
+
+| Princípio ratificado | Linha de origem | Trecho transcrito |
+|---|---|---|
+| **I — Determinismo sobre probabilidade** (parcial) | L3 | *"You prioritize reliability over speed and never guess at business logic. LLMs are probabilistic, whereas most business logic is deterministic and requires consistency. This system fixes that mismatch."* |
+| **I — Determinismo sobre probabilidade** (parcial) | L41 | *"You operate within a 3-layer architecture that separates concerns to maximize reliability. LLMs are probabilistic; business logic must be deterministic."* |
+| **II — Especificação precede código** | L47 | *"The Golden Rule: If logic changes, update the SOP before updating the code."* |
+| **IV — Definição de dados antes da implementação** | L26 | *"Data-First Rule: You must define the JSON Data Schema (Input/Output shapes) in `AGENTS.md`. Coding only begins once the 'Payload' shape is confirmed."* |
+| **IV — Definição de dados antes da implementação** | L80–86 | *"Before building any Tool, you must define the Data Schema... What does the raw input look like? What does the processed output look like? Coding only begins once the 'Payload' shape is confirmed."* |
+| **VII — Auto-reparo atualiza a documentação** | L88–95 | *"Self-Annealing (The Repair Loop): 1. Analyze: Read the stack trace and error message. Do not guess. 2. Patch. 3. Test. 4. Update Architecture: Update the corresponding `.md` file in `architecture/` with the new learning... so the error never repeats."* |
+| **VIII — Elo verificado antes de lógica** | L32–35 | *"Link (Connectivity). 1. Verification: Test all API connections and `.env` credentials. 2. Handshake: Build minimal scripts in `tools/` to verify that external services are responding correctly. Do not proceed to full logic if the 'Link' is broken."* |
+
+**Quatro dos dez princípios derivam do material** — I, II (parcial, junto com o
+plano §17), IV, VII e VIII. Os demais vêm do plano de implementação, do addendum
+§9 e das ADR-002 e ADR-003.
+
+### O que foi descartado do material, e por quê
+
+| Descartado | Motivo |
+|---|---|
+| As cinco fases **B.L.A.S.T.** (Blueprint, Link, Architect, Stylize, Trigger) | É arquitetura de projeto de automação, não princípio de motor. O motor já tem ciclo canônico próprio, derivado do SDD |
+| As três camadas **A.N.T.** (`architecture/`, Navigation, `tools/`) | Mesma razão: prescreve estrutura de diretórios de um projeto-alvo. Colide com o princípio IX (agnosticismo de stack) |
+| A persona **System Pilot** | Identidade de agente. Este item ratifica **governança**, não identidade — e identidade fixada em governança impediria o motor de operar sob outros agentes |
+| A fase **Cloud Transfer** (L72) e *"A project is only 'Complete' when the payload is in its final cloud destination"* (L100) | Pressupõe destino em nuvem. Colide diretamente com o princípio IX e com o ambiente do mantenedor, onde nada roda em segundo plano |
+
+### Consequências
+
+- A regra de não regressão da ADR-002 deixa de depender de revisão humana.
+- Cada item da Fase 0 passa a fixar o resumo do oráculo do item anterior, formando
+  uma cadeia de integridade ao longo dos doze itens.
+- A remoção de `docs/AGENTS-EXAMPLE.md` torna-se segura: tudo que dele deriva está
+  transcrito acima e nos rótulos `Origem:` da governança ratificada.
+
+---
+
+## ADR-007 — Exceção fundamentada: as três lacunas de asserção do item 001
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+**Decisão do mantenedor**, tomada sob `FR-017b` · **Saída escolhida: C**
+
+### Contexto
+
+A revalidação retroativa exigida pelo item `002` (`FR-017`) julgou os 16 artefatos
+entregues pelo item `001` contra a governança recém-ratificada. Quinze passaram.
+Um não: `scripts/verify/f0-001-foundation.sh` viola o **princípio VI — O harness é
+o oráculo**, cujo critério é *"existe critério de aceitação sem asserção
+correspondente no harness"*.
+
+Verificada correspondência **em substância**, não por homonímia:
+
+| Critério do item `001` | Asserção que o decide | Estado |
+|---|---|---|
+| `SC-001` zero proibidos no histórico | `FR-020a` + `FR-020b` | coberto |
+| `SC-002` registros classificáveis | `SC-002` | coberto |
+| `SC-003` **< 5 s** e duas execuções idênticas | `FR-018` (checagem **estática** do fonte) | 🔴 parcial |
+| `SC-004` par vermelho→verde preservado | — | 🔴 nenhuma |
+| `SC-005` nome revela fase, pacote e propósito | `FR-006` + `FR-006b` | coberto |
+| `SC-006` roda só com o do bootstrap | `FR-019` | coberto |
+| `SC-007` contratos declarados por escrito | — | 🔴 nenhuma |
+
+`FR-018` verifica que o **fonte** não contém construção não determinística. É
+estática: não observa se duas execuções produzem a mesma saída, nem quanto tempo
+levam. `SC-003` pede as duas garantias.
+
+### Problema
+
+As três saídas possíveis colidiam entre si:
+
+| Saída | Por que foi rejeitada / aceita |
+|---|---|
+| **A — corrigir `f0-001-foundation.sh`** | **Rejeitada.** Acrescentar asserções ao oráculo do item anterior quebra a ADR-002 e invalida `FR-021a` do item `002` — o resumo criptográfico fixado mudaria. A regra "um item nunca modifica o oráculo de um item anterior" seria quebrada exatamente no ciclo que a tornou mecânica |
+| **B — emendar o princípio VI** | **Rejeitada.** Restringir a exigência a itens pós-ratificação enfraquece o princípio no seu primeiro exercício, e estabelece que a governança recua diante de trabalho já feito. O princípio funcionou: ele encontrou uma lacuna real |
+| **C — exceção fundamentada com transferência a item nomeado** | **Aceita** |
+
+### Decisão
+
+**1. Exceção registrada, com prazo.** O item `001` convergiu **antes** da
+ratificação da governança — é o único dos doze nessa condição, e a ADR-003 já
+registrara essa dívida. A não conformidade é reconhecida, não perdoada.
+
+**2. A cobertura das três lacunas é transferida ao item `004` (0.4 — Pytest).**
+
+O item `004` já tem, por desenho anterior a este achado, a tarefa de promover cada
+`f0-NNN-*.sh` a módulo de teste equivalente — é a razão de `--list` existir. As
+três asserções faltantes entram **como casos de teste novos**, em arquivo novo:
+
+| Lacuna | Forma no item `004` |
+|---|---|
+| `SC-003` tempo | caso que mede a execução de `f0-001-foundation.sh` e exige < 5 s |
+| `SC-003` determinismo empírico | caso que executa duas vezes e compara a saída byte a byte |
+| `SC-004` par vermelho→verde | caso que exige `evidence/t015-red.txt` e `t023-green.txt` presentes e distintos |
+| `SC-007` contratos declarados | caso que exige a seção Contratos da spec do item `001` |
+
+**3. `scripts/verify/f0-001-foundation.sh` permanece intocado.** É isto que torna
+a saída C compatível com a ADR-002: a cobertura é acrescentada **ao lado**, nunca
+dentro. O resumo `63412ca7…5a6bbf22` continua válido e asserido.
+
+**4. A exceção expira quando o item `004` convergir.** Não é indefinida. Se o item
+`004` convergir sem cobrir as quatro lacunas, o achado reabre.
+
+### Por que C e não A
+
+A saída A parece a mais direta — "o oráculo está incompleto, complete-o". Ela
+custaria a única regra que impede regressão silenciosa no harness, e a custaria
+para pagar uma dívida de um item que antecede a própria governança. Trocar uma
+garantia estrutural permanente por uma correção pontual é mau negócio, mesmo
+quando a correção é legítima.
+
+### Consequências
+
+- O princípio VI permanece íntegro e já provou seu valor: encontrou uma lacuna
+  real que a revisão humana do item `001` não pegou.
+- A ADR-002 permanece íntegra e mecanicamente verificável.
+- O item `004` herda quatro casos de teste nomeados, com origem registrada.
+- Fica estabelecido o **primeiro precedente** do motor para conflito entre
+  governança e trabalho já convergido: reconhecer, registrar, transferir a item
+  nomeado com prazo — nunca reescrever o passado nem enfraquecer a regra.
