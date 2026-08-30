@@ -1,0 +1,28 @@
+🔴 FR-001   workflow em .github/workflows/ci.yml YAML valido com chaves top-level
+           evidencia: .github/workflows/ci.yml ausente (FR-001/FR-002)
+🔴 FR-002   diretorio .github/workflows existe
+           evidencia: .github/workflows/ inexistente (Q1)
+🔴 FR-003   job verify runs-on pinado ubuntu-24.04 nao latest
+           evidencia: ci.yml ausente — nao ha runs-on a verificar
+🔴 FR-004   checkout@v7 com fetch-depth 0
+           evidencia: ci.yml ausente
+🔴 FR-005   setup-python@v7 com python-version 3.12 familia
+           evidencia: ci.yml ausente
+🔴 FR-006   fronteira sem ruff mypy pytest pip-audit trivy gitleaks uv matrix cache pull_request_target workflow_run
+           evidencia: ci.yml ausente
+🔴 FR-007   permissions contents read least privilege sem write id-token
+           evidencia: ci.yml ausente
+🔴 FR-008   triggers push e pull_request em [main, develop]
+           evidencia: ci.yml ausente
+🔴 FR-009   job verify estavel com steps Checkout Setup Python 3.12 Run harness
+           evidencia: ci.yml ausente
+🔴 FR-010   Run harness glob for f in scripts/verify/f0-*.sh com || exit 1 sem --quiet em CI
+           evidencia: ci.yml ausente
+🔴 FR-011   propaga exit sem continue-on-error
+           evidencia: ci.yml ausente
+🔴 FR-012   sem construcao nao deterministica e determinismo interno
+           evidencia: ci.yml ausente
+🔴 FR-013   extensivel para 010 sem rename de verify ou troca de runs-on
+           evidencia: ci.yml ausente
+
+Resultado: 1/14 assercoes aprovadas — 13 violacao(oes) (critica: 0, alta: 13, media: 0) — NAO CONFORME
