@@ -57,9 +57,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: confirmar que o harness que o workspace vai sustentar está verde e que os artefatos-alvo ainda não existem; preparar evidências.
 
-- [ ] T001 Confirmar harness existente verde: `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` — deve sair `0` com `f0-001` (30/30) e `f0-003` (14/14). Se falhar, corrigir antes de prosseguir (plan.md Fase A:1, VI)
-- [ ] T002 Confirmar ausência de `pyproject.toml`, `uv.lock`, `.python-version`, `packages/`, `.venv/` (`ls pyproject.toml uv.lock .python-version` deve falhar, `test ! -d packages && test ! -d .venv`) e que `docs/plan/research/f0-004-uv-workspace.md` (381 linhas, Q1–Q10 D1–D10) e `.gitignore` (265 linhas, sem `*.lock`) existem — registra fronteira FR-001/006/013 (plan.md Fase A:2)
-- [ ] T003 Criar diretório de evidências `specs/004-uv-workspace/evidence/` (`mkdir -p specs/004-uv-workspace/evidence`) para `red.txt` e `green.txt` (Princípio III, plan.md Fase B:3 / Fase D:1)
+- [x] T001 Confirmar harness existente verde: `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` — deve sair `0` com `f0-001` (30/30) e `f0-003` (14/14). Se falhar, corrigir antes de prosseguir (plan.md Fase A:1, VI)
+- [x] T002 Confirmar ausência de `pyproject.toml`, `uv.lock`, `.python-version`, `packages/`, `.venv/` (`ls pyproject.toml uv.lock .python-version` deve falhar, `test ! -d packages && test ! -d .venv`) e que `docs/plan/research/f0-004-uv-workspace.md` (381 linhas, Q1–Q10 D1–D10) e `.gitignore` (265 linhas, sem `*.lock`) existem — registra fronteira FR-001/006/013 (plan.md Fase A:2)
+- [x] T003 Criar diretório de evidências `specs/004-uv-workspace/evidence/` (`mkdir -p specs/004-uv-workspace/evidence`) para `red.txt` e `green.txt` (Princípio III, plan.md Fase B:3 / Fase D:1)
 
 **Checkpoint**: pré-requisitos satisfeitos — oráculo anterior íntegro, alvo inexistente, evidências endereçáveis.
 
@@ -71,7 +71,7 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **⚠️ CRÍTICO**: este esqueleto implementa o contrato `specs/001-git-branching-strategy/contracts/oracle-cli.md` herdado via `contracts/workspace-contract.md` §7 e `scripts/verify/README.md`. Sem ele, `--list`/`--quiet`/códigos não são decidíveis.
 
-- [ ] T004 [US1+US2+US3] Criar `scripts/verify/f0-004-uv-workspace.sh` com esqueleto do contrato herdado: parsing de `--quiet` e `--list`, resolução da raiz pela localização do script (`SCRIPT_DIR`/`REPO_ROOT`, nunca `$PWD`), códigos `0` conforme / `1` não conforme / `2` erro de uso, formato `<emoji> FR-XXX <descrição>` uma linha por REQ-ID, linha de resultado final `X/Y passed`, mapa canônico único de descrições, guarda de recursão `FKX_ORACLE_NESTED`, sem efeitos além de stdout/stderr (FR-016, contrato oracle-cli §1–§3, data-model.md Entidade Workspace root)
+- [x] T004 [US1+US2+US3] Criar `scripts/verify/f0-004-uv-workspace.sh` com esqueleto do contrato herdado: parsing de `--quiet` e `--list`, resolução da raiz pela localização do script (`SCRIPT_DIR`/`REPO_ROOT`, nunca `$PWD`), códigos `0` conforme / `1` não conforme / `2` erro de uso, formato `<emoji> FR-XXX <descrição>` uma linha por REQ-ID, linha de resultado final `X/Y passed`, mapa canônico único de descrições, guarda de recursão `FKX_ORACLE_NESTED`, sem efeitos além de stdout/stderr (FR-016, contrato oracle-cli §1–§3, data-model.md Entidade Workspace root)
 
 **Checkpoint**: foundation ready — asserções de história podem ser acrescentadas sem recriar contrato.
 
@@ -85,20 +85,20 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 ### Implementation por grupo (mesmo arquivo, sequencial — não paralelizável)
 
-- [ ] T005 [US1] Implementar em `scripts/verify/f0-004-uv-workspace.sh` **Grupo FR-001/002/003/004** — `pyproject.toml` existe, `python3 -c 'import tomllib'` TOML válido, `project.name=="fluksos-x"` / `version=="0.1.0"` / `requires-python==">=3.12,<3.14"` / `build-system.requires==["uv_build>=0.12.7,<0.13"]` + `build-backend=="uv_build"` / `tool.uv.workspace.members==["packages/*"]` sem `exclude` (FR-001..004, D1/D4/D5, data-model Workspace root)
-- [ ] T006 [US1] Implementar **Grupo FR-005** — `.python-version` existe e `grep -Eq '^3\.12(\.[0-9]+)?$'` passa (FR-005, D5, data-model .python-version)
-- [ ] T007 [US1] Implementar **Grupo FR-006/007** — `uv.lock` existe, `tomllib` válido, `! git check-ignore -q` já será US3 mas existência aqui; quando `uv` disponível, `uv lock --check` passa se não editado manualmente (FR-006/007, D2, data-model uv.lock)
-- [ ] T008 [US1] Implementar **Grupo FR-008/009** — `.venv` existe, `test -x .venv/bin/python` e `.venv/.gitignore` contém `*` (FR-008), descartabilidade: segundo `uv sync` hash idêntico documentado mas não assertado aqui antes de workspace existir (FR-009, D3/D10, data-model .venv)
-- [ ] T009 [US2] Implementar **Grupo FR-004/015** — workspace pronto para `packages/*`: `members==["packages/*"]` já coberto em T005, ausência de `tool.uv.sources` em 004, e que todo dir casado precisaria `pyproject.toml` (contrato futuro `workspace=true`) (FR-004/015, D4, data-model Member)
-- [ ] T010 [US2] Implementar **Grupo FR-017** — CI glob inclui `f0-004` sem editar `ci.yml`: `grep -F 'for f in scripts/verify/f0-' .github/workflows/ci.yml` passa (FR-017, D8, plan.md Source Code)
-- [ ] T011 [US3] Implementar **Grupo FR-010/011/012** — Lei Zero e `.gitignore` intacto: `! grep -q '^\*.lock'` nem `uv.lock` em `.gitignore` (FR-010), `git check-ignore -q .venv` positivo e `! git check-ignore -q uv.lock` (FR-011), `git diff -- .gitignore` vazio (FR-012, D7, data-model regras cruzadas)
-- [ ] T012 [US3] Implementar **Grupo FR-013/014/015** — fronteira escada: `! test -d packages` (FR-013), `! grep -R 'ruff\|mypy\|pytest\|lefthook\|pip-audit\|trivy' pyproject.toml` / ausência de `[tool.ruff]`/`[tool.mypy]`/`[dependency-groups]` (FR-014), contrato `workspace=true` documentado (FR-015, D8)
-- [ ] T013 [US3] Implementar **Grupo meta — integridade harness herdado**: `f0-001-foundation.sh --quiet` e `f0-003-ci-minimo.sh --quiet` aprovam quando invocados pelo oráculo (não regressão, VI, SC-006) + determinismo interno (duas execuções idênticas, FR-016)
-- [ ] T014 [US3] Implementar **Grupo FR-016 self-check** — exit codes `0`/`1`/`2`, `--quiet` só violações, `--list` enumera 10–14 IDs sem executar, tempo <5s (FR-016, SC-006, oracle-cli)
+- [x] T005 [US1] Implementar em `scripts/verify/f0-004-uv-workspace.sh` **Grupo FR-001/002/003/004** — `pyproject.toml` existe, `python3 -c 'import tomllib'` TOML válido, `project.name=="fluksos-x"` / `version=="0.1.0"` / `requires-python==">=3.12,<3.14"` / `build-system.requires==["uv_build>=0.12.7,<0.13"]` + `build-backend=="uv_build"` / `tool.uv.workspace.members==["packages/*"]` sem `exclude` (FR-001..004, D1/D4/D5, data-model Workspace root)
+- [x] T006 [US1] Implementar **Grupo FR-005** — `.python-version` existe e `grep -Eq '^3\.12(\.[0-9]+)?$'` passa (FR-005, D5, data-model .python-version)
+- [x] T007 [US1] Implementar **Grupo FR-006/007** — `uv.lock` existe, `tomllib` válido, `! git check-ignore -q` já será US3 mas existência aqui; quando `uv` disponível, `uv lock --check` passa se não editado manualmente (FR-006/007, D2, data-model uv.lock)
+- [x] T008 [US1] Implementar **Grupo FR-008/009** — `.venv` existe, `test -x .venv/bin/python` e `.venv/.gitignore` contém `*` (FR-008), descartabilidade: segundo `uv sync` hash idêntico documentado mas não assertado aqui antes de workspace existir (FR-009, D3/D10, data-model .venv)
+- [x] T009 [US2] Implementar **Grupo FR-004/015** — workspace pronto para `packages/*`: `members==["packages/*"]` já coberto em T005, ausência de `tool.uv.sources` em 004, e que todo dir casado precisaria `pyproject.toml` (contrato futuro `workspace=true`) (FR-004/015, D4, data-model Member)
+- [x] T010 [US2] Implementar **Grupo FR-017** — CI glob inclui `f0-004` sem editar `ci.yml`: `grep -F 'for f in scripts/verify/f0-' .github/workflows/ci.yml` passa (FR-017, D8, plan.md Source Code)
+- [x] T011 [US3] Implementar **Grupo FR-010/011/012** — Lei Zero e `.gitignore` intacto: `! grep -q '^\*.lock'` nem `uv.lock` em `.gitignore` (FR-010), `git check-ignore -q .venv` positivo e `! git check-ignore -q uv.lock` (FR-011), `git diff -- .gitignore` vazio (FR-012, D7, data-model regras cruzadas)
+- [x] T012 [US3] Implementar **Grupo FR-013/014/015** — fronteira escada: `! test -d packages` (FR-013), `! grep -R 'ruff\|mypy\|pytest\|lefthook\|pip-audit\|trivy' pyproject.toml` / ausência de `[tool.ruff]`/`[tool.mypy]`/`[dependency-groups]` (FR-014), contrato `workspace=true` documentado (FR-015, D8)
+- [x] T013 [US3] Implementar **Grupo meta — integridade harness herdado**: `f0-001-foundation.sh --quiet` e `f0-003-ci-minimo.sh --quiet` aprovam quando invocados pelo oráculo (não regressão, VI, SC-006) + determinismo interno (duas execuções idênticas, FR-016)
+- [x] T014 [US3] Implementar **Grupo FR-016 self-check** — exit codes `0`/`1`/`2`, `--quiet` só violações, `--list` enumera 10–14 IDs sem executar, tempo <5s (FR-016, SC-006, oracle-cli)
 
 ### Captura do vermelho (não recuperável)
 
-- [ ] T015 🔴 **Executar** `scripts/verify/f0-004-uv-workspace.sh` e `scripts/verify/f0-004-uv-workspace.sh --quiet` e preservar saída íntegra em `specs/004-uv-workspace/evidence/red.txt`. Esperado `exit=1` com reprovação em massa (FR-001 base — `pyproject.toml` inexistente) e `FR-006` por ausência de `uv.lock`. Conferir `--list` enumera 10–14 IDs sem executar. Este `red.txt` é a prova de TDD — se não existir antes de T016, o par vermelho→verde é irrecuperável (Princípio III, SC-006, plan.md Fase B:3)
+- [x] T015 🔴 **Executar** `scripts/verify/f0-004-uv-workspace.sh` e `scripts/verify/f0-004-uv-workspace.sh --quiet` e preservar saída íntegra em `specs/004-uv-workspace/evidence/red.txt`. Esperado `exit=1` com reprovação em massa (FR-001 base — `pyproject.toml` inexistente) e `FR-006` por ausência de `uv.lock`. Conferir `--list` enumera 10–14 IDs sem executar. Este `red.txt` é a prova de TDD — se não existir antes de T016, o par vermelho→verde é irrecuperável (Princípio III, SC-006, plan.md Fase B:3)
 
 **Checkpoint**: existe oráculo completo e existe prova registrada de que ele reprova. A partir daqui, qualquer verde é auditável contra este vermelho.
 
@@ -110,10 +110,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: `quickstart.md` Cenário 1 + 2 + 3 (SC-001/SC-002/SC-003): `uv sync` → `.venv/bin/python` `3.12.x`, `uv.lock` TOML válido, segundo `uv sync` hash idêntico, `rm -rf .venv && uv sync` recria sem alterar lock e sem `git status` listar `.venv`
 
-- [ ] T016 [US1] Materializar workspace **via `uv`** (D1/D5): `uv init --name fluksos-x --bare --python 3.12` (ou fallback `python3 -c` escrevendo TOML) e ajustar `pyproject.toml` para root virtual conforme `contracts/workspace-contract.md` §1 — `[project] name="fluksos-x" version="0.1.0" requires-python=">=3.12,<3.14" dependencies=[]` + `[build-system] requires=["uv_build>=0.12.7,<0.13"] build-backend="uv_build"` + `[tool.uv.workspace] members=["packages/*"]` — remover `src/` se criado por `uv init`, garantir TOML válido via `python3 -c 'import tomllib'` (FR-001..004)
-- [ ] T017 [US1] Gerar `uv.lock` + `.venv` + `.python-version`: `uv sync` (sem `--locked`/`--frozen` em 004, D6) — gera `uv.lock` TOML válido universal, `.venv/bin/python` executável `3.12.x`, `.venv/.gitignore:*`, `.python-version:3.12` (FR-005..008). Fallback sem `uv`: escrever `uv.lock` TOML vazio válido + `.python-version 3.12` + `.venv` mínimo com `bin/python` stub + `.venv/.gitignore:*`
-- [ ] T018 [US1] Validar TOML estático: `python3 -c 'import tomllib; tomllib.load(open("pyproject.toml","rb")); tomllib.load(open("uv.lock","rb"))'` + `grep -Eq '^3\.12' .python-version` (FR-001/006/005, quickstart Cenário 1)
-- [ ] T019 [US1] Atualizar `scripts/verify/README.md` tabela — nova linha `f0-004-uv-workspace.sh | 10–14 | UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version)` — conforme `plan.md` Fase C:4 e contrato de crescimento do harness (ADR-002)
+- [x] T016 [US1] Materializar workspace **via `uv`** (D1/D5): `uv init --name fluksos-x --bare --python 3.12` (ou fallback `python3 -c` escrevendo TOML) e ajustar `pyproject.toml` para root virtual conforme `contracts/workspace-contract.md` §1 — `[project] name="fluksos-x" version="0.1.0" requires-python=">=3.12,<3.14" dependencies=[]` + `[build-system] requires=["uv_build>=0.12.7,<0.13"] build-backend="uv_build"` + `[tool.uv.workspace] members=["packages/*"]` — remover `src/` se criado por `uv init`, garantir TOML válido via `python3 -c 'import tomllib'` (FR-001..004)
+- [x] T017 [US1] Gerar `uv.lock` + `.venv` + `.python-version`: `uv sync` (sem `--locked`/`--frozen` em 004, D6) — gera `uv.lock` TOML válido universal, `.venv/bin/python` executável `3.12.x`, `.venv/.gitignore:*`, `.python-version:3.12` (FR-005..008). Fallback sem `uv`: escrever `uv.lock` TOML vazio válido + `.python-version 3.12` + `.venv` mínimo com `bin/python` stub + `.venv/.gitignore:*`
+- [x] T018 [US1] Validar TOML estático: `python3 -c 'import tomllib; tomllib.load(open("pyproject.toml","rb")); tomllib.load(open("uv.lock","rb"))'` + `grep -Eq '^3\.12' .python-version` (FR-001/006/005, quickstart Cenário 1)
+- [x] T019 [US1] Atualizar `scripts/verify/README.md` tabela — nova linha `f0-004-uv-workspace.sh | 10–14 | UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version)` — conforme `plan.md` Fase C:4 e contrato de crescimento do harness (ADR-002)
 
 **Checkpoint**: MVP entregue — `uv sync` em clone limpo entrega `.venv` funcional; sem este checkpoint, US2/US3 não têm sobre o que verificar descoberta/Lei Zero.
 
@@ -125,9 +125,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: `quickstart.md` Cenário 4 (SC-004): inspeção estática `members==["packages/*"]` + probe `packages/_probe` descoberto por `uv sync` sem editar root, depois removido
 
-- [ ] T020 [P] [US2] Verificar `tool.uv.workspace` via inspeção estática `quickstart.md` Cenário 4: `python3 -c 'import tomllib; assert tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]==["packages/*"]'` e ausência de `exclude` (FR-004, D4, SC-004)
-- [ ] T021 [US2] Executar probe de escalabilidade `quickstart.md` Cenário 4: criar `packages/_probe/pyproject.toml` com `requires-python` compatível, `uv sync` descobre membro sem editar `pyproject.toml` root, verificar `uv.lock` ainda válido, remover `packages/_probe` e `uv sync` limpo (SC-004, FR-015, D4)
-- [ ] T022 [US2] Verificar CI glob pós-workspace: `grep -F 'for f in scripts/verify/f0-' .github/workflows/ci.yml` ainda passa e `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` inclui `f0-004` (FR-017, SC-007)
+- [x] T020 [P] [US2] Verificar `tool.uv.workspace` via inspeção estática `quickstart.md` Cenário 4: `python3 -c 'import tomllib; assert tomllib.load(open("pyproject.toml","rb"))["tool"]["uv"]["workspace"]["members"]==["packages/*"]'` e ausência de `exclude` (FR-004, D4, SC-004)
+- [x] T021 [US2] Executar probe de escalabilidade `quickstart.md` Cenário 4: criar `packages/_probe/pyproject.toml` com `requires-python` compatível, `uv sync` descobre membro sem editar `pyproject.toml` root, verificar `uv.lock` ainda válido, remover `packages/_probe` e `uv sync` limpo (SC-004, FR-015, D4)
+- [x] T022 [US2] Verificar CI glob pós-workspace: `grep -F 'for f in scripts/verify/f0-' .github/workflows/ci.yml` ainda passa e `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` inclui `f0-004` (FR-017, SC-007)
 
 ---
 
@@ -137,9 +137,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: `quickstart.md` Cenário 5 (SC-005/SC-008): `! grep` `*.lock` em `.gitignore`, `check-ignore` positivo para `.venv` e negativo para `uv.lock`, `! test -d packages` e ausência de ruff/mypy
 
-- [ ] T023 [P] [US3] Verificar Lei Zero via `quickstart.md` Cenário 5: `! grep -q '^\*.lock' .gitignore && ! grep -q '^uv.lock' .gitignore` (FR-010), `git check-ignore -q .venv && ! git check-ignore -q uv.lock` (FR-011), `git diff -- .gitignore` vazio (FR-012, D7, SC-005)
-- [ ] T024 [P] [US3] Verificar fronteira via `quickstart.md` Cenário 5: `! test -d packages` (FR-013), `! grep -R 'ruff\|mypy\|pytest\|lefthook\|pip-audit\|trivy' pyproject.toml` e `! test -f ruff.toml && ! test -f mypy.ini && ! test -f lefthook.yml` (FR-014), `tool.uv.sources` ausente em 004 mas documentado como `{ workspace = true }` (FR-015, SC-008)
-- [ ] T025 [US3] Verificar idempotência e descartabilidade remanescente: `sha256sum uv.lock > /tmp/b && uv sync && sha256sum uv.lock > /tmp/a && diff /tmp/b /tmp/a` (SC-002) + `rm -rf .venv && uv sync && test -x .venv/bin/python && ! git check-ignore -q uv.lock` (SC-003, FR-009)
+- [x] T023 [P] [US3] Verificar Lei Zero via `quickstart.md` Cenário 5: `! grep -q '^\*.lock' .gitignore && ! grep -q '^uv.lock' .gitignore` (FR-010), `git check-ignore -q .venv && ! git check-ignore -q uv.lock` (FR-011), `git diff -- .gitignore` vazio (FR-012, D7, SC-005)
+- [x] T024 [P] [US3] Verificar fronteira via `quickstart.md` Cenário 5: `! test -d packages` (FR-013), `! grep -R 'ruff\|mypy\|pytest\|lefthook\|pip-audit\|trivy' pyproject.toml` e `! test -f ruff.toml && ! test -f mypy.ini && ! test -f lefthook.yml` (FR-014), `tool.uv.sources` ausente em 004 mas documentado como `{ workspace = true }` (FR-015, SC-008)
+- [x] T025 [US3] Verificar idempotência e descartabilidade remanescente: `sha256sum uv.lock > /tmp/b && uv sync && sha256sum uv.lock > /tmp/a && diff /tmp/b /tmp/a` (SC-002) + `rm -rf .venv && uv sync && test -x .venv/bin/python && ! git check-ignore -q uv.lock` (SC-003, FR-009)
 
 ---
 
@@ -147,12 +147,12 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: fechar ciclo vermelho→verde, provar determinismo e registrar o que a máquina não decide.
 
-- [ ] T026 🟢 Executar `scripts/verify/f0-004-uv-workspace.sh` e `scripts/verify/f0-004-uv-workspace.sh --quiet` e preservar saída íntegra em `specs/004-uv-workspace/evidence/green.txt`. Esperado `exit=0` com **10–14/10–14** aprovadas (SC-006, plan.md Fase D:1)
-- [ ] T027 Executar `quickstart.md` validação determinismo: `scripts/verify/f0-004-uv-workspace.sh > /tmp/r1.txt 2>&1` vs `/tmp/r2.txt` diff idêntico + `git status --porcelain` limpo exceto artefatos deste item (`pyproject.toml`, `uv.lock`, `.python-version`, `scripts/verify/f0-004-uv-workspace.sh`, `scripts/verify/README.md`, `specs/004-uv-workspace/evidence/`) e `.venv/` não listado (FR-009, plan.md Fase D:4)
-- [ ] T028 Executar harness acumulado conforme contrato local e remoto: `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` → `0`; cada oráculo <5s (FR-016, plan.md Fase D:6, SC-006 agregada)
-- [ ] T029 Executar `quickstart.md` validação completa em um comando (Cenário 1+2+3+4+5) — todos `OK` = contrato `contracts/workspace-contract.md` §7 satisfeito (SC-001..008)
-- [ ] T030 Registrar ciclo em commits separados vermelho→verde obedecendo `CONTRIBUTING.md` §1 (`^(feat|fix|docs|chore|refactor)(\(.+\))?: .+`): commit 🔴 com oracle + `red.txt`, commit 🟢 com `pyproject.toml`+`uv.lock`+`.python-version`+`.venv`+`README.md`+`green.txt` — par auditável (Princípio III, plan.md Fase D:7)
-- [ ] T031 [P] Anotar em `specs/004-uv-workspace/quickstart.md` ou `plan.md` Fase E que **Cenário 6 (SC-007 remoto)** — push conforme verde + PR com violação vermelho — só é observável após push/PR real em `main`/`develop` e fica deferido pós-merge (não bloqueia convergência local, mas é o único SC que exige GitHub, plan.md Fase E)
+- [x] T026 🟢 Executar `scripts/verify/f0-004-uv-workspace.sh` e `scripts/verify/f0-004-uv-workspace.sh --quiet` e preservar saída íntegra em `specs/004-uv-workspace/evidence/green.txt`. Esperado `exit=0` com **10–14/10–14** aprovadas (SC-006, plan.md Fase D:1)
+- [x] T027 Executar `quickstart.md` validação determinismo: `scripts/verify/f0-004-uv-workspace.sh > /tmp/r1.txt 2>&1` vs `/tmp/r2.txt` diff idêntico + `git status --porcelain` limpo exceto artefatos deste item (`pyproject.toml`, `uv.lock`, `.python-version`, `scripts/verify/f0-004-uv-workspace.sh`, `scripts/verify/README.md`, `specs/004-uv-workspace/evidence/`) e `.venv/` não listado (FR-009, plan.md Fase D:4)
+- [x] T028 Executar harness acumulado conforme contrato local e remoto: `for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done` → `0`; cada oráculo <5s (FR-016, plan.md Fase D:6, SC-006 agregada)
+- [x] T029 Executar `quickstart.md` validação completa em um comando (Cenário 1+2+3+4+5) — todos `OK` = contrato `contracts/workspace-contract.md` §7 satisfeito (SC-001..008)
+- [x] T030 Registrar ciclo em commits separados vermelho→verde obedecendo `CONTRIBUTING.md` §1 (`^(feat|fix|docs|chore|refactor)(\(.+\))?: .+`): commit 🔴 com oracle + `red.txt`, commit 🟢 com `pyproject.toml`+`uv.lock`+`.python-version`+`.venv`+`README.md`+`green.txt` — par auditável (Princípio III, plan.md Fase D:7)
+- [x] T031 [P] Anotar em `specs/004-uv-workspace/quickstart.md` ou `plan.md` Fase E que **Cenário 6 (SC-007 remoto)** — push conforme verde + PR com violação vermelho — só é observável após push/PR real em `main`/`develop` e fica deferido pós-merge (não bloqueia convergência local, mas é o único SC que exige GitHub, plan.md Fase E)
 
 ---
 

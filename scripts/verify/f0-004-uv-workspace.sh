@@ -446,28 +446,29 @@ SELF_OK=1
 EVID14=""
 
 # tempo <5s: mede execucao deste oraculo em nested mode (evita recursao FR-014)
+# Otimizado para <5s total: --list/--invalido sao fast-path (early exit) e determinismo roda em paralelo
 START=$(date +%s 2>/dev/null || echo 0)
 if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   TMPD="$(mktemp -d)"
-  FKX_ORACLE_NESTED=1 timeout 10 "$SELF" > "$TMPD/self1" 2>&1
-  RC1=$?
+  # --list deve enumerar 14 IDs sem executar FRs (fast-path)
+  if ! FKX_ORACLE_NESTED=1 "$SELF" --list >/dev/null 2>&1; then
+    SELF_OK=0; EVID14="${EVID14}--list falhou; "
+  fi
+  # uso invalido deve retornar 2
+  FKX_ORACLE_NESTED=1 "$SELF" --invalido >/dev/null 2>&1
+  if [ $? != 2 ]; then
+    SELF_OK=0; EVID14="${EVID14}exit 2 para uso invalido nao obedecido; "
+  fi
+  # determinismo: duas execucoes paralelas (wall ~1.9s vs 3.8s sequencial) — economiza ~1.9s para caber em <5s
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
+  wait $P1; C1=$?
+  wait $P2; C2=$?
   END=$(date +%s 2>/dev/null || echo 0)
   ELAPSED=$((END - START))
   if [ "$ELAPSED" -gt 5 ] 2>/dev/null; then
     SELF_OK=0; EVID14="${EVID14}oraculo >5s (${ELAPSED}s, SC-006); "
   fi
-  # lista e quiet ja testados via --list/--quiet behavior externo? aqui verifica que --list funciona quando chamado nested
-  if ! FKX_ORACLE_NESTED=1 "$SELF" --list >/dev/null 2>&1; then
-    SELF_OK=0; EVID14="${EVID14}--list falhou; "
-  fi
-  # verifica que uso invalido retorna 2
-  FKX_ORACLE_NESTED=1 "$SELF" --invalido >/dev/null 2>&1
-  if [ $? != 2 ]; then
-    SELF_OK=0; EVID14="${EVID14}exit 2 para uso invalido nao obedecido; "
-  fi
-  # determinismo: duas execucoes identicas
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1; C1=$?
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1; C2=$?
   if ! cmp -s "$TMPD/r1" "$TMPD/r2" 2>/dev/null || [ "$C1" != "$C2" ]; then
     SELF_OK=0; EVID14="${EVID14}duas execucoes divergiram; "
   fi
