@@ -768,3 +768,80 @@ mesmo plano.
 **Nenhum oráculo cobre ordem de execução entre specs.** É candidato a asserção do
 item `003` (CI mínimo): o mapa da ADR vigente é a única fonte, e hoje nada verifica
 se ele é coerente — se cada posição vem depois de tudo de que depende.
+
+---
+
+## ADR-012 — Emenda 2: o ciclo do motor, e quatro lacunas fora da Fase 0
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+**Efeito**: acrescenta os itens **2.9, 2.10, 3.9 e 4.11**; corrige o ciclo do motor no addendum
+
+### Correção que precede a decisão
+
+Uma auditoria anterior desta sessão listou cinco sugestões como se fossem lacunas.
+**Duas já estavam no plano** e foram propostas por engano:
+
+| Proposto como novo | Onde já estava |
+|---|---|
+| `fkx doctor` | Item **4.5**, marcado MVP, mais a tabela de features (`Doctor — verifica saúde do ambiente`) |
+| Etapa de entrevista antes da spec, produzindo um PRD | Item **4.2** `fkx interview`, com dez perguntas de descoberta já redigidas (`§` da entrevista), mais o ciclo do addendum que já começava por `INTERVIEW` |
+
+**Causa**: a busca de verificação usou `\|` como alternância com `grep -E`, onde
+isso casa uma barra vertical literal. Todas as cinco buscas retornaram vazio, e o
+vazio foi lido como ausência. Um erro de ferramenta que produziu uma conclusão
+inteira errada, e que só apareceu porque o plano foi lido de novo.
+
+Registrado sob o princípio **VIII** — *pesquisa é verificação, não memória*: uma
+busca que retorna vazio precisa ser confirmada por um controle positivo antes de
+virar conclusão. É a mesma classe de defeito das verdades vácuas do item `002`.
+
+### Achado que substitui as duas sugestões retiradas
+
+O ciclo que o motor aplicará aos projetos de terceiros, no addendum, era:
+
+```
+INTERVIEW → CONSTITUTION → RESEARCH → SPEC → PLAN → TASKS → TESTS → IMPLEMENT → HARNESS → QA → DEVOPS → COMMIT → CONVERGE
+```
+
+**Faltavam `CLARIFY` e `ANALYZE`** — zero ocorrências das duas palavras em ambos os
+documentos de planejamento. Enquanto isso, o ciclo do próprio bootstrap, ratificado
+na governança, tem as duas.
+
+Isso é mais grave que qualquer uma das sugestões retiradas. A tese do projeto é que
+**o motor é construído usando a si mesmo**; um ciclo que ele aplica aos outros e não
+aplica a si não é um processo determinístico, são dois processos com o mesmo nome.
+
+E as duas etapas não são teóricas — cada uma pegou um defeito neste bootstrap que
+nenhuma outra etapa pegou:
+
+| Etapa | O que encontrou no item `002` |
+|---|---|
+| `CLARIFY` | `SC-006` trazia "10 segundos", um limiar inventado sem fonte declarada |
+| `ANALYZE` | `SC-008` reprovaria 79 regras de exclusão corretas se implementado ao pé da letra |
+
+**Decisão**: o ciclo do addendum passa a incluir as duas, na mesma posição do ciclo
+do bootstrap.
+
+### As quatro lacunas que sobreviveram à verificação
+
+| Item | Lacuna | Por que importa |
+|---|---|---|
+| **2.9** | **Golden tests dos agentes** | O motor é determinístico nas regras, mas os agentes chamam modelo. Sem entradas fixas e saídas esperadas versionadas, trocar de modelo ou ajustar um prompt não produz sinal — é a diferença entre *"o motor funciona"* e *"o motor funciona igual ao que funcionava"* |
+| **2.10** | **Teto de custo e latência por sessão** | LiteLLM está no plano; limite de gasto não. A pergunta 8 da entrevista cobre orçamento **do projeto-alvo**, não do motor. Um laço de agente sem teto é incidente financeiro, não defeito |
+| **3.9** | **Retenção dos efêmeros** | `.fluksos-x/sessions/` e `reports/` estão excluídos do versionamento desde o item `001`, e **nada os apaga**. Em alguns meses são gigabytes silenciosos no disco do usuário |
+| **4.11** | **Contrato de saída da CLI** | `fkx run --headless` será consumido por CI e por outros agentes. Sem `--json` com schema versionado e códigos de saída documentados, cada release quebra quem integra — o mesmo problema que o contrato do oráculo resolveu na Fase 0, e que o plano não resolvia para a CLI |
+
+### Escopo
+
+Nenhum dos quatro entra na Fase 0. O `2.10` e o `4.11` **poderiam** ser antecipados,
+mas dependem de artefatos que só existem depois: gateway de modelo e comandos reais
+da CLI. Antecipá-los produziria especificação sobre o que ainda não existe —
+exatamente o que o princípio **IV** proíbe.
+
+### Consequências
+
+- A Fase 0 permanece com **16 itens**; o mapa da ADR-011 não muda.
+- Fase 2 passa a 10 itens, Fase 3 a 9, Fase 4 a 11.
+- O ciclo do motor e o ciclo do bootstrap ficam **idênticos no núcleo SDD**, com o
+  ciclo do motor acrescentando as etapas que só fazem sentido com agentes
+  (`HARNESS`, `QA`, `DEVOPS`, `COMMIT`) e a entrevista inicial.

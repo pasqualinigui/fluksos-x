@@ -897,6 +897,8 @@ O CI mínimo depende apenas de shell, git e Python, que já existem.
 | 2.6 | `agents/tools/*` — todas as tools MCP | MCP server patterns, tool schemas |
 | 2.7 | PostgresSaver setup | LangGraph persistence, migrations |
 | 2.8 | Harness integration no ciclo do agente | Loop determinístico, exit conditions |
+| 2.9 | **Golden tests dos agentes** *(Emenda 2)* — entradas fixas e saídas esperadas versionadas | Snapshot testing com LLM, tolerância a variação, detecção de regressão ao trocar modelo ou prompt |
+| 2.10 | **Teto de custo e latência por sessão** *(Emenda 2)* — limite duro no gateway, com interrupção | Budget tracking no LiteLLM, contagem de tokens, política de corte |
 
 ### Fase 3: Memória & Observabilidade (3-5 dias)
 
@@ -910,6 +912,7 @@ O CI mínimo depende apenas de shell, git e Python, que já existem.
 | 3.6 | `agents/researcher.py` — Pesquisador | Tavily API, Crawl4AI setup |
 | 3.7 | `agents/devops.py` — DevOps | kubeval, Docker syntax validation |
 | 3.8 | `guardian/*` — Agente Guardião | Trace analysis, dependency audit |
+| 3.9 | **Política de retenção dos efêmeros** *(Emenda 2)* — expiração de `.fluksos-x/sessions/` e `reports/` | Estratégias de retenção, purga segura, o que preservar para auditoria |
 
 ### Fase 4: CLI/TUI & Polish (3-5 dias)
 
@@ -925,6 +928,7 @@ O CI mínimo depende apenas de shell, git e Python, que já existem.
 | 4.8 | Testes e2e completos | pytest e2e patterns |
 | 4.9 | README.md + CONTRIBUTING.md + docs | Open-source best practices |
 | 4.10 | LiteLLM multi-provider config | Provider setup, fallback config |
+| 4.11 | **Contrato de saída da CLI** *(Emenda 2)* — `--json` com schema versionado e códigos de saída documentados | Versionamento de schema de saída, compatibilidade retroativa, consumo por CI e por outros agentes |
 
 ---
 
