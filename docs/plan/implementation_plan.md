@@ -839,6 +839,35 @@ fluksos-x/
 | 0.11 | Criar AGENTS.md (constitution base) | ✅ | Spec-Kit constitution format, invariantes |
 | 0.12 | Setup pip-audit + Trivy | ✅ | CI integration, baseline scan |
 
+#### Emenda 1 — Integração contínua e automação de release (2026-08-30)
+
+> **Origem**: auditoria executada durante o item `002`, registrada em **ADR-009**.
+> O plano original entrega ao motor a capacidade de **gerar** pipelines para os
+> sistemas-alvo (agente DevOps, item 3.7) e **não dá pipeline ao próprio motor**.
+> Todo o enforcement de qualidade era hook local — e hook local é conveniência,
+> não portão: `git commit --no-verify` o desfaz por completo.
+>
+> Os quatro itens abaixo são **acrescentados à Fase 0**. Não substituem nem
+> reordenam nenhum item de 0.1 a 0.12.
+
+| # | Item | Specify Cycle | Pesquisa Prévia Necessária |
+|---|------|-------------|---------------------------|
+| 0.13 | **CI mínimo** — workflow que executa o harness da Fase 0 em runner limpo | ✅ | Sintaxe de workflow, runners, cache; determinismo entre máquina local e runner |
+| 0.14 | **CI completo + branch protection** — Ruff, MyPy, Pytest, pip-audit, gitleaks, portão de cobertura, matriz de versões de Python, `uv sync --frozen`, validação de mensagem de commit | ✅ | Required status checks, rulesets, `uv` em CI, limiar de cobertura, matriz suportada |
+| 0.15 | **Automação de release** — `python-semantic-release`, CHANGELOG, tag, build, publicação no PyPI via **trusted publishing (OIDC)**, SBOM anexado ao release | ✅ | Trusted publishing, ambientes protegidos, `cyclonedx-py`, versionamento a partir de Conventional Commits |
+| 0.16 | **Atualização automática de dependências** — Renovate ou Dependabot, com agrupamento e harness verde obrigatório no merge | ✅ | Agrupamento de atualizações, política de automerge, interação com o lockfile |
+
+**Ordem de execução acordada** (ver ADR-009): `0.13` é executado **imediatamente
+após** o item `0.11`, antes de todos os demais. Os outros três seguem a ordem de
+dependência: `0.14` depois de `0.5`, `0.15` depois de `0.14`, `0.16` depois de
+`0.15`.
+
+**Razão da inserção antecipada de `0.13`**: o harness cresce por acréscimo desde o
+item `001`, e a integração contínua precisa crescer junto. Um CI que só chega no
+fim da Fase 0 significa que dez itens foram construídos sem rede — e que a
+primeira execução do pipeline terá de validar dez itens de uma vez, em vez de um.
+O CI mínimo depende apenas de shell, git e Python, que já existem.
+
 ### Fase 1: Harness & Indexação (4-6 dias)
 
 | # | Item | Pesquisa Prévia |

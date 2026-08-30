@@ -186,10 +186,10 @@ elif cmd in ("normativo", "violacao", "origem"):
         if cmd == "normativo":
             ok = re.search(r'\bMUST NOT\b|\bMUST\b|\bSHOULD\b', b)
         elif cmd == "violacao":
-            m = re.search(r'\*\*Violação:\*\*\s*(\S.*)', b)
+            m = re.search(r'\*\*(?:Violation|Violação):\*\*\s*(\S.*)', b)
             ok = m and len(m.group(1).strip()) > 20
         else:
-            m = re.search(r'\*\*Origem:\*\*\s*(\S.*)', b)
+            m = re.search(r'\*\*(?:Source|Origem):\*\*\s*(\S.*)', b)
             ok = m and len(m.group(1).strip()) > 10
         if not ok: faltam.append(num)
     print(' '.join(f"principio {n}" for n in faltam) or "OK")
@@ -201,9 +201,10 @@ elif cmd == "governanca":
     sec = ''
     for h in ('## Governance', '## Governança'):
         if h in body: sec = body.split(h)[-1]; break
-    falta = [k for k, pat in (("procedimento de emenda", r'[Ee]menda'),
-                              ("politica de versionamento", r'[Vv]ersionamento'),
-                              ("revisao de conformidade", r'revisão de conformidade'))
+    falta = [k for k, pat in (
+        ("procedimento de emenda",   r'Amendment Procedure|[Ee]menda'),
+        ("politica de versionamento", r'Versioning Policy|[Vv]ersionamento'),
+        ("revisao de conformidade",  r'Compliance Review|revisão de conformidade'))
              if not re.search(pat, sec)]
     print(' '.join(falta) or "OK")
 
@@ -328,7 +329,9 @@ check "FR-009" "${CANON[FR-009]}" "alta" "$([ -f "$AGENTS" ] && echo 0 || echo 1
 
 if [ -f "$AGENTS" ]; then
   MISS=""
-  for sec in "Identidade" "Como operar" "Ciclo canônico" "Regras que não se quebram" "Onde estão as fontes" "Precedência"; do
+  # Cabecalhos em ingles por ADR-010: AGENTS.md e o formato aberto lido por
+  # agentes de qualquer origem. A prosa permanece em portugues.
+  for sec in "Identity" "How to operate" "Canonical cycle" "Rules that do not bend" "Where the sources are" "Precedence"; do
     grep -q "$sec" "$AGENTS" || MISS="${MISS}[$sec] "
   done
   check "FR-010a" "${CANON[FR-010a]}" "media" "$([ -z "$MISS" ] && echo 0 || echo 1)" \

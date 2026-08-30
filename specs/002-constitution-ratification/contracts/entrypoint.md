@@ -28,14 +28,18 @@ Seções obrigatórias. O formato aberto **não impõe esquema** (pesquisa de do
 Q3) — é convenção de localização, não de estrutura. As seções abaixo são escolha
 deste motor.
 
+**Cabeçalhos em inglês, prosa em português** (ADR-010): `AGENTS.md` é o formato
+aberto, lido por agentes de qualquer origem — a estrutura precisa ser universal, o
+conteúdo é do mantenedor.
+
 | Seção | Conteúdo | Requisito |
 |---|---|---|
-| Identidade | O que é o motor, em poucas linhas | FR-010 |
-| Como operar | Comandos reais para verificar, executar o harness, iniciar um ciclo | FR-010 |
-| Ciclo canônico | A sequência normativa, **incluindo a clarificação** | FR-015 |
-| Regras que não se quebram | As invariantes de curto alcance, por ponteiro | FR-010 |
-| Onde estão as fontes | Ponteiros para governança, plano, decisões, contratos | FR-010 |
-| Precedência | A governança prevalece | invariante da spec |
+| `## Identity` | O que é o motor, em poucas linhas | FR-010 |
+| `## How to operate` | Comandos reais para verificar, executar o harness, iniciar um ciclo | FR-010 |
+| `## Canonical cycle` | A sequência normativa, **incluindo a clarificação** | FR-015 |
+| `## Rules that do not bend` | As invariantes de curto alcance, por ponteiro | FR-010 |
+| `## Where the sources are` | Ponteiros para governança, plano, decisões, contratos | FR-010 |
+| `## Precedence` | A governança prevalece | invariante da spec |
 
 **Proibições**
 

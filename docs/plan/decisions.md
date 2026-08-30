@@ -45,6 +45,10 @@ mapa é a fonte de verdade da correspondência.
 | `006` | **0.3** | MyPy strict | Consome contrato do Ruff: regras que conflitam com tipagem estrita |
 | `007` | **0.12** | pip-audit + Trivy | Precisa existir antes de ser orquestrado |
 | `008` | **0.5** | Lefthook | Orquestra 005, 006, 004 e 007 — só faz sentido depois deles |
+| `013` | **0.13** | CI mínimo | **Executado logo após o `002`** — depende só de shell, git e Python. Ver ADR-009 |
+| `014` | **0.14** | CI completo + branch protection | Depois do `008`: precisa das ferramentas existindo |
+| `015` | **0.15** | Automação de release | Depois do `014`: release exige pipeline verde |
+| `016` | **0.16** | Atualização de dependências | Depois do `015`: precisa do pipeline completo para validar o que entra |
 | `009` | **0.6** | `packages/core` | Primeiro código de produção |
 | `010` | **0.7** | `packages/cli` | Depende de `core` |
 | `011` | **0.8** | docker-compose | Domínio independente (DevOps) |
@@ -522,3 +526,151 @@ o item `002` definiu mas não exercitou — obrigação já transferida ao pós-
 - Fica registrado que o primeiro portão constitucional real produziu, além de
   vereditos, **um achado sobre a própria governança** — que é o que se espera de um
   mecanismo que se aplica a si mesmo.
+
+---
+
+## ADR-009 — Emenda 1 do plano: o motor precisa do pipeline que ele ensina a construir
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+**Efeito**: acrescenta os itens **0.13 a 0.16** à Fase 0 do `implementation_plan.md`
+
+### Contexto
+
+Auditoria do plano executada durante o item `002`, por busca sistemática em
+`docs/plan/`, não por leitura de memória.
+
+O plano cobre bem o que eu esperava e mais: Ruff, MyPy, Pytest, Lefthook,
+pip-audit, Trivy, gitleaks, SBOM via `cyclonedx-py`, hash-pinning por `uv.lock`,
+`python-semantic-release` para o CHANGELOG, `SecretStr` do Pydantic, sandbox de
+comandos, hardening de container, e observabilidade completa na Fase 3.
+
+**E não dá pipeline ao próprio motor.** As duas únicas ocorrências de CI no plano
+são o modo `fkx run --headless`, para o motor ser *consumido* por CI alheia, e o
+agente DevOps do item 3.7, que *gera* pipeline para o sistema-alvo. O motor ensina
+o que não pratica.
+
+### Os doze buracos encontrados
+
+| # | Buraco | Consequência |
+|---|---|---|
+| 1 | Nenhum workflow de integração contínua | Todo enforcement é hook local |
+| 2 | Sem branch protection nem required status checks | É a **única** forma real de neutralizar `--no-verify` |
+| 3 | `python-semantic-release` citado, nunca executado | O CHANGELOG "automático" não tem gatilho |
+| 4 | Nada publica no PyPI | O addendum já assume `fkx` publicado — o notificador de versão consulta a API do PyPI de um pacote que nada publica |
+| 5 | Sem validação automática de mensagem de commit | `semantic-release` **depende** de Conventional Commits; um commit malformado quebra o versionamento em silêncio |
+| 6 | Sem atualização automática de dependências | "Subiu merge, mudou versão" depende de memória humana |
+| 7 | Cobertura é relatório, não portão | `pytest-cov` gera número; ninguém reprova por ele |
+| 8 | Sem `uv sync --frozen` em CI | O hash-pinning só protege se alguém provar que o lock está coerente |
+| 9 | Sem matriz de versões de Python | Roda em 3.12 na máquina do mantenedor; ninguém sabe sobre as demais |
+| 10 | SBOM gerado, nunca publicado | SBOM que não acompanha o release não serve a ninguém |
+| 11 | Sem trusted publishing | A alternativa é token de longa duração no repositório, contra a Lei Zero |
+| 12 | Sem CODEOWNERS | Irrelevante com um mantenedor; relevante ao abrir o projeto |
+
+### Sobre `--no-verify`, que motivou esta auditoria
+
+**Não é possível proibir `--no-verify`.** É uma flag do cliente git, executada na
+máquina de quem commita. Nenhuma configuração dentro do repositório a impede.
+
+O que torna o bypass **inútil** vive no servidor: *required status checks*, que
+reprovam a integração mesmo quando o commit local passou, e *branch protection*,
+que impede escrita direta nas linhas principais. Por isso o item `0.14` inclui
+essas duas coisas — sem elas, o item `0.5` (Lefthook) entrega a **sensação** de
+portão sem o portão.
+
+Hook local continua valendo: ele dá feedback em segundos em vez de minutos. É
+conveniência, não garantia, e o plano precisava dizer qual é qual.
+
+### Decisão
+
+**1. Emendar o plano, não apenas criar specs.** A ADR-001 mapeia specs ↔ itens do
+plano. Criar spec sem item correspondente quebra o mapa e faz o plano mentir na
+próxima leitura. A emenda entra como seção marcada em `§17`, sem tocar em 0.1–0.12.
+
+**2. `0.13` é executado imediatamente após o item `002`.** O harness cresce por
+acréscimo desde o item `001`; a integração contínua cresce junto. Um CI que só
+chega no fim da Fase 0 significa dez itens construídos sem rede, e uma primeira
+execução do pipeline que precisa validar dez itens de uma vez.
+
+O CI mínimo é executável **agora**: depende apenas de shell, git e Python, que já
+existem. É a mesma restrição de dependências dos oráculos `001`–`003`.
+
+**3. Numeração das specs**: `013` a `016`, seguindo a ADR-001. A ordem de execução
+diverge da numeração — como já ocorre desde o item `001` —, e a divergência está
+declarada aqui e no plano.
+
+### Consequência para o método
+
+Esta ausência **não foi apontada na leitura inicial do plano**. Foram apontadas a
+ordem inexecutável do `§17` e a premissa falsa sobre `AGENTS.md`, ambas defeitos de
+*conteúdo presente*. O CI era defeito de **ausência**, e ausência não salta da
+página: só aparece quando alguém pergunta *"o que deveria estar aqui e não está?"*.
+
+Fica registrado como lição de método: a leitura de um plano precisa de uma passada
+por **checklist de completude**, não apenas de revisão crítica do que está escrito.
+Esta é uma das razões que motivam a etapa `INTAKE` avaliada para o motor.
+
+---
+
+## ADR-010 — Fronteira de idioma: onde o projeto fala inglês e onde fala português
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: aceita
+
+### Contexto
+
+O projeto é escrito em português do Brasil por decisão do mantenedor, que não tem
+fluência em inglês. A ambição é que o motor seja utilizável globalmente.
+
+Traduzir depois é caro e, em alguns lugares, **impossível sem quebrar**: tradução
+automática de identificador quebra o código, e de documento normativo produz
+ambiguidade exatamente onde ela não pode existir. Depender de "o dev traduz na
+IDE dele" não é mecanismo.
+
+### Decisão
+
+| Camada | Idioma | Razão |
+|---|---|---|
+| Identificadores, comandos da CLI, nomes de arquivo, códigos de erro | **inglês** | É a superfície pública. `fkx run --headless` já é inglês. Não custa nada ao mantenedor, que não escreve identificadores em prosa |
+| **Rótulos estruturais** da governança e da porta de entrada | **inglês** | São nomes de campo, não prosa: `**Violation:**`, `**Source:**`, `**Version**`, `**Ratified**`. São o que o harness lê e o que uma tradução futura precisa preservar intacto |
+| Prosa da governança e da porta de entrada | **português** | É o que o mantenedor lê e mantém |
+| Specs, ADRs, pesquisa, veredictos, plano | **português** | É a oficina. Não é superfície pública e não está previsto traduzir |
+
+A regra em uma frase: **o que é campo, é inglês; o que é texto, é português.**
+
+### Constatação que limita a decisão
+
+`scripts/verify/f0-001-foundation.sh` casa a palavra **`escopo`** dentro de
+`CONTRIBUTING.md` (asserção `FR-005`). Pela ADR-002, aquele oráculo **não pode ser
+editado**. Portanto `escopo` fica **congelado em português** em `CONTRIBUTING.md`
+até que o item `004` promova os oráculos a módulos de teste.
+
+É um caso pequeno — uma palavra —, mas ilustra o custo real da regra de não
+regressão: **acoplamento a idioma vira dívida no instante em que o oráculo
+converge.** Daí a decisão ser tomada agora, no item `002`, e não depois.
+
+### Escopo da aplicação imediata
+
+Convertidos agora, com o oráculo `f0-002` ajustado no mesmo movimento:
+
+| Artefato | Antes | Depois |
+|---|---|---|
+| `.specify/memory/constitution.md` | `**Violação:**`, `**Origem:**` | `**Violation:**`, `**Source:**` |
+| `.specify/memory/constitution.md` | `## Restrições Adicionais`, `## Fluxo de Desenvolvimento` | `## Additional Constraints`, `## Development Workflow` |
+| `.specify/memory/constitution.md` | subseções de governança em português | `### Amendment Procedure`, `### Versioning Policy`, `### Compliance Review Expectation` |
+| `AGENTS.md` | seis cabeçalhos em português | seis cabeçalhos em inglês |
+
+**Não** convertidos: specs, ADRs, pesquisa, `compliance-001.md`, `CONTRIBUTING.md`
+e toda a prosa. São a oficina, permanecem em português.
+
+### Reabertura do item 002
+
+A conversão exige editar `scripts/verify/f0-002-constitution.sh`, de um item já
+convergido. Pela letra da ADR-002, o proibido é um item modificar o oráculo de
+**outro**; o item `002` ajustando o próprio não é isso.
+
+A alternativa era pagar depois pelo mecanismo de exceção da ADR-007 — o que criaria
+a **segunda** dívida da mesma classe antes de a primeira ser paga. Reabrir agora
+custa seis asserções e dois arquivos; adiar custa uma dívida permanente.
+
+O ciclo vermelho→verde do item `002` **não é refeito**: nenhuma asserção nova é
+acrescentada e nenhum requisito muda. É refatoração de rótulo sobre verde
+existente, e o verde é reconfirmado ao final.

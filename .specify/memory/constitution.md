@@ -19,8 +19,8 @@ Princípios acrescentados (10):
 
 Seções alteradas:
   Core Principles          — modelo de 5 slots preenchido com 10 princípios (I–X)
-  Restrições Adicionais    — antes [SECTION_2_NAME]/[SECTION_2_CONTENT]
-  Fluxo de Desenvolvimento — antes [SECTION_3_NAME]/[SECTION_3_CONTENT]
+  Additional Constraints   — antes [SECTION_2_NAME]/[SECTION_2_CONTENT]
+  Development Workflow     — antes [SECTION_3_NAME]/[SECTION_3_CONTENT]
   Governance               — antes [GOVERNANCE_RULES]
   Rodapé                   — versão, ratificação e última emenda preenchidas
 
@@ -60,10 +60,10 @@ Toda decisão que possa ser expressa como regra MUST ser implementada como códi
 determinístico. Julgamento de modelo probabilístico MUST ficar restrito ao
 roteamento entre regras — nunca à regra em si.
 
-**Violação:** existe decisão de negócio ou de conformidade cujo resultado depende
+**Violation:** existe decisão de negócio ou de conformidade cujo resultado depende
 da saída de um modelo, sem regra determinística equivalente que a valide.
 
-**Origem:** `docs/plan/implementation_plan.md` §1; material de referência do
+**Source:** `docs/plan/implementation_plan.md` §1; material de referência do
 mantenedor, transcrito em ADR-006 — *"LLMs are probabilistic, whereas most
 business logic is deterministic and requires consistency."*
 
@@ -73,10 +73,10 @@ Nenhum artefato executável MUST ser criado ou alterado antes de existir
 especificação aprovada que o descreva. Se a lógica muda, a especificação muda
 **antes**.
 
-**Violação:** existe registro que altera artefato executável sem especificação
+**Violation:** existe registro que altera artefato executável sem especificação
 correspondente, ou cuja especificação foi registrada depois do código.
 
-**Origem:** material de referência do mantenedor, ADR-006 — *"The Golden Rule: If
+**Source:** material de referência do mantenedor, ADR-006 — *"The Golden Rule: If
 logic changes, update the SOP before updating the code."*; plano §17 (SDD).
 
 ### III. Teste antes da implementação (NÃO NEGOCIÁVEL)
@@ -85,10 +85,10 @@ Todo requisito MUST possuir verificação executável que reprove antes da
 implementação e aprove depois. Ambas as execuções MUST ser preservadas como
 evidência versionada.
 
-**Violação:** não existe par de evidências vermelho→verde para o requisito, ou o
+**Violation:** não existe par de evidências vermelho→verde para o requisito, ou o
 registro do verde precede o do vermelho no histórico.
 
-**Origem:** plano §17 (TDD); ADR-002. A prova é o par de registros, porque ela não
+**Source:** plano §17 (TDD); ADR-002. A prova é o par de registros, porque ela não
 é recuperável depois do fato.
 
 ### IV. Definição de dados antes da implementação
@@ -96,10 +96,10 @@ registro do verde precede o do vermelho no histórico.
 Antes de implementar um componente, o formato dos seus dados de entrada e de
 saída MUST estar declarado em artefato de modelo de dados versionado.
 
-**Violação:** existe componente cujo contrato de entrada/saída não é encontrável
+**Violation:** existe componente cujo contrato de entrada/saída não é encontrável
 no modelo de dados ou nos contratos da sua especificação.
 
-**Origem:** material de referência do mantenedor, ADR-006 — *"Data-First Rule:
+**Source:** material de referência do mantenedor, ADR-006 — *"Data-First Rule:
 Coding only begins once the 'Payload' shape is confirmed."*
 
 ### V. Segurança é a Lei Zero
@@ -108,10 +108,10 @@ Segredo MUST NOT existir em código, log, mensagem de registro ou histórico. A
 regra de exclusão MUST preceder a possibilidade de registro. Travas de
 dependência MUST permanecer versionadas.
 
-**Violação:** arquivo de categoria proibida consta do índice ou do histórico; ou
+**Violation:** arquivo de categoria proibida consta do índice ou do histórico; ou
 regra de exclusão cobre a trava de dependências.
 
-**Origem:** `docs/plan/addendum_v3.md` §9; item 001, FR-008..FR-013. É Lei Zero
+**Source:** `docs/plan/addendum_v3.md` §9; item 001, FR-008..FR-013. É Lei Zero
 porque histórico não se corrige: só se reescreve, e reescrita é incidente.
 
 ### VI. O harness é o oráculo
@@ -120,10 +120,10 @@ Conformidade MUST ser decidida por código de saída de verificação executáve
 nunca por julgamento. Nenhum item MUST modificar a verificação de um item
 anterior.
 
-**Violação:** existe critério de aceitação sem asserção correspondente no
+**Violation:** existe critério de aceitação sem asserção correspondente no
 harness; ou o diff de um item altera o oráculo de outro.
 
-**Origem:** plano §14; ADR-002 e ADR-006, que tornam a segunda metade desta regra
+**Source:** plano §14; ADR-002 e ADR-006, que tornam a segunda metade desta regra
 mecanicamente verificável por resumo criptográfico.
 
 ### VII. Auto-reparo atualiza a documentação
@@ -131,10 +131,10 @@ mecanicamente verificável por resumo criptográfico.
 Ao corrigir uma falha, o ciclo MUST registrar a causa no artefato normativo
 correspondente, de modo que a mesma falha não possa repetir-se sem ser detectada.
 
-**Violação:** existe correção de falha cujo registro não altera nenhum artefato
+**Violation:** existe correção de falha cujo registro não altera nenhum artefato
 normativo — especificação, contrato, decisão arquitetural ou harness.
 
-**Origem:** material de referência do mantenedor, ADR-006 — *"Self-Annealing:
+**Source:** material de referência do mantenedor, ADR-006 — *"Self-Annealing:
 Update the corresponding file with the new learning so the error never repeats."*
 
 ### VIII. Elo verificado antes de lógica
@@ -143,10 +143,10 @@ Nenhuma lógica MUST ser construída sobre dependência externa cuja disponibili
 e contrato não tenham sido verificados por execução mínima registrada. Pesquisa é
 verificação, não memória.
 
-**Violação:** existe código que consome serviço, ferramenta ou versão externa sem
+**Violation:** existe código que consome serviço, ferramenta ou versão externa sem
 evidência de verificação em `docs/plan/research/`.
 
-**Origem:** material de referência do mantenedor, ADR-006 — *"Handshake: Do not
+**Source:** material de referência do mantenedor, ADR-006 — *"Handshake: Do not
 proceed to full logic if the 'Link' is broken."*
 
 ### IX. Agnosticismo de stack
@@ -154,10 +154,10 @@ proceed to full logic if the 'Link' is broken."*
 O motor MUST NOT assumir linguagem, framework ou ferramenta do sistema-alvo. Toda
 dependência de stack MUST estar isolada atrás de adaptador declarado.
 
-**Violação:** existe, fora de adaptador declarado, referência a ferramenta
+**Violation:** existe, fora de adaptador declarado, referência a ferramenta
 específica do sistema-alvo.
 
-**Origem:** plano §1 e §6 — o motor desenvolve **qualquer** sistema. Foi por este
+**Source:** plano §1 e §6 — o motor desenvolve **qualquer** sistema. Foi por este
 princípio que a fase de transferência para nuvem do material de referência foi
 descartada (ADR-006).
 
@@ -166,12 +166,12 @@ descartada (ADR-006).
 Toda execução do motor MUST produzir saída rastreável a um requisito
 identificado. Falha MUST nomear o requisito violado e a evidência observada.
 
-**Violação:** existe caminho de falha que termina sem identificador de requisito
+**Violation:** existe caminho de falha que termina sem identificador de requisito
 ou sem evidência na saída.
 
-**Origem:** plano §14; contrato de interface do oráculo, item 001 §3.
+**Source:** plano §14; contrato de interface do oráculo, item 001 §3.
 
-## Restrições Adicionais
+## Additional Constraints
 
 **Escada de dependências.** Nenhum artefato pode exigir ferramenta que ainda não
 existe no seu ponto do bootstrap. Um verificador que dependa de ferramenta
@@ -192,7 +192,7 @@ são ligados explicitamente e desligados após uso; reinício automático é pro
 administrador ou modo especial do sistema operacional em qualquer plataforma
 suportada.
 
-## Fluxo de Desenvolvimento
+## Development Workflow
 
 O ciclo canônico é normativo e não admite atalho:
 
@@ -224,7 +224,7 @@ entre ela e a porta de entrada operacional, os planos ou a documentação de
 contribuição, **ela prevalece** — e a divergência precisa ser corrigida, não
 tolerada.
 
-### Procedimento de emenda
+### Amendment Procedure
 
 1. A emenda é proposta em especificação própria, com justificativa e o princípio
    afetado nomeado.
@@ -236,7 +236,7 @@ tolerada.
 4. A emenda adotada atualiza a versão, o rodapé e o registro de impacto no topo
    deste arquivo.
 
-### Política de versionamento
+### Versioning Policy
 
 Versionamento semântico sobre a governança:
 
@@ -249,7 +249,7 @@ Versionamento semântico sobre a governança:
 Execução repetida da ratificação sobre conteúdo idêntico **não** produz versão
 nova: a versão acompanha mudança de conteúdo, não execução de comando.
 
-### Expectativa de revisão de conformidade
+### Compliance Review Expectation
 
 Toda etapa de planejamento preenche o portão de conformidade a partir deste
 arquivo. Toda etapa de análise trata violação de princípio como falha

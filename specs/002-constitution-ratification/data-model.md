@@ -21,8 +21,12 @@ autoridade.
 | `numeral` | Romano, contínuo de `I` a `X`, sem lacuna | FR-004 | sequência dos cabeçalhos de princípio |
 | `nome` | Frase nominal curta, única no conjunto | FR-004 | texto do cabeçalho |
 | `enunciado` | Declarativo, com ao menos um `MUST` ou `MUST NOT` | FR-005 | presença do verbo normativo no corpo |
-| `criterio_de_violacao` | Frase que descreve um **estado observável de artefato** | FR-005 | rótulo `Violação:` presente e não vazio |
-| `origem` | Referência a fonte que sobrevive à remoção do material transitório | FR-006 | rótulo `Origem:` presente e não vazio |
+| `criterio_de_violacao` | Frase que descreve um **estado observável de artefato** | FR-005 | rótulo `**Violation:**` presente e não vazio |
+| `origem` | Referência a fonte que sobrevive à remoção do material transitório | FR-006 | rótulo `**Source:**` presente e não vazio |
+
+> **Rótulos em inglês por ADR-010**: são nomes de campo, não prosa. O conteúdo dos
+> dez princípios permanece em português. O oráculo aceita ambas as grafias, para
+> que um fork ou uma tradução futura não reprove por escolha de idioma.
 
 **Invariantes**
 

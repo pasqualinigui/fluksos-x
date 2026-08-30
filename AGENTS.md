@@ -1,6 +1,6 @@
 # fluksos-x
 
-## Identidade
+## Identity
 
 CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: as
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
@@ -9,7 +9,7 @@ elas. Serve qualquer stack, porque não assume nenhuma.
 **Estado**: Fase 0 (bootstrap), item 002 de 012. As ferramentas de qualidade
 chegam nos itens 004–009 — até lá, só shell, git e Python 3.12 stdlib.
 
-## Como operar
+## How to operate
 
 ```bash
 # harness completo — o oráculo do projeto
@@ -25,7 +25,7 @@ scripts/verify/f0-002-constitution.sh --list
 
 Saída `0` é obrigatória antes de qualquer entrega. Sem ela, não convergiu.
 
-## Ciclo canônico
+## Canonical cycle
 
 ```
 RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS 🔴 → IMPLEMENT 🟢 → CONVERGE
@@ -34,7 +34,7 @@ RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS 🔴 �
 Cada etapa produz artefato versionado em `specs/<NNN>-<slug>/`. A etapa de
 clarificação fecha ambiguidade **antes** de o planejamento derivar tarefas dela.
 
-## Regras que não se quebram
+## Rules that do not bend
 
 1. **Especificação antes de código.** Mudou a lógica, muda a especificação antes.
 2. **Teste antes da implementação.** O par vermelho→verde vive em commits
@@ -48,13 +48,13 @@ clarificação fecha ambiguidade **antes** de o planejamento derivar tarefas del
 7. **A especificação é insumo do planejamento, nunca sua saída.** Achado de plano
    volta à etapa de análise; um plano que corrige a spec apaga o próprio defeito.
 
-## Ambiente
+## Environment
 
 Nada roda em segundo plano. Docker é ligado sob demanda e desligado após uso;
 `restart: always` é proibido. Nenhuma escrita em configuração de escopo global da
 máquina — identidade de autoria vive em escopo local do repositório.
 
-## Onde estão as fontes
+## Where the sources are
 
 | Preciso de… | Vou a… |
 |---|---|
@@ -66,7 +66,7 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
 
-## Precedência
+## Precedence
 
 A governança em `.specify/memory/constitution.md` **prevalece** sobre este
 arquivo, sobre os planos e sobre a documentação de contribuição. Divergência entre
