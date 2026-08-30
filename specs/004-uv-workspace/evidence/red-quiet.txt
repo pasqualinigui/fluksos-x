@@ -1,0 +1,20 @@
+🔴 FR-001   pyproject.toml existe TOML valido name fluksos-x version 0.1.0
+           evidencia: pyproject.toml ausente na raiz (FR-001 D1)
+🔴 FR-002   requires-python == >=3.12,<3.14 single interseccao
+           evidencia: pyproject.toml ausente — sem requires-python
+🔴 FR-003   build-system uv_build>=0.12.7,<0.13 build-backend uv_build
+           evidencia: pyproject.toml ausente
+🔴 FR-004   tool.uv.workspace members [packages/*] sem exclude sem sources em 004
+           evidencia: pyproject.toml ausente
+🔴 FR-005   .python-version existe e contem 3.12
+           evidencia: .python-version ausente na raiz (FR-005 D5)
+🔴 FR-006   uv.lock existe TOML valido universal versionado
+           evidencia: uv.lock ausente ao lado de pyproject.toml (FR-006 D2)
+🔴 FR-007   uv.lock nao editado manual uv lock --check quando uv presente
+           evidencia: uv.lock ausente — sem o que verificar
+🔴 FR-008   .venv existe com bin/python 3.12 e .venv/.gitignore *
+           evidencia: .venv/ ausente ao lado de pyproject.toml (FR-008 D3)
+🔴 FR-009   .venv descartavel regeneravel e ignorado git status limpo
+           evidencia: .venv ausente — nao ha descartabilidade a verificar
+
+Resultado: 5/14 assercoes aprovadas — 9 violacao(oes) (critica: 0, alta: 9, media: 0) — NAO CONFORME
