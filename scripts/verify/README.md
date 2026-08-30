@@ -29,7 +29,7 @@ scripts/verify/
 ├── README.md                  # este arquivo
 ├── f0-001-foundation.sh       # item 001 (0.9) — git, exclusões, convenções
 ├── f0-002-constitution.sh     # item 002 (0.11) — governança, porta de entrada
-├── f0-003-uv-workspace.sh     # item 003 (0.1)  — a criar
+├── f0-003-ci-minimo.sh        # item 003 (0.13) — CI mínimo — harness Fase 0 em runner limpo
 └── ...                        # até f0-012
 ```
 
@@ -97,6 +97,7 @@ scripts/verify/f0-001-foundation.sh --list
 |---|---|---|
 | `f0-001-foundation.sh` | 30 | repositório e linhas de trabalho, convenções de registro, higiene do histórico (Lei Zero, duas camadas), estado do índice |
 | `f0-002-constitution.sh` | 33 | governança ratificada (10 princípios com critério de violação e origem), porta de entrada e seu orçamento, ciclo canônico, obrigações herdadas do item 001, **integridade do oráculo anterior** |
+| `f0-003-ci-minimo.sh` | 14 | CI mínimo — harness Fase 0 em runner limpo (`.github/workflows/ci.yml`), determinismo e fronteira |
 
 ### Integridade por resumo criptográfico (item 002, ADR-006)
 
