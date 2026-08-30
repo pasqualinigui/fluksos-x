@@ -6,8 +6,8 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 0 (bootstrap), item 002 de 012. As ferramentas de qualidade
-chegam nos itens 004–009 — até lá, só shell, git e Python 3.12 stdlib.
+**Estado**: Fase 0 (bootstrap), item 004 de 016. As ferramentas de qualidade
+chegam nos itens 005–009 — até lá, só shell, git e Python 3.12 stdlib.
 
 ## How to operate
 
@@ -47,6 +47,12 @@ clarificação fecha ambiguidade **antes** de o planejamento derivar tarefas del
 6. **Segredo nunca entra no histórico.** Lei Zero. A exclusão precede o registro.
 7. **A especificação é insumo do planejamento, nunca sua saída.** Achado de plano
    volta à etapa de análise; um plano que corrige a spec apaga o próprio defeito.
+8. **O oráculo emite IDs da spec.** Fragmentou ou uniu requisitos, o mapa vai
+   escrito no contrato do oráculo. Remapeamento silencioso é proibido (ADR-015).
+9. **Contratos tem vocabulário único.** `Entregue por este item` /
+   `Recebido de itens anteriores` / `Transferido a itens posteriores` (ADR-015).
+10. **CONVERGE fecha a lista.** Zero tarefas `[ ]` é condição do verde final
+    (ADR-015).
 
 ## Environment
 
@@ -61,7 +67,8 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Os dez princípios, com critério de violação e origem | `.specify/memory/constitution.md` |
 | Convenções de registro, linhas de trabalho e o que nunca entra | `CONTRIBUTING.md` |
 | Plano geral das 5 fases e a estrutura final | `docs/plan/implementation_plan.md` |
-| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..006) |
+| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..015) |
+| O que uma auditoria encontrou | `docs/plan/audit/f0-*.md` |
 | Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md` |
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
