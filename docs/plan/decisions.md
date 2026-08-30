@@ -935,3 +935,152 @@ Registrado para que a adoção não seja lida como adesão à crítica.
 Algoritmo derivado da skill `grilling` de Matt Pocock (`mattpocock/skills`),
 licença MIT, Copyright (c) 2026 Matt Pocock. Reimplementado, não copiado. A
 atribuição acompanha o código do item `4.2`.
+
+---
+
+## ADR-014 — Registro da auditoria pós-004 e a convenção de auditoria-checkpoint
+
+**Data**: 2026-08-30 · **Item**: nenhum (checkpoint não-item, entre 004 e 005) ·
+**Estado**: aceita · **Evidência**: `docs/plan/audit/f0-audit-001-004.md`
+
+### Contexto
+
+Os itens 001–004 da Fase 0 convergiram com harness verde (91/91 asserções). O
+mantenedor pediu uma auditoria cruzada antes de iniciar o item 005: *as specs
+foram feitas corretamente? o SDD está sendo executado direito? o harness está
+bom?* A pergunta é a que a ADR-009 ensinou: não só revisar o que está escrito,
+mas perguntar o que deveria estar e não está.
+
+A auditoria encontrou quatro achados acionáveis (A1, A2, M3, M4) e cinco baixos,
+registrados com evidência reproduzível no relatório. Os dois altos divergem da
+governança vigente:
+
+- **A1** — a cadeia de integridade por hash (ADR-006) só existe de 002 sobre 001;
+  003 e 004 aprovam o harness herdado sem asserir sua integridade.
+- **A2** — o oráculo do 004 remapeia silenciosamente os FRs da spec
+  (FR-001…017 → FR-001…014), violando o princípio X.
+
+### Decisão
+
+**1. Nenhum oráculo ou artefato convergido é tocado.** Os achados A1, A2, M3 e
+M4 são **exceções registradas com transferência à spec 005**, exatamente o
+mecanismo da ADR-007. A correção é **aditiva**: nasce certa da 005 em diante, e
+a dívida fica visível até ser paga.
+
+**2. A auditoria vira convenção.** Auditorias de completude são **checkpoints
+não-item**: ocorrem entre fases e a cada no máximo quatro itens, com artefato
+versionado em `docs/plan/audit/`, no formato do relatório inaugural. Não entram
+no mapa de execução da ADR-011 — são a etapa ANALYZE ampliada para o plano
+inteiro. Os achados alimentam este arquivo e, quando o motor existir, o Agente
+Guardião (item 3.8).
+
+**3. Destino de cada achado** — fixado no relatório §5: A1/A2/M3/M4 à spec 005;
+B1/B2 valem como norma a partir da 005; B3 é dívida de registro reconhecida; B4
+vira asserção de pin na 005; B5 é corrigido no próprio saneamento (AGENTS.md é
+porta de entrada, não oráculo convergido).
+
+### Por que não criar uma spec de saneamento
+
+As dívidas são exatamente do formato da spec 005 (Pytest, 0.4): a ADR-007 já
+transferiu cinco casos a ela, e a ADR-002 a aponta como o item que promove os
+oráculos a pytest. Uma spec intermediária quebraria a renumeração da ADR-011 sem
+ganho. A spec 005 herda tudo pela seção Contratos — o canal que já existe.
+
+### Consequências
+
+- O repositório passa a ter três classes de documento normativo: **plano**
+  (intenção), **ADRs** (decisão), **auditoria** (evidência). O relatório não é
+  normativo; as ADRs que ele gerou são.
+- A spec 005 começa com a maior lista de dívidas recebidas até aqui — o que é
+  o sinal de que o mecanismo funciona, não de que falhou.
+- O motor herda o padrão: auditoria periódica de completude é função do Guardião.
+
+---
+
+## ADR-015 — Padrão corrigido do harness: manifesto de integridade, mapa FR↔asserção, CONVERGE fecha a lista
+
+**Data**: 2026-08-30 · **Item**: nenhum (checkpoint não-item) · **Estado**: aceita ·
+**Origem**: achados A1, A2, M3, M4 de `docs/plan/audit/f0-audit-001-004.md` ·
+**Efeito**: normativo a partir da spec 005; nenhum oráculo 001–004 é modificado
+
+### Problema
+
+Quatro defeitos do harness atual, todos da mesma família — a norma diz mais do
+que o mecanismo garante:
+
+1. **Integridade (A1)** — ADR-006 fixou a regra, mas ela se expressa como
+   "cada item fixa o hash do anterior", e a cadeia parou no 002. Falta um
+   mecanismo único e estático.
+2. **Rastreabilidade (A2)** — o oráculo pode reidentificar requisitos sem deixar
+   rastro; a saída do harness deixa de nomear o requisito da spec.
+3. **Convergência (M3)** — o CONVERGE fechou a spec 003 com a lista de tarefas
+   aberta; "convergiu" passou a valer mais que "registrou".
+4. **Cobertura herdada (M4)** — o self-check do oráculo novo cobre a si e
+   "alguns anteriores", sem regra.
+
+### Decisão
+
+**(a) Manifesto de integridade — `scripts/verify/manifest.sha256`.**
+
+A partir da spec 005, os resumos de **todos** os oráculos convergidos vivem num
+arquivo único, no formato nativo de `sha256sum` (para verificação por
+`sha256sum -c`, sem parser novo). Valores congelados nesta ADR (medidos em
+2026-08-30, harness verde):
+
+```
+63412ca7a9ada4af0e435db89fdbb649423b56005dfd2908c59ba2745a6bbf22  scripts/verify/f0-001-foundation.sh
+406d72528ddebba417887a65f553c99d9c7df8982fb2b72672904b3ec09386a7  scripts/verify/f0-002-constitution.sh
+d10c61e8623fcf3f7c706ab8ca7387303c2d5282da0afaee50bf5c6401b6f7d4  scripts/verify/f0-003-ci-minimo.sh
+3db36208b4e13fb24bace3aaa3247224f163ca02a070d8b15e64084b1bafd88e  scripts/verify/f0-004-uv-workspace.sh
+```
+
+Regras: a spec **N** cria ou acrescenta o manifesto cobrindo `001..N`, e seu
+oráculo o assere (`sha256sum -c` exit 0). Divergência de hash sobe para decisão
+por ADR — **nunca** para atualização silenciosa do valor. O manifesto é
+aditivo: uma linha por oráculo, na ordem de execução.
+
+**(b) Mapa FR↔asserção é obrigatório quando não for identidade.**
+
+O oráculo emite os identificadores **da spec** (FR-NNN da spec). Fragmentação ou
+junção só é admitida com o mapa escrito no `contracts/oracle-cli.md` do item
+(ex.: "asserção FR-016a/b refinam FR-016; FR-015 não verificável por harness,
+verificado por cenário humano"). Remapeamento silencioso é proibido.
+
+**(c) Vocabulário único da seção Contratos.**
+
+Toda spec usa as três subseções canônicas, grepeáveis por qualquer oráculo:
+
+```
+### Entregue por este item
+### Recebido de itens anteriores
+### Transferido a itens posteriores
+```
+
+(A 003 usa duas delas; a 004 usa "Contratos expostos"; o nome padrão é o da 003,
+que é o que o oráculo já verifica.)
+
+**(d) CONVERGE fecha a lista.**
+
+Zero tarefas `[ ]` em `tasks.md` é condição do verde final — asserida pelo
+oráculo **do próprio item** (cada item verifica a si, nunca os anteriores).
+A 003 convergiu com 31/31 abertas: exceção registrada, sem edição retroativa.
+
+**(e) Self-check cobre todos os anteriores.**
+
+O oráculo do item N executa `--quiet` de `f0-001…f0-(N-1)`, não de um subconjunto.
+Fecha a lacuna da 004, que pula a 002.
+
+### O que não muda
+
+- ADR-002 (um item nunca modifica oráculo anterior) — estas regras são aditivas.
+- ADR-006 — o manifesto é a forma estática da cadeia que ela descreveu.
+- Os oráculos 001–004 — intocados; os quatro hashes acima os congelam.
+
+### Consequências
+
+- A spec 005 nasce com o padrão corrigido e com a primeira execução do
+  manifesto — seu próprio oráculo entra no manifesto como linha 5.
+- O CI mínimo (003) não precisa mudar: o glob `f0-*.sh` não inclui o manifesto
+  (que é dado, não script); o oráculo da 005 o verifica.
+- A primeira divergência de hash no futuro terá precedente e procedimento — que
+  é o que distingue incidente de rotina.
