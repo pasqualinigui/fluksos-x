@@ -1,0 +1,14 @@
+FR-001   pyproject.toml existe TOML valido name fluksos-x version 0.1.0
+FR-002   requires-python == >=3.12,<3.14 single interseccao
+FR-003   build-system uv_build>=0.12.7,<0.13 build-backend uv_build
+FR-004   tool.uv.workspace members [packages/*] sem exclude sem sources em 004
+FR-005   .python-version existe e contem 3.12
+FR-006   uv.lock existe TOML valido universal versionado
+FR-007   uv.lock nao editado manual uv lock --check quando uv presente
+FR-008   .venv existe com bin/python 3.12 e .venv/.gitignore *
+FR-009   .venv descartavel regeneravel e ignorado git status limpo
+FR-010   .gitignore sem *.lock nem uv.lock ativo
+FR-011   .venv ignorado e uv.lock nao ignorado e .gitignore inalterado vs 001
+FR-012   sem packages/ e sem ruff/mypy/pytest/lefthook/pip-audit/trivy
+FR-013   CI 003 glob inclui f0-004 sem editar ci.yml e harness herdado integro
+FR-014   oraculo self-check exit 0/1/2 quiet list determinismo <5s
