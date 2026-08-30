@@ -44,6 +44,7 @@ homônima o verifica diretamente, sem decompor nada.
 | `FR-005b` | Cada princípio declara **critério de violação** rotulado e não vazio | alta |
 | `FR-006` | Cada princípio declara **origem** rotulada e não vazia | alta |
 | `FR-007` | A seção de governança declara as três subseções: procedimento de emenda, política de versionamento, expectativa de revisão de conformidade | média |
+| | *A seção é localizada por `## Governance` **ou** `## Governança` — o modelo canônico usa a forma inglesa. O nome do cabeçalho não é o requisito; as três subseções são. Correção aplicada em 2026-08-30, após `FR-007` reprovar com as três subseções presentes: o defeito estava no oráculo, não na governança* | |
 | `FR-008` | Registro de impacto presente, **em ocorrência única**, contendo versão anterior, versão nova, princípios acrescentados e pendências deferidas | média |
 
 > `FR-005b` é a asserção de maior consequência do item. Ela não julga se o

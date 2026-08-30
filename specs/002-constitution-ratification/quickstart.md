@@ -2,9 +2,14 @@
 
 **Feature**: `002-constitution-ratification` · **Data**: 2026-08-30
 
-Roteiro de validação executável. Nove cenários: sete decididos pela máquina, dois
+Roteiro de validação executável do oráculo `f0-002-constitution.sh`, que verifica
+**33 asserções** em cinco grupos. Onze cenários: nove decididos pela máquina, dois
 que **exigem julgamento humano** — e estão aqui exatamente porque o oráculo não
 consegue decidi-los, não porque foram esquecidos.
+
+> Os cenários 10 e 11 foram acrescentados na convergência (T044): descrevem
+> comportamento que existe no oráculo construído e que o roteiro original não
+> cobria.
 
 Pré-requisitos: nenhum além de shell, git e Python 3.12. Nenhuma dependência do
 projeto é necessária neste ponto do bootstrap.
@@ -153,6 +158,54 @@ execuções. Um oráculo que altera o estado que mede não é oráculo.
 
 ---
 
+## Cenário 10 — A revalidação retroativa cobre os 16 artefatos
+
+```bash
+python3 - <<'PY'
+import re, pathlib
+alvo = pathlib.Path('specs/002-constitution-ratification/compliance-001.md').read_text(encoding='utf-8')
+art = [l.strip() for l in pathlib.Path('/dev/stdin').read_text().splitlines() if l.strip()]
+PY
+scripts/verify/f0-002-constitution.sh 2>&1 | grep -E 'FR-017a|FR-017b'
+```
+
+**Esperado**: `FR-017a` verde — o documento de veredito nomeia os **16** artefatos
+fixados em `research.md` E8, por comparação de **conjuntos**: um artefato ausente é
+nomeado na reprovação, nunca escondido numa contagem.
+
+---
+
+## Cenário 11 — `FR-017b` só libera com decisão registrada
+
+Uma não conformidade retroativa reprova **enquanto não houver decisão do
+mantenedor registrada**. Depois de registrada, aprova — sem isso, a saída "exceção
+fundamentada" seria inalcançável, e a governança só poderia apagar a dívida ou
+capitular diante dela.
+
+O registro exige **quatro partes**. Os controles abaixo removem uma de cada vez e
+confirmam que a asserção reprova nomeando a que falta:
+
+```bash
+cp specs/002-constitution-ratification/compliance-001.md /tmp/bkp.md
+for caso in saida fundamentacao data adr; do
+  # mutilar o registro conforme o caso, executar, restaurar
+  scripts/verify/f0-002-constitution.sh 2>&1 | grep -A2 'FR-017b'
+done
+cp /tmp/bkp.md specs/002-constitution-ratification/compliance-001.md
+```
+
+**Esperado**, com o estado real (decisão C registrada na ADR-007): `FR-017b` verde.
+Com qualquer das quatro partes ausente: **reprova**, nomeando `saida-escolhida`,
+`fundamentacao`, `data-ISO` ou `decisao-arquitetural`.
+
+> Este controle existe porque a primeira implementação **aprovava com a saída
+> apagada**: o padrão usava `\s*`, que inclui quebra de linha, e capturava a linha
+> seguinte. A asserção parecia funcionar. Foi o controle adversarial que a pegou,
+> não outra asserção — o mesmo padrão do defeito de verdade vácua encontrado no
+> portão vermelho.
+
+---
+
 ## Critério de conclusão
 
 | Cenário | Verificação | Requisito |
@@ -166,7 +219,11 @@ execuções. Um oráculo que altera o estado que mede não é oráculo.
 | 7 | oráculo anterior íntegro e aprovando | FR-021 |
 | 8 | harness acumulado, < 5 s por oráculo | SC-006 |
 | 9 | determinismo, sem resíduo | FR-020c |
+| 10 | 16/16 artefatos com veredito | FR-017a, SC-007 |
+| 11 | decisão registrada libera; ausente reprova | FR-017b |
 
-Os cenários 3 e 6 são os únicos que a máquina não decide. Estão nomeados como
+Os cenários 3 e 6 são os únicos que a máquina não decide. O 3 foi executado em
+2026-08-30 e seus dez vereditos estão em `compliance-001.md`; o 6 permanece
+pendente de ação do mantenedor. Estão nomeados como
 tais para que sua ausência seja visível — um roteiro que escondesse os limites do
 próprio harness daria a impressão de cobertura total.

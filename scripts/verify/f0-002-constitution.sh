@@ -251,6 +251,13 @@ PY
 # a decisao arquitetural que a formaliza. Faltando qualquer uma, o achado segue
 # pendente e FR-017b reprova.
 py_decisao() {
+  # CAUSA REGISTRADA (principio VII) — defeito real, corrigido em 2026-08-30:
+  # a primeira versao usava `\*\*Saída escolhida\*\*:\s*(\S.*)`. Em Python `\s`
+  # inclui QUEBRA DE LINHA, entao com o valor apagado o padrao atravessava a linha
+  # vazia e capturava a LINHA SEGUINTE — aprovando um registro de decisao em branco.
+  # Detectado pelo controle adversarial, nao por assercao: a assercao aprovava.
+  # A ancoragem correta e `[ \t]*(\S[^\n]*)`, que nao cruza a quebra de linha.
+  # Nao substituir por \s* de novo.
   python3 - "$COMPLIANCE" <<'PYD'
 import re, sys, pathlib
 t = pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')

@@ -105,6 +105,27 @@ explícitas, não invasão de escopo.
 > `FR-017b`. Isso não é falha do plano: é o comportamento especificado. Um plano
 > que garantisse conclusão incondicional estaria contradizendo a spec.
 
+> **Desfecho registrado em 2026-08-30 — a interrupção ocorreu.**
+>
+> A revalidação retroativa julgou os 16 artefatos do item 001. Quinze conformes.
+> Um não: `scripts/verify/f0-001-foundation.sh` viola o **princípio VI**, porque
+> `SC-003` (tempo e determinismo empírico), `SC-004` (par vermelho→verde) e
+> `SC-007` (contratos declarados) não possuem asserção correspondente no harness.
+>
+> O ciclo parou, como manda `FR-017b`. A decisão do mantenedor foi a **saída C** —
+> exceção fundamentada com transferência ao item 004 —, registrada na **ADR-007**.
+> `f0-001-foundation.sh` permanece intocado: corrigi-lo quebraria a ADR-002 e
+> invalidaria `FR-021a` deste próprio item.
+>
+> Uma **quinta lacuna** apareceu depois, já na Fase 9, ao registrar commits numa
+> linha de funcionalidade: `FR-001` mede a linha apontada por HEAD, não a
+> existência da linha principal — o harness reprova em qualquer `feature/*`, que é
+> o fluxo prescrito pelo `CONTRIBUTING.md` §2. Mesma classe, mesma decisão.
+>
+> As quatro primeiras vieram de comparação sistemática entre critérios e
+> asserções. A quinta veio de **usar** o harness num fluxo que ele nunca tinha
+> visto. Nenhuma das duas formas de achado substitui a outra.
+
 ---
 
 ## Project Structure

@@ -169,3 +169,89 @@ permanece em `main` — que é o que o item 001 de fato fez.
 entre critérios e asserções. Esta veio de **usar** o harness num fluxo que ele
 nunca tinha visto. As duas formas de achado são necessárias, e nenhuma substitui a
 outra.
+
+---
+
+# Cenário 3 — Teste de decidibilidade dos dez princípios
+
+**Data**: 2026-08-30 · **Tarefa**: T041 · **Critério**: `SC-002`
+**Método**: para cada princípio, um artefato real do repositório e a pergunta
+*"este artefato viola este princípio?"* — respondida **sem discutir o que o
+princípio quis dizer**. Só o critério de violação escrito na governança conta.
+
+Este é um dos dois cenários que a máquina não decide. `FR-005b` assere que o
+critério de violação **existe e está rotulado**; se ele é **utilizável** é o que se
+mede aqui.
+
+| № | Princípio | Artefato testado | Observado | Veredito | Decidido sem interpretação? |
+|---|---|---|---|---|---|
+| **I** | Determinismo sobre probabilidade | `scripts/verify/f0-002-constitution.sh` | Zero decisões dependentes de saída de modelo. O único casamento de `llm` na busca foi a substring dentro de `re.fullmatch` | **não viola** | ✅ sim |
+| **II** | Especificação precede código | `scripts/verify/f0-002-constitution.sh` | `specs/002-constitution-ratification/` existe; spec e oráculo entraram no mesmo registro `13014e8`, spec não posterior ao código | **não viola** | ✅ sim |
+| **III** | Teste antes da implementação | `specs/002-constitution-ratification/evidence/` | `red.txt` em `13014e8`; `green.txt` em `7e88314`, **posterior**. O par existe e o verde não precede o vermelho | **não viola** | ✅ sim |
+| **IV** | Definição de dados antes da implementação | `scripts/verify/f0-002-constitution.sh` | Contrato de entrada/saída em `contracts/oracle-cli.md`: invocação, três códigos de saída, formato de linha, 33 asserções | **não viola** | ✅ sim |
+| **V** | Segurança é a Lei Zero | `.gitignore` e o índice do repositório | `git ls-files -i -c --exclude-standard` devolve **0**; a trava de dependências permanece versionável (`FR-013` do item 001, verde) | **não viola** | ✅ sim |
+| **VI** | O harness é o oráculo | `scripts/verify/f0-001-foundation.sh` | `SC-003` coberto só parcialmente, `SC-004` e `SC-007` sem asserção, `FR-001` mede a linha apontada por HEAD | 🔴 **viola** | ✅ sim |
+| **VI** | O harness é o oráculo | `scripts/verify/f0-002-constitution.sh` | `SC-002` → `FR-005b` + cenário 3; `SC-004` → `FR-011` + cenário 6. Correspondência existe e a fronteira está declarada no contrato §2.1 | **não viola** | ✅ sim |
+| **VII** | Auto-reparo atualiza a documentação | `scripts/verify/f0-002-constitution.sh` | As cinco correções deste ciclo alteraram o oráculo e/ou o contrato — artefatos normativos | **não viola** | ⚠️ **não** — ver abaixo |
+| **VIII** | Elo verificado antes de lógica | `docs/plan/research/f0-002-constitution.md` | O oráculo consome git e Python 3.12; ambos verificados e registrados em `docs/plan/research/` | **não viola** | ✅ sim |
+| **IX** | Agnosticismo de stack | `AGENTS.md` | Zero referências a ferramenta de sistema-alvo fora de adaptador declarado | **não viola** | ✅ sim |
+| **X** | Observabilidade | `scripts/verify/f0-002-constitution.sh` | 52 chamadas de resultado, **todas** carregando identificador de requisito; nenhum caminho de falha anônimo | **não viola** | ✅ sim |
+
+## Resultado
+
+| | |
+|---|---|
+| Princípios testados | **10** (11 vereditos — VI testado contra dois artefatos) |
+| Decididos sem interpretação | **9 de 10** |
+| Exigiram interpretação | **1 — princípio VII** |
+| Violações encontradas | **1**, já registrada e decidida (ADR-007, saída C) |
+
+## 🔴 O princípio VII não foi decidível
+
+Foi o único veredito que não saiu do critério escrito. O enunciado diz:
+
+> *"Ao corrigir uma falha, o ciclo MUST registrar **a causa** no artefato normativo
+> correspondente, de modo que a mesma falha não possa repetir-se sem ser
+> detectada."*
+
+O critério de violação diz:
+
+> *"existe correção de falha cujo registro **não altera nenhum artefato
+> normativo**."*
+
+**As duas frases cobram coisas diferentes.** A correção do regex de `py_decisao`
+alterou o oráculo — pelo critério, não viola. Mas a **causa** não estava registrada
+em lugar nenhum até T045, e nada impedia alguém reintroduzir `\s*` no dia seguinte:
+pelo enunciado, o propósito não era servido.
+
+Precisei escolher entre as duas leituras para emitir veredito. **Isso é exatamente
+o que `FR-005` proíbe.** Adotei o critério, porque é ele que a governança declara
+como teste — declarar violação onde o critério não a sustenta seria o falso
+positivo que o princípio existe para evitar.
+
+O achado é o produto mais valioso deste cenário: `FR-005b` assere que o critério
+**existe**, e ele existia. A máquina não tem como ver que ele é **mais fraco que o
+enunciado que deveria operacionalizar**. Só o uso mostra.
+
+Encaminhado como **candidato a emenda PATCH** em T047 — a ser exercitado por
+`/speckit-constitution` próprio. Emendar governança de dentro de outro comando é
+o que a ADR-007 estabeleceu que não se faz.
+
+## Cenário 6 — pendente de ação do mantenedor
+
+`SC-004` exige que o agente construtor carregue a orientação de `AGENTS.md` em
+toda sessão, sem ação manual. **Nenhum processo automatizado pode verificar isso**:
+um script não observa o contexto carregado por outro processo (research E6).
+
+`FR-011` verde assere que a diretiva `@AGENTS.md` está no lugar documentado pelo
+fornecedor — o mecanismo, nunca o efeito.
+
+> **Registro a preencher pelo mantenedor** (T042)
+>
+> Procedimento: abrir sessão nova do agente construtor na raiz do projeto e
+> perguntar algo que só a porta de entrada responde — por exemplo, qual é a etapa
+> do ciclo canônico entre especificação e planejamento (resposta esperada:
+> **CLARIFY**).
+>
+> **Resultado observado**:
+> **Data**:

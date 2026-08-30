@@ -305,3 +305,29 @@ de entrada e quitação de dívida agregam valor, mas o trabalho prossegue sem e
   recuperável depois.
 - T030 é a única tarefa que pode **encerrar o ciclo sem conclusão**. Isso não é
   falha do plano: é o comportamento especificado em `FR-017b`.
+
+---
+
+## Phase 10: Convergence
+
+**Origem**: `/speckit-converge` executado em 2026-08-30, **sob portão constitucional
+real** — a primeira avaliação do motor contra governança ratificada, não contra
+portão substituto.
+
+Seis achados. Nenhum invalida o verde de 33/33: o oráculo mede o que foi
+especificado, e mede corretamente. Os achados são de **registro** — trabalho que
+aconteceu e não ficou rastreável — e um de verificação humana não executada.
+
+- [X] T040 Registrar em `specs/002-constitution-ratification/spec.md` › Contratos › **Transferido a itens posteriores** a linha destinada ao **item 004 (0.4 — Pytest)**: cobertura das cinco lacunas de asserção do harness do item 001, conforme ADR-007. Motivo a declarar: o item 004 já promove cada oráculo a módulo de teste, e as asserções entram como casos novos **ao lado**, nunca dentro de `f0-001-foundation.sh`, o que preserva a ADR-002 e `FR-021a`. Sem esta linha, o destinatário da transferência não encontra sua obrigação lendo a spec — que é exatamente o que a seção Contratos existe para impedir per `FR-023` e ADR-007 (missing)
+- [X] T041 Executar o **cenário 3** de `quickstart.md`: tomar cada um dos dez princípios ratificados e um artefato real do repositório, e emitir veredito de violação **sem discutir o que o princípio quis dizer**. Registrar os dez vereditos em `specs/002-constitution-ratification/compliance-001.md`, em seção própria. T038 foi marcada concluída tendo executado os cenários 2 e 5, que não são os exigidos — `SC-002` segue sem verificação per SC-002, T038 (partial)
+- [ ] T042 Solicitar ao mantenedor a execução do **cenário 6** de `quickstart.md` — abrir sessão nova do agente construtor num diretório limpo e confirmar que a orientação de `AGENTS.md` é carregada sem ação manual — e registrar o resultado. É o único critério que **nenhum processo automatizado pode verificar**: um script não observa o contexto carregado por outro processo (research E6). `FR-011` verde assere o mecanismo documentado, não o efeito per SC-004, T038 (partial)
+- [X] T043 Registrar em `specs/002-constitution-ratification/plan.md` o **desfecho da Fase F**: a interrupção prevista ocorreu, a não conformidade encontrada foi `f0-001-foundation.sh` contra o princípio VI, a decisão do mantenedor foi a **saída C** (ADR-007), e uma **quinta lacuna** apareceu depois, na Fase 9, ao usar o harness numa linha de funcionalidade. O plano prevê a possibilidade da parada mas não registra que ela aconteceu per plan: Fase F (partial)
+- [X] T044 Sincronizar `specs/002-constitution-ratification/quickstart.md` com o oráculo efetivamente construído: as **33 asserções**, um cenário para a **revalidação retroativa** (`compliance-001.md` com 16 vereditos) e um cenário para o comportamento de **`FR-017b` liberado por decisão registrada** — incluindo os quatro controles adversariais que provam que ele reprova sem saída escolhida, sem fundamentação, sem data ISO ou sem decisão arquitetural per plan: quickstart (partial)
+- [X] T045 Registrar a causa da correção do regex de `py_decisao` em `scripts/verify/f0-002-constitution.sh`: `\s` inclui quebra de linha, então `\*\*Saída escolhida\*\*:\s*(\S.*)` **atravessava a linha vazia e capturava a linha seguinte**, aprovando um registro de decisão em branco. Detectado pelo controle adversarial, não por asserção. A ancoragem correta é `[ \t]*(\S[^\n]*)`. Sem o comentário, nada impede a reintrodução do mesmo defeito per Constituição VII (partial)
+- [X] T046 Registrar em `specs/002-constitution-ratification/contracts/oracle-cli.md` a correção de `FR-007`: a seção de governança é localizada por **`## Governance` ou `## Governança`**, porque o modelo canônico usa a forma inglesa. O nome do cabeçalho não é o requisito — as três subseções são —, e a exigência permanece idêntica. Hoje isso só existe como comentário no oráculo, e o contrato é onde a asserção é definida per Constituição VII, contrato §2 (partial)
+- [X] T047 Registrar em `docs/plan/decisions.md` a observação de que o **critério de violação do princípio VII é mais fraco que seu enunciado**: o enunciado exige registrar a **causa** *"de modo que a mesma falha não possa repetir-se"*, mas o critério cobra apenas que *"o registro altere algum artefato normativo"* — uma correção pode mudar o código, não registrar causa nenhuma e ainda assim passar. Achado de uso do primeiro portão constitucional real; encaminhado como **candidato a emenda PATCH** da governança, a ser exercitado por `/speckit-constitution` próprio, **não** aqui — emendar governança de passagem é o que a ADR-007 estabeleceu que não se faz per Constituição VII (partial)
+
+**Nota de escopo**: nenhuma das oito tarefas altera o oráculo do item 001 nem
+reabre asserção já verde. T040, T043, T044 e T046 alteram artefatos deste item
+para que passem a descrever o que existe; T045 e T047 registram causa; T041 e T042
+executam verificação humana que ficou pendente.

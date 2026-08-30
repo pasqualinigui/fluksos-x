@@ -447,3 +447,78 @@ quando a correção é legítima.
 - Fica estabelecido o **primeiro precedente** do motor para conflito entre
   governança e trabalho já convergido: reconhecer, registrar, transferir a item
   nomeado com prazo — nunca reescrever o passado nem enfraquecer a regra.
+
+---
+
+## ADR-008 — Achado de uso: o critério do princípio VII é mais fraco que seu enunciado
+
+**Data**: 2026-08-30 · **Item**: `002` (0.11) · **Estado**: **registrada, não aplicada**
+**Origem**: cenário 3 de `quickstart.md`, executado em T041
+
+> Esta ADR **não emenda a governança**. Ela registra um achado e o encaminha ao
+> procedimento próprio. Emendar governança de dentro de outro comando é o que a
+> ADR-007 estabeleceu que não se faz.
+
+### Contexto
+
+O cenário 3 submete cada um dos dez princípios ratificados ao teste de
+decidibilidade: tomar um artefato real e responder *"viola ou não viola?"* usando
+**apenas** o critério de violação escrito na governança.
+
+Nove princípios passaram. O **VII — Auto-reparo atualiza a documentação** não.
+
+### Achado
+
+O enunciado e o critério cobram coisas diferentes:
+
+| | Texto |
+|---|---|
+| **Enunciado** | *"Ao corrigir uma falha, o ciclo MUST registrar **a causa** no artefato normativo correspondente, **de modo que a mesma falha não possa repetir-se** sem ser detectada."* |
+| **Critério de violação** | *"existe correção de falha cujo registro **não altera nenhum artefato normativo**."* |
+
+O caso concreto que expôs a folga: durante o item `002`, o padrão de `py_decisao`
+em `f0-002-constitution.sh` usava `\s*`, que em Python inclui quebra de linha, e
+por isso atravessava a linha vazia e capturava a linha seguinte — aprovando um
+registro de decisão em branco. A correção alterou o oráculo, que é artefato
+normativo: **pelo critério, não viola**. Mas a causa não ficou registrada, e nada
+impedia a reintrodução do mesmo `\s*` no dia seguinte: **pelo enunciado, o
+propósito não era servido**.
+
+Emitir veredito exigiu **escolher entre as duas leituras** — que é exatamente o
+que `FR-005` do item `002` proíbe.
+
+### Por que a máquina não pega isto
+
+`FR-005b` assere que cada princípio **tem** um critério de violação rotulado e não
+vazio. O critério do VII existe e está rotulado — a asserção aprova, corretamente.
+
+Nenhuma asserção compara o **critério** com o **enunciado que ele deveria
+operacionalizar**. Essa comparação é semântica, e é o que o cenário 3 faz.
+
+**Consequência para o método**: `FR-005b` verde não é prova de decidibilidade; é
+prova de que o critério existe. A decidibilidade é medida pelo cenário 3, por
+pessoa, e a diferença entre as duas coisas precisa continuar visível.
+
+### Encaminhamento
+
+**Candidato a emenda PATCH** da governança — esclarece redação sem alterar o que é
+decidido em nenhum dos nove princípios restantes. Redação sugerida para o critério
+do princípio VII:
+
+> *"existe correção de falha cujo registro não identifica **a causa** no artefato
+> normativo correspondente."*
+
+A emenda MUST ser exercitada por `/speckit-constitution` próprio, seguindo o
+procedimento da seção Governance: proposta em especificação, avaliação de impacto
+sobre artefatos já convergidos, e atualização de versão, rodapé e registro de
+impacto. Será também o **primeiro exercício real do procedimento de emenda**, que
+o item `002` definiu mas não exercitou — obrigação já transferida ao pós-Fase 0.
+
+### Consequências
+
+- O princípio VII permanece **inalterado** e vigente na forma ratificada.
+- O achado fica rastreável: quem exercitar a emenda encontra o caso concreto que a
+  motivou, sem reconstituir a conversa.
+- Fica registrado que o primeiro portão constitucional real produziu, além de
+  vereditos, **um achado sobre a própria governança** — que é o que se espera de um
+  mecanismo que se aplica a si mesmo.

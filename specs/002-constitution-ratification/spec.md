@@ -368,6 +368,7 @@ alvo inexistente.
 
 | Destinatário | Responsabilidade transferida | Motivo |
 |---|---|---|
+| **004** (0.4 Pytest) | Cobertura das **cinco lacunas de asserção** do harness do item 001: `SC-003` (tempo e determinismo empírico), `SC-004` (par vermelho→verde), `SC-007` (contratos declarados) e `FR-001` (mede a linha apontada por HEAD, não a existência da linha principal) | Decisão do mantenedor sob `FR-017b`, registrada na **ADR-007**. O item 004 já promove cada oráculo a módulo de teste, então as asserções entram como **casos novos, ao lado** — nunca dentro de `f0-001-foundation.sh`, o que preserva a ADR-002 e a asserção `FR-021a` deste item. A exceção **expira quando o item 004 convergir** |
 | **008** (0.5 Lefthook) | Bloqueio automático de violações de princípio verificáveis mecanicamente | A ferramenta de hooks só existe no item 008 |
 | **008** (0.5 Lefthook) | Decisão sobre teto agregado de tempo do harness completo | O custo real de um bloqueio pré-registro só é conhecido quando a ferramenta existir; até lá vale o limite por oráculo |
 | **Pós-Fase 0** | Primeira emenda da governança e exercício do procedimento definido | Este item ratifica a versão inaugural e define o procedimento; exercitá-lo exige mudança real |
