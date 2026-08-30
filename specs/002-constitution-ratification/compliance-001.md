@@ -141,5 +141,31 @@ sem cobri-las, o achado reabre.
 | `scripts/verify/f0-001-foundation.sh` | **intocado** — resumo `63412ca7…5a6bbf22` permanece válido |
 | Princípio VI | íntegro, sem emenda |
 | ADR-002 | íntegra |
-| Cobertura transferida a | **item 004 (Pytest)**, 4 casos nomeados |
+| Cobertura transferida a | **item 004 (Pytest)**, 5 casos nomeados |
 | Prazo | convergência do item 004 |
+
+---
+
+## Adendo — quinta lacuna, encontrada no uso (2026-08-30)
+
+Durante a Fase 9 deste item, `FR-001` do oráculo do item 001 reprovou ao trabalhar
+numa linha de funcionalidade:
+
+```
+🔴 FR-001  repositorio existe e linha principal e main
+           evidencia: linha atual: feature/f0-constitution-ratification
+```
+
+A asserção mede **a linha apontada por HEAD**, não a existência da linha
+principal. `refs/heads/main` existia. Enunciado e implementação divergem, e o
+efeito é que o harness reprova em qualquer linha de funcionalidade — o fluxo que o
+`CONTRIBUTING.md` §2 do próprio projeto prescreve.
+
+Mesma classe, mesma decisão (**C**): transferida ao item 004 como caso de teste
+novo, sem tocar em `f0-001-foundation.sh`. Até lá, o registro do bootstrap
+permanece em `main` — que é o que o item 001 de fato fez.
+
+**Nota de método**: as quatro primeiras lacunas vieram de comparação sistemática
+entre critérios e asserções. Esta veio de **usar** o harness num fluxo que ele
+nunca tinha visto. As duas formas de achado são necessárias, e nenhuma substitui a
+outra.
