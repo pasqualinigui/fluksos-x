@@ -35,25 +35,26 @@ As 12 specs são criadas na **ordem de dependência** abaixo. A numeração
 sequencial do Spec-Kit (`001`–`012`) reflete essa ordem, não a do plano. Este
 mapa é a fonte de verdade da correspondência.
 
+> ⚠️ **SUPERSEDIDA — não use esta tabela.** A **ADR-011** a substitui: a Emenda 1
+> do plano (ADR-009) acrescentou quatro itens à Fase 0 e alterou as posições de
+> execução. A tabela abaixo permanece apenas como **registro histórico** do estado
+> original de 12 itens. Cada linha vai prefixada por `HIST` para que uma busca por
+> texto não a confunda com o mapa vigente.
+
 | Spec | Item do plano | Título | Justificativa da posição |
 |---|---|---|---|
-| `001` | **0.9** | Git + branching strategy | O Spec-Kit cria feature desde a primeira spec; a prova vermelho→verde exige histórico |
-| `002` | **0.11** | AGENTS.md / constitution | Governa as 10 specs seguintes; o portão constitucional do Spec-Kit lê este artefato |
-| `003` | **0.1** | UV workspace monorepo | Base física de todos os pacotes |
-| `004` | **0.4** | Pytest | Habilita TDD real dos itens seguintes — precisa vir antes de Ruff |
-| `005` | **0.2** | Ruff | |
-| `006` | **0.3** | MyPy strict | Consome contrato do Ruff: regras que conflitam com tipagem estrita |
-| `007` | **0.12** | pip-audit + Trivy | Precisa existir antes de ser orquestrado |
-| `008` | **0.5** | Lefthook | Orquestra 005, 006, 004 e 007 — só faz sentido depois deles |
-| `009` | **0.6** | `packages/core` | Primeiro código de produção |
-| `010` | **0.7** | `packages/cli` | Depende de `core` |
-| `011` | **0.8** | docker-compose | Domínio independente (DevOps) |
-| `012` | **0.10** | `docs/tree.md` | Por último: reflete a árvore real resultante |
-
-> ⚠️ **Este mapa foi emendado.** A **ADR-011** o substitui: a Emenda 1 do plano
-> (ADR-009) acrescentou quatro itens à Fase 0, e a inserção deles altera as
-> posições de execução. A tabela acima permanece como registro do estado original
-> de 12 itens; **a fonte de verdade vigente é a ADR-011**.
+| HIST `001` | **0.9** | Git + branching strategy | O Spec-Kit cria feature desde a primeira spec; a prova vermelho→verde exige histórico |
+| HIST `002` | **0.11** | AGENTS.md / constitution | Governa as 10 specs seguintes; o portão constitucional do Spec-Kit lê este artefato |
+| HIST `003` | **0.1** | UV workspace monorepo | Base física de todos os pacotes |
+| HIST `004` | **0.4** | Pytest | Habilita TDD real dos itens seguintes — precisa vir antes de Ruff |
+| HIST `005` | **0.2** | Ruff | |
+| HIST `006` | **0.3** | MyPy strict | Consome contrato do Ruff: regras que conflitam com tipagem estrita |
+| HIST `007` | **0.12** | pip-audit + Trivy | Precisa existir antes de ser orquestrado |
+| HIST `008` | **0.5** | Lefthook | Orquestra 005, 006, 004 e 007 — só faz sentido depois deles |
+| HIST `009` | **0.6** | `packages/core` | Primeiro código de produção |
+| HIST `010` | **0.7** | `packages/cli` | Depende de `core` |
+| HIST `011` | **0.8** | docker-compose | Domínio independente (DevOps) |
+| HIST `012` | **0.10** | `docs/tree.md` | Por último: reflete a árvore real resultante |
 
 ### Consequências
 
