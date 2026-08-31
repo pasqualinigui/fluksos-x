@@ -6,8 +6,7 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 0 (bootstrap), item 004 de 016. As ferramentas de qualidade
-chegam nos itens 005–009 — até lá, só shell, git e Python 3.12 stdlib.
+**Estado**: Fase 0 (bootstrap), item 006 de 016. As ferramentas ruff e pytest já estão disponíveis; MyPy, pip-audit e Lefthook chegam nos itens 007–009.
 
 ## How to operate
 
