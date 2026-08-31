@@ -1,0 +1,4 @@
+⏭️ FR-009   Trivy fs skip se Docker ausente 0 quando disponivel
+           evidencia: Docker ausente, Trivy fs skip ⏭️
+
+Resultado: 15/16 asserções aprovadas (1 não aplicáveis) — CONFORME

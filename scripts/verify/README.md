@@ -106,6 +106,7 @@ scripts/verify/f0-001-foundation.sh --list
 | `f0-005-pytest.sh` | 15 | Pytest 9.1.1 — harness TDD + manifest 5 linhas + 5 dívidas ADR-007 (FR-001..015, ADR-015) |
 | `f0-006-ruff.sh` | 14 | Ruff 0.16.5 — linter + formatter (FR-001..014, `ruff check`/`format` idempotente) |
 | `f0-007-mypy.sh` | 16 | MyPy 2.3.1 strict — type checker (FR-001..016, `mypy --strict` determinístico, 007) |
+| `f0-008-pip-audit.sh` | 16 | pip-audit 2.10.1 + Trivy 0.74.0 — auditoria (FR-001..016, `pip-audit`/`trivy fs`, 008) |
 
 ### Integridade por resumo criptográfico (item 002, ADR-006)
 
