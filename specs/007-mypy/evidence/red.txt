@@ -1,0 +1,29 @@
+🔴 FR-001   mypy==2.3.1 em [dependency-groups] dev exato
+           evidencia: dependency-groups.dev=['pytest==9.1.1', 'pytest-asyncio==1.4.0', 'pytest-cov==7.1.0', 'ruff==0.16.5'] sem mypy==2.3.1 ou mypy em project.dependencies (D1)
+🔴 FR-002   [tool.mypy] python_version 3.12 strict true warn_unused_configs true exclude
+           evidencia: tool.mypy divergente: {} (esperado python_version 3.12 strict true warn_unused_configs true exclude "(?x)^(docs/|specs/|\.venv/|\.ruff_cache/|\.mypy_cache/|\.pytest_cache/)")
+🔴 FR-003   [[tool.mypy.overrides]] module tests.* disallow_untyped_defs false etc.
+           evidencia: tool.mypy.overrides divergente: null (esperado module tests.* disallow_untyped_defs false disallow_untyped_calls false warn_return_any false)
+✅ FR-004   mypy.ini nao existe fonte unica pyproject.toml
+🔴 FR-005   uv.lock contem mypy com hash
+           evidencia: uv.lock sem name = "mypy" (FR-005)
+🔴 FR-006   uv.lock contem mypy e transitivos mypy_extensions/pathspec/tomli e uv lock --check
+           evidencia: uv.lock sem transitivos: sem mypy; sem mypy_extensions; sem pathspec; 
+✅ FR-007   .mypy_cache/.dmypy.json gitignored e uv.lock nao ignorado
+🔴 FR-008   uv run mypy --strict . 0 conforme
+           evidencia: mypy não em uv.lock — não há como executar mypy --strict (FR-008)
+🔴 FR-009   uv run mypy --strict tests/ 0 com overrides relaxado
+           evidencia: mypy não em uv.lock
+🔴 FR-010   mypy --version 2.3.1 e strict 11 flags
+           evidencia: mypy não em uv.lock
+✅ FR-011   oraculo 12-16 assercoes CANON quiet list FKX EPOCHSECONDS
+✅ FR-012   CI glob inclui f0-007 sem editar ci.yml
+🔴 FR-013   CONVERGE tasks.md zero [ ]
+           evidencia: tasks.md contém 38 tarefas [ ] abertas (CONVERGE)
+✅ FR-014   fronteira sem lefthook.yml/packages/mypy.ini/ruff.toml
+🔴 FR-015   specs/README.md 007 mypy concluida 006 ruff
+           evidencia: specs/README.md sem "007.*mypy.*✅";  README atual: | `007` | **0.3** | F0 | MyPy 2.3.1 strict | ⏳ próxima (RESEARCH) |
+🔴 FR-016   git ls-files specs/007-mypy/spec.md rastreado
+           evidencia: specs/007-mypy/spec.md não rastreado (??); docs/plan/research/f0-007-mypy.md não rastreado; 
+
+Resultado: 5/16 asserções aprovadas — 11 violação(ões) (critica: 0, alta: 11, media: 0) — NAO CONFORME

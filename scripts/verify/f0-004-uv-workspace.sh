@@ -376,19 +376,24 @@ if [ -d "$PACKAGES" ]; then
   FR12_OK=0; EVID12="${EVID12}packages/ existe (FR-013 D8); "
 fi
 # verifica pyproject sem tool adiantada
-# Nota 005/006: pytest (005) e ruff (006) via [dependency-groups]/[tool.ruff] são legítimos
+# Nota 005/006/007: pytest (005), ruff (006) e mypy (007) via [dependency-groups]/[tool.*] são legítimos
 # após seus itens. Este oráculo congela o estado de 004 onde ainda não existiam.
-# Para não quebrar o harness após 005/006, este FR-012 passa a permitir ambos.
+# Para não quebrar o harness após 005/006/007, este FR-012 passa a permitir todos.
 if [ -f "$PYPROJECT" ]; then
   # mypy em pyproject só deve ser detectado como [tool.mypy], não como .mypy_cache em exclude
-  if grep -Eq '^\[tool\.mypy\]|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
-    HIT=$(grep -Eo 'mypy|lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
+  # Após 007, [tool.mypy] é legítimo se mypy em uv.lock — permite sem reprovar
+  if grep -Eq 'lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    HIT=$(grep -Eo 'lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
     FR12_OK=0; EVID12="${EVID12}pyproject.toml contem tool adiantada: $HIT (FR-014 escada); "
   fi
-  if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente; "; fi
-  # [dependency-groups] permitido após 005/006 (contém pytest/ruff)
+  if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then
+    if ! grep -q 'name = "mypy"' "$UVLOCK" 2>/dev/null; then
+      FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente sem mypy em uv.lock; "
+    fi
+  fi
+  # [dependency-groups] permitido após 005/006/007 (contém pytest/ruff/mypy)
   if grep -q '\[dependency-groups\]' "$PYPROJECT" 2>/dev/null; then
-    if grep -Eq '^\[tool\.mypy\]|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    if grep -Eq 'lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
       FR12_OK=0; EVID12="${EVID12}[dependency-groups] com tool adiantada; "
     fi
   fi

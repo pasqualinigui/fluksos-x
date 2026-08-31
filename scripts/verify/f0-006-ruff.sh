@@ -422,7 +422,12 @@ fi
 # =============================================================================
 FR14_OK=1
 EVID14=""
-if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR14_OK=0; EVID14="${EVID14}[tool.mypy] presente; "; fi
+# Nota 007: mypy via [tool.mypy] é legítimo após 007; permite quando em uv.lock
+if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then
+  if ! grep -q 'name = "mypy"' "$UVLOCK" 2>/dev/null; then
+    FR14_OK=0; EVID14="${EVID14}[tool.mypy] presente sem mypy em uv.lock; "
+  fi
+fi
 if [ -f "$ROOT/mypy.ini" ]; then FR14_OK=0; EVID14="${EVID14}mypy.ini existe; "; fi
 if [ -f "$ROOT/lefthook.yml" ]; then FR14_OK=0; EVID14="${EVID14}lefthook.yml existe (deve ser 009); "; fi
 if [ -d "$ROOT/packages" ]; then FR14_OK=0; EVID14="${EVID14}packages/ existe; "; fi

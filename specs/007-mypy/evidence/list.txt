@@ -1,0 +1,16 @@
+FR-001   mypy==2.3.1 em [dependency-groups] dev exato
+FR-002   [tool.mypy] python_version 3.12 strict true warn_unused_configs true exclude
+FR-003   [[tool.mypy.overrides]] module tests.* disallow_untyped_defs false etc.
+FR-004   mypy.ini nao existe fonte unica pyproject.toml
+FR-005   uv.lock contem mypy com hash
+FR-006   uv.lock contem mypy e transitivos mypy_extensions/pathspec/tomli e uv lock --check
+FR-007   .mypy_cache/.dmypy.json gitignored e uv.lock nao ignorado
+FR-008   uv run mypy --strict . 0 conforme
+FR-009   uv run mypy --strict tests/ 0 com overrides relaxado
+FR-010   mypy --version 2.3.1 e strict 11 flags
+FR-011   oraculo 12-16 assercoes CANON quiet list FKX EPOCHSECONDS
+FR-012   CI glob inclui f0-007 sem editar ci.yml
+FR-013   CONVERGE tasks.md zero [ ]
+FR-014   fronteira sem lefthook.yml/packages/mypy.ini/ruff.toml
+FR-015   specs/README.md 007 mypy concluida 006 ruff
+FR-016   git ls-files specs/007-mypy/spec.md rastreado

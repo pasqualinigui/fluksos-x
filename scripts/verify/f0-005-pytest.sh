@@ -571,15 +571,19 @@ fi
 # =============================================================================
 FR15_OK=1
 EVID15=""
-# Nota 006: ruff via [tool.ruff] é legítimo após 006; este oráculo congela 005 onde ruff ainda não existia.
-# Para não quebrar harness após 006, permite [tool.ruff] e ruff.toml quando 006 existe.
+# Nota 006/007: ruff (006) e mypy (007) via [tool.*] são legítimos após seus itens.
+# Para não quebrar harness após 006/007, permite [tool.ruff]/[tool.mypy] quando em uv.lock.
 if grep -q '^\[tool\.ruff\]' "$PYPROJECT" 2>/dev/null; then
   if ! grep -q 'name = "ruff"' "$UVLOCK" 2>/dev/null; then
     FR15_OK=0; EVID15="${EVID15}[tool.ruff] presente sem ruff em uv.lock (FR-015); "
   fi
 fi
 if [ -f "$ROOT/ruff.toml" ]; then FR15_OK=0; EVID15="${EVID15}ruff.toml existe; "; fi
-if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}[tool.mypy] presente; "; fi
+if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then
+  if ! grep -q 'name = "mypy"' "$UVLOCK" 2>/dev/null; then
+    FR15_OK=0; EVID15="${EVID15}[tool.mypy] presente sem mypy em uv.lock; "
+  fi
+fi
 if [ -f "$ROOT/mypy.ini" ]; then FR15_OK=0; EVID15="${EVID15}mypy.ini existe; "; fi
 if [ -f "$ROOT/lefthook.yml" ]; then FR15_OK=0; EVID15="${EVID15}lefthook.yml existe; "; fi
 if [ -d "$ROOT/packages" ]; then FR15_OK=0; EVID15="${EVID15}packages/ existe (FR-015); "; fi
