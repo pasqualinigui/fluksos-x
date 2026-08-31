@@ -6,7 +6,7 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 0 (bootstrap), item 006 de 016. As ferramentas ruff e pytest já estão disponíveis; MyPy, pip-audit e Lefthook chegam nos itens 007–009.
+**Estado**: Fase 0 (bootstrap), item 008 de 016 concluído (harness 8/8 verde). Ferramentas ativas: ruff 0.16.5 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0; Lefthook (009) é o próximo.
 
 ## How to operate
 
@@ -71,6 +71,7 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md` |
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
+| Bootstrap zero-context (primeira mensagem) | `docs/guides/agent-bootstrap.md` |
 
 ## Precedence
 
