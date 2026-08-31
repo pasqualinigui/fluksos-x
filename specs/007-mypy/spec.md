@@ -130,7 +130,7 @@ Mantenedor roda `mypy --strict` e precisa ver **fronteira** (sem `lefthook`/`pac
 - **FR-012**: `CI` `003` (`/.github/workflows/ci.yml` `for f in scripts/verify/f0-*.sh`) MUST incluir `f0-007` sem editar `ci.yml` (Q9, D9, FR-012 de 006).
 - **FR-013**: CONVERGE — `specs/007-mypy/tasks.md` MUST ter zero `[ ]` quando `f0-007` sai 0 — asserido por `f0-007` `grep -E "^- \[ \]"` (ADR-015d, Q10).
 - **FR-014**: Fronteira Escada — MUST NOT conter `lefthook.yml`, `pip-audit`/`trivy`, `packages/` com `pyproject.toml`, `mypy.ini` separado, `ruff.toml` separado, `ann`/`d` já cobertos por `ruff` mas `mypy` `strict` não deve ser `ignore` — qualquer presença reprova (constitution Additional Constraints, Q10, D10).
-- **FR-015**: `specs/README.md` MUST conter `007` com `mypy` `✅` e `006` `✅` e `008` `⏳` — `grep -q "007.*mypy.*✅" specs/README.md` e `grep -q "006.*ruff.*✅"` (inquebrável em escala, ADR-011).
+- **FR-015**: `specs/README.md` MUST conter `007` com `mypy` `✅` e `hash` `a60c5b4` e `006` `✅` e `008` `⏳` — `grep -iq "007.*mypy.*✅.*a60c5b4" specs/README.md` e `grep -q "006.*ruff.*✅"` (inquebrável em escala, ADR-011).
 - **FR-016**: `specs/007-mypy/spec.md` e `docs/plan/research/f0-007-mypy.md` MUST estar rastreados por git (`git ls-files --error-unmatch specs/007-mypy/spec.md` 0) — `??` reprova (commit inquebrável).
 
 ### Key Entities

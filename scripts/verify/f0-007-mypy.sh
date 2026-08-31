@@ -479,8 +479,8 @@ if [ ! -f "$README_SPECS" ]; then
 else
   FR15_OK=1
   EVID15=""
-  if ! grep -iq "007.*mypy.*✅" "$README_SPECS" 2>/dev/null; then
-    FR15_OK=0; EVID15="${EVID15}specs/README.md sem \"007.*mypy.*✅\"; "
+  if ! grep -iq "007.*mypy.*✅.*a60c5b4" "$README_SPECS" 2>/dev/null; then
+    FR15_OK=0; EVID15="${EVID15}specs/README.md sem \"007.*mypy.*✅.*a60c5b4\"; "
   fi
   if ! grep -iq "006.*ruff.*✅" "$README_SPECS" 2>/dev/null; then
     FR15_OK=0; EVID15="${EVID15}specs/README.md sem \"006.*ruff.*✅\"; "

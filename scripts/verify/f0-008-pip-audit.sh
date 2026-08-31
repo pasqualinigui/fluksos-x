@@ -513,11 +513,11 @@ if [ ! -f "$README_SPECS" ]; then
 else
   FR14_OK=1
   EVID14=""
-  if ! grep -iq "008.*pip-audit.*✅" "$README_SPECS" 2>/dev/null; then
-    FR14_OK=0; EVID14="${EVID14}specs/README.md sem \"008.*pip-audit.*✅\"; "
+  if ! grep -iq "008.*pip-audit.*✅.*62d2a91" "$README_SPECS" 2>/dev/null; then
+    FR14_OK=0; EVID14="${EVID14}specs/README.md sem \"008.*pip-audit.*✅.*62d2a91\"; "
   fi
-  if ! grep -iq "007.*mypy.*✅" "$README_SPECS" 2>/dev/null; then
-    FR14_OK=0; EVID14="${EVID14}specs/README.md sem \"007.*mypy.*✅\"; "
+  if ! grep -iq "007.*mypy.*✅.*a60c5b4" "$README_SPECS" 2>/dev/null; then
+    FR14_OK=0; EVID14="${EVID14}specs/README.md sem \"007.*mypy.*✅.*a60c5b4\"; "
   fi
   if [ "$FR14_OK" = "1" ]; then
     pass "FR-014" "${CANON[FR-014]}"

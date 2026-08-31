@@ -129,7 +129,7 @@ Mantenedor roda `pip-audit` e precisa ver **fronteira** (sem `lefthook`/`package
 - **FR-011**: `CI` `003` (`/.github/workflows/ci.yml` `for f in scripts/verify/f0-*.sh`) MUST incluir `f0-008` sem editar `ci.yml` (Q9, D9, FR-012 de 007).
 - **FR-012**: CONVERGE — `specs/008-pip-audit-trivy/tasks.md` MUST ter zero `[ ]` quando `f0-008` sai 0 — asserido por `f0-008` `grep -E "^- \[ \]"` (ADR-015d, Q10).
 - **FR-013**: Fronteira Escada — MUST NOT conter `lefthook.yml`, `gitleaks`/`pip-audit.toml`, `packages/` com `pyproject.toml`, `docker-compose.yml`, `requirements.txt` com `pip-audit`, `cyclonedx` SBOM artefato — qualquer presença reprova (constitution Additional Constraints, Q10, D10).
-- **FR-014**: `specs/README.md` MUST conter `008` com `pip-audit` `✅` e `007` `✅` e `009` `⏳` — `grep -q "008.*pip-audit.*✅" specs/README.md` e `grep -q "007.*mypy.*✅"` (inquebrável em escala, ADR-011).
+- **FR-014**: `specs/README.md` MUST conter `008` com `pip-audit` `✅` e `hash` `62d2a91` e `007` `✅` com `a60c5b4` e `009` `⏳` — `grep -iq "008.*pip-audit.*✅.*62d2a91" specs/README.md` e `grep -iq "007.*mypy.*✅.*a60c5b4"` (inquebrável em escala, ADR-011).
 - **FR-015**: `specs/008-pip-audit-trivy/spec.md` e `docs/plan/research/f0-008-pip-audit-trivy.md` MUST estar rastreados por git (`git ls-files --error-unmatch specs/008-pip-audit-trivy/spec.md` 0) — `??` reprova (commit inquebrável).
 - **FR-016**: `Trivy` 0.74.0 MUST NOT ser `0.69.4` vulnerável e `pip-audit` MUST NOT ser `<2.10.1` — `grep -q "0.69.4"` reprova e `pip-audit --version` 2.10.1 (D3, Q1).
 
