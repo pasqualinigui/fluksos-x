@@ -12,5 +12,36 @@ build-backend = "uv_build"
 [tool.uv.workspace]
 members = ["packages/*"]
 
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==7.1.0",
+]
+
+[tool.pytest.ini_options]
+minversion = "9.1"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+pythonpath = ["."]
+addopts = "-ra --strict-markers --strict-config"
+markers = ["slow: marks tests as slow", "harness: oracle promotion tests"]
+filterwarnings = ["error"]
+xfail_strict = true
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+branch = true
+source = ["tests"]
+parallel = false
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+
 [tool.uv]
 package = false

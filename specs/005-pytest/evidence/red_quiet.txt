@@ -1,0 +1,20 @@
+🔴 FR-001   [dependency-groups] dev com pytest==9.1.1 pytest-asyncio==1.4.0 pytest-cov==7.1.0 exato
+           evidencia: dependency-groups.dev=None esperado ["pytest==9.1.1","pytest-asyncio==1.4.0","pytest-cov==7.1.0"] (D1)
+🔴 FR-003   [tool.pytest.ini_options] minversion testpaths addopts markers filterwarnings xfail_strict asyncio
+           evidencia: tool.pytest.ini_options divergente: {} (esperado minversion 9.1, testpaths [tests], addopts -ra --strict-markers --strict-config, markers slow/harness, filterwarnings error, xfail_strict true, asyncio strict/function, coverage branch true)
+🔴 FR-004   tests/conftest.py py_compile valido e sem pytest.toml separado
+           evidencia: tests/conftest.py ausente (FR-004); 
+🔴 FR-005   tests/test_harness_oracles.py parametrizado FKX_ORACLE_NESTED re FR
+           evidencia: tests/test_harness_oracles.py ausente (FR-005)
+🔴 FR-006   uv.lock contem pytest com hash tomllib valido uv lock --check
+           evidencia: uv.lock sem name = "pytest" (FR-006)
+🔴 FR-008   manifest.sha256 5 linhas sha256sum -c 0
+           evidencia: manifest.sha256 ausente em scripts/verify/ (FR-008)
+🔴 FR-010   tests/test_harness_debts.py 5 casos ADR-007 nomeados
+           evidencia: tests/test_harness_debts.py ausente (FR-010)
+🔴 FR-011   uv run pytest -q 0 conforme nomeando FR
+           evidencia: tests/*.py ausentes — pytest não coletaria (FR-011)
+🔴 FR-013   CONVERGE tasks.md zero [ ]
+           evidencia: tasks.md contém 36 tarefas [ ] abertas (CONVERGE exige zero, ADR-015d)
+
+Resultado: 6/15 asserções aprovadas — 9 violação(ões) (critica: 0, alta: 9, media: 0) — NAO CONFORME

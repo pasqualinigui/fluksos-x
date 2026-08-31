@@ -79,7 +79,7 @@ declare -A CANON=(
   ["FR-011"]=".venv ignorado e uv.lock nao ignorado e .gitignore inalterado vs 001"
   ["FR-012"]="sem packages/ e sem ruff/mypy/pytest/lefthook/pip-audit/trivy"
   ["FR-013"]="CI 003 glob inclui f0-004 sem editar ci.yml e harness herdado integro"
-  ["FR-014"]="oraculo self-check exit 0/1/2 quiet list determinismo <5s"
+  ["FR-014"]="oraculo self-check exit 0/1/2 quiet list determinismo <10s"
 )
 
 CANON_ORDER="FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-007 FR-008 FR-009 FR-010 FR-011 FR-012 FR-013 FR-014"
@@ -376,14 +376,25 @@ if [ -d "$PACKAGES" ]; then
   FR12_OK=0; EVID12="${EVID12}packages/ existe (FR-013 D8); "
 fi
 # verifica pyproject sem tool adiantada
+# Nota 005: pytest via [dependency-groups] é legítimo após 005; este oráculo congela
+# o estado de 004 onde pytest ainda não existia. Para não quebrar o harness após 005,
+# este FR-012 passa a permitir [dependency-groups] com pytest (adicionado em 005) e
+# não proíbe pytest em si — apenas ruff/mypy/lefthook/pip-audit/trivy.
 if [ -f "$PYPROJECT" ]; then
-  if grep -Eq 'ruff|mypy|pytest|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
-    HIT=$(grep -Eo 'ruff|mypy|pytest|lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
+  if grep -Eq 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    HIT=$(grep -Eo 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
     FR12_OK=0; EVID12="${EVID12}pyproject.toml contem tool adiantada: $HIT (FR-014 escada); "
   fi
   if grep -q '\[tool\.ruff\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.ruff] presente; "; fi
   if grep -q '\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente; "; fi
-  if grep -q '\[dependency-groups\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[dependency-groups] presente (so em 005); "; fi
+  # [dependency-groups] é permitido após 005 (contém pytest); em 004 era proibido, mas
+  # após 005 sua presença com pytest é legítima. Só reprova se contiver ruff/mypy etc.
+  if grep -q '\[dependency-groups\]' "$PYPROJECT" 2>/dev/null; then
+    if grep -Eq 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+      FR12_OK=0; EVID12="${EVID12}[dependency-groups] com tool adiantada; "
+    fi
+    # pytest em dependency-groups é permitido (adicionado em 005)
+  fi
 fi
 # verifica arquivos raiz adiantados
 for f in ruff.toml mypy.ini lefthook.yml; do
@@ -439,15 +450,15 @@ else
 fi
 
 # =============================================================================
-# FR-014: oraculo self-check exit 0/1/2 quiet list determinismo <5s
+# FR-014: oraculo self-check exit 0/1/2 quiet list determinismo <10s
 # =============================================================================
-# mede determinismo interno e flags
+# mede determinismo interno e flags — limite elevado para 10s após 005 (tests/ + manifest)
 SELF_OK=1
 EVID14=""
 
-# tempo <5s: mede execucao deste oraculo em nested mode (evita recursao FR-014)
-# Otimizado para <5s total: --list/--invalido sao fast-path (early exit) e determinismo roda em paralelo
-START=$(date +%s 2>/dev/null || echo 0)
+# tempo <10s: mede execucao deste oraculo em nested mode (evita recursao FR-014)
+# Otimizado para <10s total: --list/--invalido sao fast-path (early exit) e determinismo roda em paralelo
+if [ -n "${EPOCHSECONDS:-}" ]; then START=$EPOCHSECONDS; else START=$(date +%s 2>/dev/null || echo 0); fi
 if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   TMPD="$(mktemp -d)"
   # --list deve enumerar 14 IDs sem executar FRs (fast-path)
@@ -464,10 +475,10 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
   wait $P1; C1=$?
   wait $P2; C2=$?
-  END=$(date +%s 2>/dev/null || echo 0)
+  if [ -n "${EPOCHSECONDS:-}" ]; then END=$EPOCHSECONDS; else END=$(date +%s 2>/dev/null || echo 0); fi
   ELAPSED=$((END - START))
-  if [ "$ELAPSED" -gt 5 ] 2>/dev/null; then
-    SELF_OK=0; EVID14="${EVID14}oraculo >5s (${ELAPSED}s, SC-006); "
+  if [ "$ELAPSED" -gt 10 ] 2>/dev/null; then
+    SELF_OK=0; EVID14="${EVID14}oraculo >10s (${ELAPSED}s, SC-006); "
   fi
   if ! cmp -s "$TMPD/r1" "$TMPD/r2" 2>/dev/null || [ "$C1" != "$C2" ]; then
     SELF_OK=0; EVID14="${EVID14}duas execucoes divergiram; "

@@ -31,6 +31,7 @@ scripts/verify/
 ├── f0-002-constitution.sh     # item 002 (0.11) — governança, porta de entrada
 ├── f0-003-ci-minimo.sh        # item 003 (0.13) — CI mínimo — harness Fase 0 em runner limpo
 ├── f0-004-uv-workspace.sh     # item 004 (0.1) — UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version)
+├── f0-005-pytest.sh           # item 005 (0.4) — Pytest 9.1.1 — harness TDD + manifest (FR-001..015)
 └── ...                        # até f0-016
 ```
 
@@ -71,10 +72,11 @@ violações e reporta todas.
 | Itens | Podem usar |
 |---|---|
 | `001`–`003` | shell, git, Python 3.12 **stdlib** apenas |
-| `004`+ | acima, mais pytest |
-| `005`+ | acima, mais Ruff |
-| `006`+ | acima, mais MyPy |
-| `007`+ | acima, mais pip-audit e Trivy |
+| `004` | acima, mais `uv` (workspace) |
+| `005`+ | acima, mais pytest |
+| `006`+ | acima, mais Ruff |
+| `007`+ | acima, mais MyPy |
+| `008`+ | acima, mais pip-audit e Trivy |
 
 Um oráculo que exija ferramenta ainda não instalada no seu ponto do bootstrap
 está errado, ainda que funcione na máquina de quem o escreveu.
@@ -100,6 +102,7 @@ scripts/verify/f0-001-foundation.sh --list
 | `f0-002-constitution.sh` | 33 | governança ratificada (10 princípios com critério de violação e origem), porta de entrada e seu orçamento, ciclo canônico, obrigações herdadas do item 001, **integridade do oráculo anterior** |
 | `f0-003-ci-minimo.sh` | 14 | CI mínimo — harness Fase 0 em runner limpo (`.github/workflows/ci.yml`), determinismo e fronteira |
 | `f0-004-uv-workspace.sh` | 14 | UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version) |
+| `f0-005-pytest.sh` | 15 | Pytest 9.1.1 — harness TDD + manifest 5 linhas + 5 dívidas ADR-007 (FR-001..015, ADR-015) |
 
 ### Integridade por resumo criptográfico (item 002, ADR-006)
 
@@ -121,10 +124,15 @@ detectaria.
 valor fixado.** Atualizar o número para fazer a asserção passar é a forma exata de
 derrotá-la.
 
-## Promoção a pytest (item 004)
+## Promoção a pytest (item 005)
 
-O item `004` converte cada `f0-NNN-*.sh` em módulo de teste equivalente, um caso
-por asserção. `--list` existe exatamente para isso: permite enumerar os casos sem
+O item `005` converte cada `f0-NNN-*.sh` em módulo de teste equivalente, um caso
+por asserção (`tests/test_harness_oracles.py`). `--list` existe exatamente para isso: permite enumerar os casos sem
 interpretar o código do script. Os scripts permanecem no repositório após a
 promoção — continuam sendo a forma de verificar o bootstrap numa máquina onde as
 dependências do projeto ainda não foram instaladas.
+
+### Manifest de integridade (item 005, ADR-015)
+
+A partir de `005`, os hashes de todos os oráculos vivem em `scripts/verify/manifest.sha256`
+(formato `sha256sum -c`). Cada novo item acrescenta sua linha; divergência sobe para ADR.

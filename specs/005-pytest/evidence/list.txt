@@ -1,0 +1,15 @@
+FR-001   [dependency-groups] dev com pytest==9.1.1 pytest-asyncio==1.4.0 pytest-cov==7.1.0 exato
+FR-002   pytest não em [project.dependencies] nem legado nem requirements.txt
+FR-003   [tool.pytest.ini_options] minversion testpaths addopts markers filterwarnings xfail_strict asyncio
+FR-004   tests/conftest.py py_compile valido e sem pytest.toml separado
+FR-005   tests/test_harness_oracles.py parametrizado FKX_ORACLE_NESTED re FR
+FR-006   uv.lock contem pytest com hash tomllib valido uv lock --check
+FR-007   .pytest_cache htmlcov .coverage gitignored e uv.lock não ignorado
+FR-008   manifest.sha256 5 linhas sha256sum -c 0
+FR-009   self-check f0-001..004 --quiet todos, sem tocar anterior
+FR-010   tests/test_harness_debts.py 5 casos ADR-007 nomeados
+FR-011   uv run pytest -q 0 conforme nomeando FR
+FR-012   CI glob inclui f0-005 sem editar ci.yml
+FR-013   CONVERGE tasks.md zero [ ]
+FR-014   determinismo 2x cmp + <5s EPOCHSECONDS/time.monotonic
+FR-015   fronteira sem ruff/mypy/lefthook/packages/xdist/pyproject

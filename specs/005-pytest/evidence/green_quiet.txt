@@ -1,0 +1,2 @@
+
+Resultado: 15/15 asserções aprovadas — CONFORME
