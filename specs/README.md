@@ -15,8 +15,8 @@
 | `003` | **0.13** | F0 | CI mínimo | ✅ concluída |
 | `004` | **0.1** | F0 | UV workspace monorepo | ✅ concluída |
 | `005` | **0.4** | F0 | Pytest 9.1.1 — harness TDD | ✅ concluída (`68c38fb`) |
-| `006` | **0.2** | F0 | Ruff 0.16.5 | ⏳ próxima (RESEARCH) |
-| `007` | **0.3** | F0 | MyPy 2.3.1 strict | ⏳ |
+| `006` | **0.2** | F0 | Ruff 0.16.5 | ✅ concluída (`8918fab`) |
+| `007` | **0.3** | F0 | MyPy 2.3.1 strict | ⏳ próxima (RESEARCH) |
 | `008` | **0.12** | F0 | pip-audit + Trivy | ⏳ |
 | `009` | **0.5** | F0 | Lefthook 2.1.11 | ⏳ |
 | `010` | **0.14** | F0 | CI completo + branch protection | ⏳ |
