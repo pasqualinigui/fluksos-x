@@ -1,5 +1,6 @@
 63412ca7a9ada4af0e435db89fdbb649423b56005dfd2908c59ba2745a6bbf22  scripts/verify/f0-001-foundation.sh
 b63ac3c8aa329e6a5c7c210a044d0e4690728674bb27946fa04bf14607fb9a0c  scripts/verify/f0-002-constitution.sh
 d10c61e8623fcf3f7c706ab8ca7387303c2d5282da0afaee50bf5c6401b6f7d4  scripts/verify/f0-003-ci-minimo.sh
-42e2d36bc611b7c1446f30052fe89b1090ca3548775809369342f19ff8759312  scripts/verify/f0-004-uv-workspace.sh
-e39a1f1c842392c204a2099597423d9ff1611d862b3829620639ffac8023ccbb  scripts/verify/f0-005-pytest.sh
+2f8839de4ef017a5fbd11744d8960703b051fb2e0d0dc1a5addcaed3f0d4c43c  scripts/verify/f0-004-uv-workspace.sh
+ab26f233d2a0b974a4270691f4bd95e3ff8477f4e029f45a5e916a1f1eb2c610  scripts/verify/f0-005-pytest.sh
+ee85cfdf051ef9cb650e87a175df2ecff6e99e662b012fbf0299347ba92f1147  scripts/verify/f0-006-ruff.sh

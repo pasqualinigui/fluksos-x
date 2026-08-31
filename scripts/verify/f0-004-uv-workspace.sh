@@ -376,24 +376,21 @@ if [ -d "$PACKAGES" ]; then
   FR12_OK=0; EVID12="${EVID12}packages/ existe (FR-013 D8); "
 fi
 # verifica pyproject sem tool adiantada
-# Nota 005: pytest via [dependency-groups] é legítimo após 005; este oráculo congela
-# o estado de 004 onde pytest ainda não existia. Para não quebrar o harness após 005,
-# este FR-012 passa a permitir [dependency-groups] com pytest (adicionado em 005) e
-# não proíbe pytest em si — apenas ruff/mypy/lefthook/pip-audit/trivy.
+# Nota 005/006: pytest (005) e ruff (006) via [dependency-groups]/[tool.ruff] são legítimos
+# após seus itens. Este oráculo congela o estado de 004 onde ainda não existiam.
+# Para não quebrar o harness após 005/006, este FR-012 passa a permitir ambos.
 if [ -f "$PYPROJECT" ]; then
-  if grep -Eq 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
-    HIT=$(grep -Eo 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
+  # mypy em pyproject só deve ser detectado como [tool.mypy], não como .mypy_cache em exclude
+  if grep -Eq '^\[tool\.mypy\]|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    HIT=$(grep -Eo 'mypy|lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
     FR12_OK=0; EVID12="${EVID12}pyproject.toml contem tool adiantada: $HIT (FR-014 escada); "
   fi
-  if grep -q '\[tool\.ruff\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.ruff] presente; "; fi
-  if grep -q '\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente; "; fi
-  # [dependency-groups] é permitido após 005 (contém pytest); em 004 era proibido, mas
-  # após 005 sua presença com pytest é legítima. Só reprova se contiver ruff/mypy etc.
+  if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente; "; fi
+  # [dependency-groups] permitido após 005/006 (contém pytest/ruff)
   if grep -q '\[dependency-groups\]' "$PYPROJECT" 2>/dev/null; then
-    if grep -Eq 'ruff|mypy|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    if grep -Eq '^\[tool\.mypy\]|lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
       FR12_OK=0; EVID12="${EVID12}[dependency-groups] com tool adiantada; "
     fi
-    # pytest em dependency-groups é permitido (adicionado em 005)
   fi
 fi
 # verifica arquivos raiz adiantados

@@ -225,18 +225,29 @@ Achado crítico A2 (`f0-audit-001-004.md:78-88`): `spec 004` definiu `FR-001..01
 
 ```python
 import subprocess, pathlib, re, glob
+
 ORACLES = sorted(pathlib.Path("scripts/verify").glob("f0-*.sh"))
 
+
 def _canon_ids(oracle: pathlib.Path) -> list[str]:
-    out = subprocess.run([str(oracle), "--list"], capture_output=True, text=True, env={"FKX_ORACLE_NESTED":"1", **dict(**{})})
+    out = subprocess.run(
+        [str(oracle), "--list"],
+        capture_output=True,
+        text=True,
+        env={"FKX_ORACLE_NESTED": "1", **dict(**{})},
+    )
     return [line.split()[1] for line in out.stdout.splitlines() if line.strip()]
+
 
 @pytest.mark.harness
 @pytest.mark.parametrize("oracle", ORACLES, ids=lambda p: p.name)
 def test_oracle_exit_codes_and_format(oracle):
-    r = subprocess.run([str(oracle)], capture_output=True, text=True, env={"FKX_ORACLE_NESTED":"1"})
-    assert r.returncode in (0,1)  # 2 só para uso inválido
+    r = subprocess.run(
+        [str(oracle)], capture_output=True, text=True, env={"FKX_ORACLE_NESTED": "1"}
+    )
+    assert r.returncode in (0, 1)  # 2 só para uso inválido
     assert re.search(r"^(✅|🔴|⏭️) FR-\d+", r.stdout, re.M)
+
 
 def test_oracle_list_enumerates_canon():
     # cada oráculo deve ter CANON_ORDER == --list
@@ -272,9 +283,13 @@ B2: `f0-004:449` usou `date +%s` (fork externo) para `<5s` — construção não
 
 ```python
 import time, subprocess
-def test_oracle_runtime_lt_5s(oracle=pathlib.Path("scripts/verify/f0-001-foundation.sh")):
+
+
+def test_oracle_runtime_lt_5s(
+    oracle=pathlib.Path("scripts/verify/f0-001-foundation.sh"),
+):
     start = time.monotonic()
-    subprocess.run([str(oracle)], capture_output=True, env={"FKX_ORACLE_NESTED":"1"})
+    subprocess.run([str(oracle)], capture_output=True, env={"FKX_ORACLE_NESTED": "1"})
     assert time.monotonic() - start < 5.0
 ```
 
@@ -282,8 +297,12 @@ def test_oracle_runtime_lt_5s(oracle=pathlib.Path("scripts/verify/f0-001-foundat
 
 ```python
 def test_oracle_deterministic():
-    r1 = subprocess.run(["scripts/verify/f0-001-foundation.sh"], capture_output=True, text=True)
-    r2 = subprocess.run(["scripts/verify/f0-001-foundation.sh"], capture_output=True, text=True)
+    r1 = subprocess.run(
+        ["scripts/verify/f0-001-foundation.sh"], capture_output=True, text=True
+    )
+    r2 = subprocess.run(
+        ["scripts/verify/f0-001-foundation.sh"], capture_output=True, text=True
+    )
     assert r1.stdout == r2.stdout and r1.returncode == r2.returncode
 ```
 

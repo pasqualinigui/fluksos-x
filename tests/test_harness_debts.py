@@ -2,6 +2,7 @@
 
 Cobre SC-003 tempo, SC-003 determinismo, SC-004 red→green, SC-007 contratos, FR-001 branch.
 """
+
 import pathlib
 import subprocess
 import time
@@ -31,7 +32,9 @@ def test_red_green_pair_distinct():
     assert red.exists(), "red.txt ausente — TDD vermelho não registrado"
     # green may not exist yet in red phase; if exists, must be distinct
     if green.exists():
-        assert red.read_bytes() != green.read_bytes(), "red.txt e green.txt idênticos — vermelho→verde não distinto"
+        assert red.read_bytes() != green.read_bytes(), (
+            "red.txt e green.txt idênticos — vermelho→verde não distinto"
+        )
         assert red.stat().st_size > 0 and green.stat().st_size > 0
 
 
@@ -49,4 +52,6 @@ def test_main_branch_exists():
         ["git", "show-ref", "--verify", "refs/heads/main"],
         capture_output=True,
     )
-    assert r.returncode == 0, "refs/heads/main não existe — FR-001 deve medir branch, não HEAD"
+    assert r.returncode == 0, (
+        "refs/heads/main não existe — FR-001 deve medir branch, não HEAD"
+    )

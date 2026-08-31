@@ -1,0 +1,20 @@
+🔴 FR-001   ruff==0.16.5 em [dependency-groups] dev exato
+           evidencia: dependency-groups.dev=['pytest==9.1.1', 'pytest-asyncio==1.4.0', 'pytest-cov==7.1.0'] sem ruff==0.16.5 ou ruff em project.dependencies (D1)
+🔴 FR-002   [tool.ruff] line-length 88 target-version py312 exclude
+           evidencia: tool.ruff divergente: {} (esperado line-length 88 target-version py312 exclude com .ruff_cache/.venv)
+🔴 FR-003   [tool.ruff.lint] select E,F,W,C90 extend-select I,UP,B,SIM,S,C4,A,RUF ignore per-file-ignores
+           evidencia: tool.ruff.lint divergente: {}
+🔴 FR-004   [tool.ruff.format] quote-style double indent-style space line-ending auto
+           evidencia: tool.ruff.format divergente: {}
+🔴 FR-006   uv.lock contem ruff com hash
+           evidencia: uv.lock sem name = "ruff" (FR-006)
+🔴 FR-008   uv run ruff check . 0 conforme
+           evidencia: ruff não em uv.lock — não há como executar ruff check (FR-008)
+🔴 FR-009   uv run ruff format --check --diff . 0 idempotente
+           evidencia: ruff não em uv.lock — não há como executar format --check (FR-009)
+🔴 FR-010   ruff format . idempotente sha256sum
+           evidencia: ruff não disponível para teste idempotente
+🔴 FR-013   CONVERGE tasks.md zero [ ]
+           evidencia: tasks.md contém 34 tarefas [ ] abertas (CONVERGE)
+
+Resultado: 5/14 asserções aprovadas — 9 violação(ões) (critica: 0, alta: 9, media: 0) — NAO CONFORME

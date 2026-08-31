@@ -2,6 +2,7 @@
 
 Cada f0-*.sh é orquestrado via subprocess com FKX_ORACLE_NESTED=1.
 """
+
 import pathlib
 import re
 import subprocess
@@ -28,7 +29,9 @@ def test_oracle_exit_codes_and_format(oracle: pathlib.Path):
         [str(oracle)], capture_output=True, text=True, env={"FKX_ORACLE_NESTED": "1"}
     )
     assert r.returncode in (0, 1), f"{oracle} exit {r.returncode} not in (0,1)"
-    assert re.search(r"^(✅|🔴|⏭️) FR-\d+", r.stdout, re.M), f"format mismatch in {oracle}:\n{r.stdout[:500]}"
+    assert re.search(r"^(✅|🔴|⏭️) FR-\d+", r.stdout, re.M), (
+        f"format mismatch in {oracle}:\n{r.stdout[:500]}"
+    )
 
 
 def test_oracle_list_enumerates_canon():

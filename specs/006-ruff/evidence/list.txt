@@ -1,0 +1,14 @@
+FR-001   ruff==0.16.5 em [dependency-groups] dev exato
+FR-002   [tool.ruff] line-length 88 target-version py312 exclude
+FR-003   [tool.ruff.lint] select E,F,W,C90 extend-select I,UP,B,SIM,S,C4,A,RUF ignore per-file-ignores
+FR-004   [tool.ruff.format] quote-style double indent-style space line-ending auto
+FR-005   ruff.toml nao existe fonte unica pyproject.toml
+FR-006   uv.lock contem ruff com hash
+FR-007   .ruff_cache gitignored e uv.lock nao ignorado
+FR-008   uv run ruff check . 0 conforme
+FR-009   uv run ruff format --check --diff . 0 idempotente
+FR-010   ruff format . idempotente sha256sum
+FR-011   oraculo 10-14 assercoes CANON quiet list FKX EPOCHSECONDS
+FR-012   CI glob inclui f0-006 sem editar ci.yml
+FR-013   CONVERGE tasks.md zero [ ]
+FR-014   fronteira sem mypy/lefthook/packages/ruff.toml D/ANN

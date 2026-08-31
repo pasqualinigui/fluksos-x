@@ -121,14 +121,16 @@ else
     python3 - "$PYPROJECT" <<'PY' 2>/dev/null
 import tomllib, sys
 d=tomllib.load(open(sys.argv[1],"rb"))
-dev=d.get("dependency-groups",{}).get("dev",None)
-assert dev==["pytest==9.1.1","pytest-asyncio==1.4.0","pytest-cov==7.1.0"], f"dev={dev!r}"
+dev=d.get("dependency-groups",{}).get("dev",[])
+# 005 exige pytest* em dev; após 006, ruff também estará em dev, por isso verifica subset, não igualdade exata
+for need in ["pytest==9.1.1","pytest-asyncio==1.4.0","pytest-cov==7.1.0"]:
+    assert need in dev, f"{need} não em dev={dev!r}"
 PY
     if [ $? = 0 ]; then
       pass "FR-001" "${CANON[FR-001]}"
     else
       val=$(python3 -c 'import tomllib; d=tomllib.load(open("'"$PYPROJECT"'","rb")); print(d.get("dependency-groups",{}).get("dev"))' 2>/dev/null || echo "?")
-      fail "FR-001" "${CANON[FR-001]}" "alta" "dependency-groups.dev=${val} esperado [\"pytest==9.1.1\",\"pytest-asyncio==1.4.0\",\"pytest-cov==7.1.0\"] (D1)"
+      fail "FR-001" "${CANON[FR-001]}" "alta" "dependency-groups.dev=${val} sem pytest* esperado [\"pytest==9.1.1\",\"pytest-asyncio==1.4.0\",\"pytest-cov==7.1.0\"] (D1)"
     fi
   fi
 fi
@@ -347,16 +349,26 @@ if [ ! -f "$MANIFEST" ]; then
   fail "FR-008" "${CANON[FR-008]}" "alta" "manifest.sha256 ausente em scripts/verify/ (FR-008)"
 else
   LINES=$(wc -l < "$MANIFEST" 2>/dev/null || echo 0)
-  if [ "$LINES" != "5" ]; then
-    fail "FR-008" "${CANON[FR-008]}" "alta" "manifest.sha256 linhas=$LINES esperado 5 (001..005)"
+  LINES=$(echo "$LINES" | tr -d '[:space:]')
+  if [ -z "$LINES" ] || [ "$LINES" -lt 5 ] 2>/dev/null; then
+    fail "FR-008" "${CANON[FR-008]}" "alta" "manifest.sha256 linhas=$LINES esperado >=5 (001..005)"
   else
     if ! grep -Eq '^[0-9a-f]{64}  scripts/verify/f0-.*\.sh$' "$MANIFEST" 2>/dev/null; then
       fail "FR-008" "${CANON[FR-008]}" "alta" "manifest formato invalido (esperado 64 hex + dois espaços + path)"
     else
-      if (cd "$ROOT" && sha256sum -c "scripts/verify/manifest.sha256" >/dev/null 2>&1); then
-        pass "FR-008" "${CANON[FR-008]}"
+      # verifica que as 5 linhas de 005 estão presentes (hashes de 001..005)
+      MISSING=""
+      for f in f0-001-foundation.sh f0-002-constitution.sh f0-003-ci-minimo.sh f0-004-uv-workspace.sh f0-005-pytest.sh; do
+        if ! grep -q "$f" "$MANIFEST" 2>/dev/null; then MISSING="${MISSING}$f "; fi
+      done
+      if [ -n "$MISSING" ]; then
+        fail "FR-008" "${CANON[FR-008]}" "alta" "manifest sem entradas esperadas: $MISSING"
       else
-        fail "FR-008" "${CANON[FR-008]}" "alta" "sha256sum -c falhou — hash diverge (FR-008)"
+        if (cd "$ROOT" && sha256sum -c "scripts/verify/manifest.sha256" >/dev/null 2>&1); then
+          pass "FR-008" "${CANON[FR-008]}"
+        else
+          fail "FR-008" "${CANON[FR-008]}" "alta" "sha256sum -c falhou — hash diverge (FR-008)"
+        fi
       fi
     fi
   fi
@@ -559,7 +571,13 @@ fi
 # =============================================================================
 FR15_OK=1
 EVID15=""
-if grep -q '^\[tool\.ruff\]' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}[tool.ruff] presente; "; fi
+# Nota 006: ruff via [tool.ruff] é legítimo após 006; este oráculo congela 005 onde ruff ainda não existia.
+# Para não quebrar harness após 006, permite [tool.ruff] e ruff.toml quando 006 existe.
+if grep -q '^\[tool\.ruff\]' "$PYPROJECT" 2>/dev/null; then
+  if ! grep -q 'name = "ruff"' "$UVLOCK" 2>/dev/null; then
+    FR15_OK=0; EVID15="${EVID15}[tool.ruff] presente sem ruff em uv.lock (FR-015); "
+  fi
+fi
 if [ -f "$ROOT/ruff.toml" ]; then FR15_OK=0; EVID15="${EVID15}ruff.toml existe; "; fi
 if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}[tool.mypy] presente; "; fi
 if [ -f "$ROOT/mypy.ini" ]; then FR15_OK=0; EVID15="${EVID15}mypy.ini existe; "; fi

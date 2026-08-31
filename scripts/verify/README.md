@@ -32,6 +32,7 @@ scripts/verify/
 ├── f0-003-ci-minimo.sh        # item 003 (0.13) — CI mínimo — harness Fase 0 em runner limpo
 ├── f0-004-uv-workspace.sh     # item 004 (0.1) — UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version)
 ├── f0-005-pytest.sh           # item 005 (0.4) — Pytest 9.1.1 — harness TDD + manifest (FR-001..015)
+├── f0-006-ruff.sh             # item 006 (0.2) — Ruff 0.16.5 — linter + formatter (FR-001..014)
 └── ...                        # até f0-016
 ```
 
@@ -103,6 +104,7 @@ scripts/verify/f0-001-foundation.sh --list
 | `f0-003-ci-minimo.sh` | 14 | CI mínimo — harness Fase 0 em runner limpo (`.github/workflows/ci.yml`), determinismo e fronteira |
 | `f0-004-uv-workspace.sh` | 14 | UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version) |
 | `f0-005-pytest.sh` | 15 | Pytest 9.1.1 — harness TDD + manifest 5 linhas + 5 dívidas ADR-007 (FR-001..015, ADR-015) |
+| `f0-006-ruff.sh` | 14 | Ruff 0.16.5 — linter + formatter (FR-001..014, `ruff check`/`format` idempotente) |
 
 ### Integridade por resumo criptográfico (item 002, ADR-006)
 

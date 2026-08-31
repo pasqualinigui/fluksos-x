@@ -113,16 +113,26 @@ import pathlib, subprocess, re, pytest
 
 ORACLES = sorted(pathlib.Path("scripts/verify").glob("f0-*.sh"))
 
+
 def _canon_ids(oracle: pathlib.Path) -> list[str]:
-    out = subprocess.run([str(oracle), "--list"], capture_output=True, text=True, env={"FKX_ORACLE_NESTED":"1"})
+    out = subprocess.run(
+        [str(oracle), "--list"],
+        capture_output=True,
+        text=True,
+        env={"FKX_ORACLE_NESTED": "1"},
+    )
     return [line.split()[1] for line in out.stdout.splitlines() if line.strip()]
+
 
 @pytest.mark.harness
 @pytest.mark.parametrize("oracle", ORACLES, ids=lambda p: p.name)
 def test_oracle_exit_codes_and_format(oracle: pathlib.Path):
-    r = subprocess.run([str(oracle)], capture_output=True, text=True, env={"FKX_ORACLE_NESTED":"1"})
+    r = subprocess.run(
+        [str(oracle)], capture_output=True, text=True, env={"FKX_ORACLE_NESTED": "1"}
+    )
     assert r.returncode in (0, 1)  # 2 só para uso inválido (--list/--invalido)
     assert re.search(r"^(✅|🔴|⏭️) FR-\d+", r.stdout, re.M)
+
 
 def test_oracle_list_enumerates_canon():
     for oracle in ORACLES:
