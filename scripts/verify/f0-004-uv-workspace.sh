@@ -378,12 +378,12 @@ fi
 # verifica pyproject sem tool adiantada
 # Nota 005/006/007: pytest (005), ruff (006) e mypy (007) via [dependency-groups]/[tool.*] são legítimos
 # após seus itens. Este oráculo congela o estado de 004 onde ainda não existiam.
-# Para não quebrar o harness após 005/006/007, este FR-012 passa a permitir todos.
+# Para não quebrar o harness após 005/006/007/008, este FR-012 passa a permitir todos.
 if [ -f "$PYPROJECT" ]; then
   # mypy em pyproject só deve ser detectado como [tool.mypy], não como .mypy_cache em exclude
-  # Após 007, [tool.mypy] é legítimo se mypy em uv.lock — permite sem reprovar
-  if grep -Eq 'lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
-    HIT=$(grep -Eo 'lefthook|pip-audit|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
+  # Após 007/008, [tool.mypy] e pip-audit em dev são legítimos se em uv.lock
+  if grep -Eq 'lefthook|trivy' "$PYPROJECT" 2>/dev/null; then
+    HIT=$(grep -Eo 'lefthook|trivy' "$PYPROJECT" | sort -u | tr '\n' ' ')
     FR12_OK=0; EVID12="${EVID12}pyproject.toml contem tool adiantada: $HIT (FR-014 escada); "
   fi
   if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then
@@ -391,9 +391,9 @@ if [ -f "$PYPROJECT" ]; then
       FR12_OK=0; EVID12="${EVID12}[tool.mypy] presente sem mypy em uv.lock; "
     fi
   fi
-  # [dependency-groups] permitido após 005/006/007 (contém pytest/ruff/mypy)
+  # [dependency-groups] permitido após 005/006/007/008 (contém pytest/ruff/mypy/pip-audit)
   if grep -q '\[dependency-groups\]' "$PYPROJECT" 2>/dev/null; then
-    if grep -Eq 'lefthook|pip-audit|trivy' "$PYPROJECT" 2>/dev/null; then
+    if grep -Eq 'lefthook|trivy' "$PYPROJECT" 2>/dev/null; then
       FR12_OK=0; EVID12="${EVID12}[dependency-groups] com tool adiantada; "
     fi
   fi

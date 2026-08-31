@@ -1,8 +1,8 @@
 63412ca7a9ada4af0e435db89fdbb649423b56005dfd2908c59ba2745a6bbf22  scripts/verify/f0-001-foundation.sh
 b63ac3c8aa329e6a5c7c210a044d0e4690728674bb27946fa04bf14607fb9a0c  scripts/verify/f0-002-constitution.sh
 d10c61e8623fcf3f7c706ab8ca7387303c2d5282da0afaee50bf5c6401b6f7d4  scripts/verify/f0-003-ci-minimo.sh
-759376ee79a6014254ad34538401d5d8cd0756f49962c8dba72ffa90830e0b0f  scripts/verify/f0-004-uv-workspace.sh
-dccb114aa0ea12301a4c16391f635dc4402c515c754b3969dbc803c977cda55f  scripts/verify/f0-005-pytest.sh
+018926b5a6b89e481a03789921fb49bbe2ae75a94fc731f8513dc99ead91b730  scripts/verify/f0-004-uv-workspace.sh
+8ae95f8c9d7ad5514d7513abb8d8cdcef6d9bb3783fe271b4573086f752cd716  scripts/verify/f0-005-pytest.sh
 5f2688463fbd061598ff5dc28733b2f095e37e0f8624d550aeacdd103e69782f  scripts/verify/f0-006-ruff.sh
 54fa81990a064aa5cbee2e517e5ea53109dd88d6020c742055dd61b5b8ce539a  scripts/verify/f0-007-mypy.sh
 9105ec08e435ecb1be2e4b86c9b069c60f6503bacfef888fe6a6b992ef312944  scripts/verify/f0-008-pip-audit.sh

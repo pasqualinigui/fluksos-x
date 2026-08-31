@@ -590,7 +590,13 @@ if [ -d "$ROOT/packages" ]; then FR15_OK=0; EVID15="${EVID15}packages/ existe (F
 if [ -f "$ROOT/pytest.toml" ] || [ -f "$ROOT/.pytest.toml" ]; then FR15_OK=0; EVID15="${EVID15}pytest.toml presente (FR-004); "; fi
 if grep -q 'xdist' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}xdist em pyproject.toml (FR-015); "; fi
 if grep -q 'execnet' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}execnet em pyproject.toml; "; fi
-if grep -q 'pip-audit\|trivy' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}pip-audit/trivy em pyproject.toml; "; fi
+# pip-audit em dev é legítimo após 008; permite se em uv.lock
+if grep -q 'pip-audit' "$PYPROJECT" 2>/dev/null; then
+  if ! grep -q 'name = "pip-audit"' "$UVLOCK" 2>/dev/null; then
+    FR15_OK=0; EVID15="${EVID15}pip-audit em pyproject.toml sem pip-audit em uv.lock; "
+  fi
+fi
+if grep -q 'trivy' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}trivy em pyproject.toml; "; fi
 if [ "$FR15_OK" = "1" ]; then
   pass "FR-015" "${CANON[FR-015]}"
 else
