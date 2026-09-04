@@ -8,3 +8,4 @@ b63ac3c8aa329e6a5c7c210a044d0e4690728674bb27946fa04bf14607fb9a0c  scripts/verify
 a70a4f63cca08dbc501165d2798747fbba0f1572eedf2571488a588a01db20e8  scripts/verify/f0-008-pip-audit.sh
 0607c0ca70ca8994f273d337e8ac9ea7f171af5b472d7780891afecc2e521dc6  scripts/verify/f0-009-lefthook.sh
 36276ba501fdc57bd40b86f1683d51bf2742294df544ec3ddc00f48c08f90d72  scripts/verify/f0-010-ci-completo.sh
+049ff46ae883e45b9d2c4d15d58b73fff20d5dabfd25e534571b7e16e5110208  scripts/verify/f0-011-core.sh

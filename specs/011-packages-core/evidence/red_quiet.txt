@@ -1,0 +1,22 @@
+🔴 FR-001   pydantic+settings runtime packages/core + hash lock
+           evidencia: packages/core/pyproject.toml ausente; lock sem pydantic; lock sem pydantic-settings; 
+🔴 FR-002   membro UV + 4 modulos + init nada alem
+           evidencia: packages/core/ ausente; 
+🔴 FR-003   settings FKX_ + SecretStr + ConfigError
+           evidencia: config.py ausente; 
+🔴 FR-004   TypedDict canais/reducers sem Pydantic state
+           evidencia: state.py ausente; 
+🔴 FR-005   modelos Pydantic sem logica
+           evidencia: models.py ausente; 
+🔴 FR-006   FkxError + 3 sem except nu
+           evidencia: exceptions.py ausente; 
+🔴 FR-007   ruff + mypy zeros src/fkx_core
+           evidencia: src/fkx_core/ ausente
+🔴 FR-008   testes tests/test_fkx_core verdes TDD
+           evidencia: tests/test_fkx_core_*.py ausentes (TDD, Q7)
+🔴 FR-009   env example cobre vars env nunca
+           evidencia: .env.example ausente (T017 documenta vars); config.py ausente; 
+🔴 FR-012   README 011 hash + zero [ ] + vermelho-verde
+           evidencia: README sem "011.*packages-core.*✅.*hash"; tasks.md com 26 [ ] abertas (CONVERGE); par vermelho/verde 011 ausente no log (red= green=); 
+
+Resultado: 2/12 asserções aprovadas — 10 violação(ões) (critica: 0, alta: 10, media: 0) — NAO CONFORME
