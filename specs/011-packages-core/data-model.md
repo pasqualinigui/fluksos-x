@@ -32,7 +32,8 @@ Payloads Pydantic (validação, sem lógica): tipos fechados, `model_config` est
 ## Superfície pública (`fkx_core/__init__.py`)
 
 `load_settings` (constrói `Settings`), `Settings`, `KernelState`, `FkxError`,
-`ConfigError`, `StateError`, `ModelError`. Nomes fixos neste contrato; o que
+`ConfigError`, `StateError`, `ModelError`, `EnvName`, `LogLevel`, `ErrorDetail`.
+Nomes fixos neste contrato; o que
 012/Fase 1 importam vem daqui, nunca de submódulo direto.
 
 ## Relações

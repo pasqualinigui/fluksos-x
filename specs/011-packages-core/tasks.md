@@ -98,10 +98,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 1 (env limpo + `.env` descartável; remover obrigatória → `ConfigError`).
 
-- [ ] T014 [US1] Adicionar `pydantic==2.13.5` + `pydantic-settings==2.15.0` como runtime de `packages/core/pyproject.toml` (membro) + `uv sync` (hash em `uv.lock`) (FR-001, research D1)
-- [ ] T015 [P] [US1] Escrever testes `tests/test_fkx_core_config.py` (tipos, defaults, máscara `SecretStr`, var ausente → `ConfigError`) — REPROVANDO sem o módulo (TDD)
-- [ ] T016 [US1] Implementar `packages/core/src/fkx_core/config.py` + exportar em `__init__.py` até T015 passar (FR-003, data-model Settings)
-- [ ] T017 [US1] Estender `.env.example` com exatamente `FKX_ENV`, `FKX_LOG_LEVEL`, `FKX_API_SECRET` (template, nunca valor) (FR-009)
+- [x] T014 [US1] Adicionar `pydantic==2.13.5` + `pydantic-settings==2.15.0` como runtime de `packages/core/pyproject.toml` (membro) + `uv sync` (hash em `uv.lock`) (FR-001, research D1)
+- [x] T015 [P] [US1] Escrever testes `tests/test_fkx_core_config.py` (tipos, defaults, máscara `SecretStr`, var ausente → `ConfigError`) — REPROVANDO sem o módulo (TDD)
+- [x] T016 [US1] Implementar `packages/core/src/fkx_core/config.py` + exportar em `__init__.py` até T015 passar (FR-003, data-model Settings)
+- [x] T017 [US1] Estender `.env.example` com exatamente `FKX_ENV`, `FKX_LOG_LEVEL`, `FKX_API_SECRET` (template, nunca valor) (FR-009)
 
 **Checkpoint**: US1 funcional e testável independentemente (MVP do item).
 
@@ -113,8 +113,8 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 2 (chaves + mesclagem + mypy 0).
 
-- [ ] T018 [P] [US2] Escrever testes `tests/test_fkx_core_state.py` (canais, mesclagem overwrite/acúmulo) — REPROVANDO sem o módulo (TDD)
-- [ ] T019 [US2] Implementar `packages/core/src/fkx_core/state.py` (`TypedDict` status/etapa/erros + reducer) até T018 passar (FR-004, data-model State)
+- [x] T018 [P] [US2] Escrever testes `tests/test_fkx_core_state.py` (canais, mesclagem overwrite/acúmulo) — REPROVANDO sem o módulo (TDD)
+- [x] T019 [US2] Implementar `packages/core/src/fkx_core/state.py` (`TypedDict` status/etapa/erros + reducer) até T018 passar (FR-004, data-model State)
 
 ---
 
@@ -124,10 +124,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 3 (tipos exatos, zero `except:` nu).
 
-- [ ] T020 [P] [US3] Escrever testes `tests/test_fkx_core_errors.py` (tipos, mensagens contextuais, sem segredo) — REPROVANDO sem o módulo (TDD)
-- [ ] T021 [US3] Implementar `packages/core/src/fkx_core/exceptions.py` (`FkxError` + 3) até T020 passar (FR-006, data-model Errors)
-- [ ] T022 [P] [US1+US2] Escrever testes `tests/test_fkx_core_models.py` (validação, sem lógica) — REPROVANDO sem o módulo (TDD)
-- [ ] T023 [US1+US2] Implementar `packages/core/src/fkx_core/models.py` + fechar `__init__.py` (superfície: `load_settings`, `Settings`, `KernelState`, 4 erros) (FR-005, data-model Superfície)
+- [x] T020 [P] [US3] Escrever testes `tests/test_fkx_core_errors.py` (tipos, mensagens contextuais, sem segredo) — REPROVANDO sem o módulo (TDD)
+- [x] T021 [US3] Implementar `packages/core/src/fkx_core/exceptions.py` (`FkxError` + 3) até T020 passar (FR-006, data-model Errors)
+- [x] T022 [P] [US1+US2] Escrever testes `tests/test_fkx_core_models.py` (validação, sem lógica) — REPROVANDO sem o módulo (TDD)
+- [x] T023 [US1+US2] Implementar `packages/core/src/fkx_core/models.py` + fechar `__init__.py` (superfície: `load_settings`, `Settings`, `KernelState`, 4 erros) (FR-005, data-model Superfície)
 
 ---
 
@@ -135,7 +135,7 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: oráculo verde, fronteira admitida via ADR prévia, lista fechada.
 
-- [ ] T024 **ADR PRÉVIA** — redigir ADR-023 em `docs/plan/decisions.md` (molde ADR-018/021/022): admitir `packages/core/` com `pyproject.toml` de membro nos oráculos 004–008 que asserem `packages/` ausente (jurisdição da 011; resto proibido); forma exata dos diffs; aplicação SÓ em T025. Sem esta ADR, T025 não executa (plan.md Fase C + restrição 3)
+- [x] T024 **ADR PRÉVIA** — redigir ADR-023 em `docs/plan/decisions.md` (molde ADR-018/021/022): admitir `packages/core/` com `pyproject.toml` de membro nos oráculos 004–008 que asserem `packages/` ausente (jurisdição da 011; resto proibido); forma exata dos diffs; aplicação SÓ em T025. Sem esta ADR, T025 não executa (plan.md Fase C + restrição 3)
 - [ ] T025 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-011-core.sh` rumo a 12/12 + ADR-023 aplicada SÓ agora + manifest 11/11 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T013: `feat(packages): packages core kernel (011)` (plan.md Fase C/D)
 - [ ] T026 `specs/README.md` `011 ✅` + hash do commit T025 (inquebrável FR-011; quickstart Cenário 5)
 - [ ] T027 Re-executar harness 11/11 + manifest 11/11 + quickstart "validação completa em um comando" (quickstart Cenário 5)

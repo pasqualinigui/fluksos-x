@@ -141,7 +141,7 @@ else
   for m in __init__.py config.py state.py models.py exceptions.py; do
     if [ ! -f "$SRCDIR/$m" ]; then FR2_OK=0; EVID2="${EVID2}src/fkx_core/$m ausente; "; fi
   done
-  EXTRA=$(ls "$SRCDIR" 2>/dev/null | grep -v -x -e "__init__.py" -e "config.py" -e "state.py" -e "models.py" -e "exceptions.py" -e "__pycache__" | tr '\n' ' ' || true)
+  EXTRA=$(ls "$SRCDIR" 2>/dev/null | grep -v -x -e "__init__.py" -e "config.py" -e "state.py" -e "models.py" -e "exceptions.py" -e "py.typed" -e "__pycache__" | tr '\n' ' ' || true)
   if [ -n "$EXTRA" ]; then FR2_OK=0; EVID2="${EVID2}modulos alem dos 4: $EXTRA (Q8); "; fi
   if [ -d "$ROOT/packages/cli" ]; then FR2_OK=0; EVID2="${EVID2}packages/cli existe (deve ser 012); "; fi
 fi

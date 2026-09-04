@@ -586,7 +586,8 @@ if grep -q '^\[tool\.mypy\]' "$PYPROJECT" 2>/dev/null; then
 fi
 if [ -f "$ROOT/mypy.ini" ]; then FR15_OK=0; EVID15="${EVID15}mypy.ini existe; "; fi
 # lefthook.yml é jurisdição da 009 (conteúdo asserido por f0-009) — ADR-018
-if [ -d "$ROOT/packages" ]; then FR15_OK=0; EVID15="${EVID15}packages/ existe (FR-015); "; fi
+if [ -d "$ROOT/packages" ] && [ ! -f "$ROOT/packages/core/pyproject.toml" ]; then FR15_OK=0; EVID15="${EVID15}packages/ sem core/pyproject.toml de membro (ADR-023); "; fi
+if [ -n "$(ls "$ROOT/packages" 2>/dev/null | grep -v -x "core" | tr -d '[:space:]' || true)" ]; then FR15_OK=0; EVID15="${EVID15}packages/ com conteudo alem de core/ (ADR-023); "; fi
 if [ -f "$ROOT/pytest.toml" ] || [ -f "$ROOT/.pytest.toml" ]; then FR15_OK=0; EVID15="${EVID15}pytest.toml presente (FR-004); "; fi
 if grep -q 'xdist' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}xdist em pyproject.toml (FR-015); "; fi
 if grep -q 'execnet' "$PYPROJECT" 2>/dev/null; then FR15_OK=0; EVID15="${EVID15}execnet em pyproject.toml; "; fi

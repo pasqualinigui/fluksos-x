@@ -491,7 +491,8 @@ FR13_OK=1
 EVID13=""
 # lefthook.yml é jurisdição da 009 (conteúdo asserido por f0-009) — ADR-018
 if [ -f "$ROOT/.gitleaks.toml" ] || [ -f "$ROOT/gitleaks.toml" ]; then FR13_OK=0; EVID13="${EVID13}gitleaks.toml existe; "; fi
-if [ -d "$ROOT/packages" ]; then FR13_OK=0; EVID13="${EVID13}packages/ existe (deve ser 011/012); "; fi
+if [ -d "$ROOT/packages" ] && [ ! -f "$ROOT/packages/core/pyproject.toml" ]; then FR13_OK=0; EVID13="${EVID13}packages/ sem core/pyproject.toml de membro (ADR-023); "; fi
+if [ -n "$(ls "$ROOT/packages" 2>/dev/null | grep -v -x "core" | tr -d '[:space:]' || true)" ]; then FR13_OK=0; EVID13="${EVID13}packages/ com conteudo alem de core/ (ADR-023); "; fi
 if [ -f "$ROOT/docker-compose.yml" ]; then FR13_OK=0; EVID13="${EVID13}docker-compose.yml existe (deve ser 015); "; fi
 if [ -f "$ROOT/requirements.txt" ] && grep -qi "pip-audit" "$ROOT/requirements.txt" 2>/dev/null; then FR13_OK=0; EVID13="${EVID13}requirements.txt com pip-audit; "; fi
 if [ -f "$ROOT/pylock.toml" ]; then FR13_OK=0; EVID13="${EVID13}pylock.toml existe (só em 013); "; fi
