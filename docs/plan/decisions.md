@@ -1229,3 +1229,49 @@ direto.
   o estado ainda não os comporta); no verde, aprova.
 - Estabelece o molde reutilizável: PLAN declara → ADR autoriza → verde aplica →
   manifest cita. A 010 (gitleaks, CI) e a 011/012 (`packages/`) herdam o molde.
+
+---
+
+## ADR-019 — Flake ambiental sob carga: registro, critério de convergência e transferência à 010
+
+**Data**: 2026-09-04 · **Item**: `009` (0.5), fase CONVERGE · **Estado**: aceita ·
+**Evidência**: runs do harness em loop durante a 009 (dados abaixo). **Classe**:
+achado de uso (como ADR-008), não defeito de implementação — nenhuma asserção é
+tocada por esta ADR.
+
+### Dados observados (não alegados)
+
+- ~60 execuções de oráculo em loops completos: 5 reprovações (~7%), em 5
+  oráculos distintos (003-FR-014, 004, 007, 008-FR-007, 009-FR-014) — nunca a
+  mesma FR duas vezes, nunca reproduzível isolada (002-nested 24/24 verde,
+  008 6/6, 007 3/3, todos os oráculos 3–6× verdes sozinhos).
+- 1 mecanismo capturado com prova: 008-FR-007 reprovou `grep "would have
+  audited"` e a re-execução imediata para evidência **continha a string** —
+  comportamento transiente da ferramenta externa, não erro de lógica.
+- Carga sustentada ~4.0 durante os loops; oráculos disparam processos aninhados
+  em paralelo e invocam ferramentas externas (`uv run`, `pip-audit`); asserts de
+  temporização usam `EPOCHSECONDS` (resolução 1s).
+- Nenhuma das FRs que falharam foi tocada pela 009 (únicos toques: 5 pontos
+  ADR-018, sem relação com os pontos de falha).
+
+### Decisão
+
+**1. Natureza: ambiental e pré-existente, não regressão da 009.** O padrão
+(falhas heterogêneas, isoladas-verdes, um caso com prova de transiência) é
+incompatível com defeito de lógica introduzido — defeito de lógica reproduz.
+
+**2. Critério de CONVERGE inalterado e cumprido.** CONVERGE exige harness exit 0
++ manifest + cadeia verdes — avaliado em run completo limpo (9/9 + 9/9 +
+pytest 15 passed, evidência `green.txt` da 009). O critério nunca exigiu
+"todo loop sempre verde sob qualquer carga"; nenhum item da história seria
+reavaliado por esse padrão retroativo.
+
+**3. Transferência à 010 (CI completo).** Endurecimento pertence ao pipeline,
+não aos oráculos convergidos: dimensionar runner, política de retry/quarentena
+para transientes de ferramenta externa, e tetos de tempo com margem para carga
+(EPOCHSECONDS 1s é instrumento grosseiro sob load ~4). Até lá, loops locais sob
+carga são evidência de tendência, não veredito.
+
+**4. Procedimento futuro.** Flake com 2+ amostras na mesma FR vira defeito
+investigado (não mais "ambiental por padrão"); quem alegar ambiental apresenta
+tabela amostra/isolado como a acima.

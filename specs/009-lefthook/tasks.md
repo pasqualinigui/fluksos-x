@@ -133,11 +133,11 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: inquebráveis, lista fechada, validação ponta-a-ponta.
 
-- [ ] T029 `specs/README.md` `009 ✅` + hash do commit T028 (inquebrável FR-015; quickstart Cenário 5)
-- [ ] T030 Re-executar harness 9/9 + manifest 9/9 + quickstart "validação completa em um comando" (quickstart Cenários 5–6)
-- [ ] T031 Confirmar `tasks.md` zero `^- [ ]` (o próprio oráculo FR-016 já asserir; dupla checagem humana) e `git log` com vermelho-antes-do-verde
-- [ ] T032 [P] Troubleshooting do quickstart executado contra os 3 cenários de falha (hook ausente, config rejeitado, vermelho herdado fora ADR-018)
-- [ ] T033 Rolagem da porta de entrada: `AGENTS.md:9` → harness 9/9 verde, próximo item 010 (precedente `docs(agents)` 004/006; entra no commit verde ou em `docs(agents)` separado, nunca no vermelho)
+- [x] T029 `specs/README.md` `009 ✅` + hash do commit T028 (inquebrável FR-015; quickstart Cenário 5)
+- [x] T030 Re-executar harness 9/9 + manifest 9/9 + quickstart "validação completa em um comando" (quickstart Cenários 5–6)
+- [x] T031 Confirmar `tasks.md` zero `^- [ ]` (o próprio oráculo FR-016 já asserir; dupla checagem humana) e `git log` com vermelho-antes-do-verde
+- [x] T032 [P] Troubleshooting do quickstart executado contra os 3 cenários de falha (hook ausente, config rejeitado, vermelho herdado fora ADR-018)
+- [x] T033 Rolagem da porta de entrada: `AGENTS.md:9` → harness 9/9 verde, próximo item 010 (precedente `docs(agents)` 004/006; entra no commit verde ou em `docs(agents)` separado, nunca no vermelho)
 
 ---
 
