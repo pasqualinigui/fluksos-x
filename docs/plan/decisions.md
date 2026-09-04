@@ -1084,3 +1084,106 @@ Fecha a lacuna da 004, que pula a 002.
   (que é dado, não script); o oráculo da 005 o verifica.
 - A primeira divergência de hash no futuro terá precedente e procedimento — que
   é o que distingue incidente de rotina.
+
+---
+
+## ADR-016 — Trava de cadência da auditoria-checkpoint: a 5ª spec não converge sem relatório
+
+**Data**: 2026-09-04 · **Item**: nenhum (checkpoint não-item, entre 008 e 009) ·
+**Estado**: aceita · **Origem**: convenção da ADR-014 ("a cada no máximo quatro
+itens") + folga detectada em sessão: nenhum oráculo, tasks.md ou CONVERGE travava
+a 009 na ausência da auditoria 005–008 — o gatilho dependia de alguém contar até
+quatro, isto é, de julgamento humano onde deveria haver regra (princípios I, VI).
+
+### Decisão
+
+**1. Toda spec que seria a 5ª desde a última auditoria recebe como obrigação
+herdada a existência do relatório** `docs/plan/audit/f0-audit-NNN-MMM.md`,
+**asserida pelo próprio oráculo** (presença do arquivo + cabeçalhos grepeáveis do
+formato inaugural: `Veredito`, `Achados`, `Destino`). Sem relatório, o oráculo
+reprova e a spec não converge. A trava é local (cada item verifica a si, ADR-015d)
+e mecânica: esquecer a auditoria passa a ser impossível por construção.
+
+**2. Bootstrap declarado.** A primeira portadora é a 009 (`f0-audit-005-008.md`,
+de 2026-09-04): a auditoria aterrissou antes, de modo que a 009 nasce verde nessa
+FR. Não há ciclo vermelho→verde a recuperar aqui — há regra a estrear. Registrado
+nesta ADR para que o verde inicial nunca seja lido como prova do mecanismo.
+
+**3. Teto 4 mantido; recalibragem com dados.** Rendimento observado: auditoria
+001–004 achou 4 acionáveis/4 itens (2 altos); 005–008 achou 2 altos + 1 médio +
+4 notas/4 itens. Densidade ≈ 1 achado relevante por item sustenta o teto até a
+Fase 0 fechar (16 ÷ 4 = 4 auditorias exatas). Reavaliar granularidade por fase
+(Fase 2, com agentes e não-determinismo, pode justificar teto menor) quando houver
+ponto de dado da Fase 1 — nunca por intuição.
+
+### Consequências
+
+- A 009 herda via Contratos ("Recebido de itens anteriores"): relatório
+  `f0-audit-005-008.md` + 1 FR de cadência no próprio oráculo.
+- Auditoria segue não-item fora do mapa ADR-011; o que entra no mapa é só a FR
+  que a exige. Nenhum oráculo 001–008 é tocado por esta ADR.
+
+---
+
+## ADR-017 — Registro da auditoria pós-008: exceção do manifest silencioso e pré-autorização de fronteira
+
+**Data**: 2026-09-04 · **Item**: nenhum (checkpoint não-item, entre 008 e 009) ·
+**Estado**: aceita · **Evidência**: `docs/plan/audit/f0-audit-005-008.md` (A1, A2,
+M3, M4, B1–B3).
+
+### 1. Exceção A1: edições pós-convergência sem ADR (`0e7b077`, `0afea59`)
+
+Reconhecido e registrado, não perdoado: os dois commits alteraram oráculos
+convergidos (004/005 e 007/008) e regeneraram o manifest sem decisão, violando
+ADR-002/006/015a. A substância era legítima (conflito genuíno de fronteira:
+a 008 põe `pip-audit` em dev por desenho; as fronteiras o proibiam) — por isso
+exceção, não reversão. Reverter seria reescrever histórico (incidente, Lei Zero).
+
+**Base congelada a partir desta ADR** (estado verificado `sha256sum -c` 8/8 em
+2026-09-04; é este o presente que o futuro comparará):
+
+```
+63412ca7a9ada4af0e435db89fdbb649423b56005dfd2908c59ba2745a6bbf22  f0-001
+b63ac3c8aa329e6a5c7c210a044d0e4690728674bb27946fa04bf14607fb9a0c  f0-002
+d10c61e8623fcf3f7c706ab8ca7387303c2d5282da0afaee50bf5c6401b6f7d4  f0-003
+018926b5a6b89e481a03789921fb49bbe2ae75a94fc731f8513dc99ead91b730  f0-004
+8ae95f8c9d7ad5514d7513abb8d8cdcef6d9bb3783fe271b4573086f752cd716  f0-005
+5f2688463fbd061598ff5dc28733b2f095e37e0f8624d550aeacdd103e69782f  f0-006
+da18a82ac2d8815480839fc1fd6858d50b0d340918e4e457ccd157d959d4bf32  f0-007
+10c7323c562d4699c7ac49192dea10d230da0f2948a544403d371c231233412e  f0-008
+```
+
+**Nota de supersessão (B1):** a tabela do §(a) da ADR-015 reflete 2026-08-30 e
+diverge da base acima no item 004. Não é reescrita (registro histórico); o
+manifest é a fonte vigente e esta ADR é a ponte entre os dois estados.
+
+### 2. Regra de pré-autorização de fronteira (A2) + transferência à 009
+
+Asserção de fronteira ("ferramenta X ainda não existe") é verdade temporária; todo
+item que adiciona ferramenta quebra a fronteira dos anteriores por desenho. A
+partir desta ADR, o procedimento é:
+
+1. O **PLAN do item novo declara o impacto de fronteira** (quais oráculos
+   anteriores reprovarão sobre estado correto, e por quê);
+2. A **decisão de ajuste entra por ADR prévia ao merge** (conflito de contrato
+   entre specs, ADR-002) — nunca por fix pós-vermelho com regeneração silenciosa;
+3. O padrão de legitimidade é o de `0e7b077`: **proibido ↔ ausente do `uv.lock`**,
+   nunca proibido ↔ nome estático (nomes envelhecem; o lock é a fonte).
+
+**Transferência à 009 (Lefthook):** seu PLAN declara o impacto sobre as fronteiras
+004/005 (`lefthook` em pyproject/dev, `lefthook.yml` novo) sob esta regra antes de
+qualquer merge. É a primeira execução do procedimento — e a prova de que A1 não
+se repete.
+
+### 3. Exceção M3: vermelho co-comitado em 005–008
+
+`red.txt` estreia no mesmo commit feat que o verde nas quatro specs — ordem
+temporal improvável, prova degradada a alegação. Sem reparo (histórico imutável);
+exceção registrada. A partir da 009, vermelho em commit separado volta a ser
+obrigatório.
+
+### 4. Destinos menores
+
+- M4 (texto T013 auto-referente na 005, oráculo correto): registro, sem ação.
+- B2 (Trivy ⏭️ sem Docker na 008): validação plena transferida à 010 (ou 015).
+- B3 (CI em servidor não-evidenciado, resíduo 003-T031): revalidar na 010.
