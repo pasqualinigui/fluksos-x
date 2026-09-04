@@ -376,9 +376,11 @@ FR14_OK=1; EVID14=""
 if [ ! -f "$MANIFEST" ]; then
   FR14_OK=0; EVID14="${EVID14}manifest.sha256 ausente; "
 else
-  LINES=$(wc -l < "$MANIFEST" 2>/dev/null | tr -d ' ' || echo 0)
-  if [ "$LINES" != "9" ] 2>/dev/null; then
-    FR14_OK=0; EVID14="${EVID14}manifest com $LINES linhas (esperado 9); "
+  LINES=$(wc -l < "$MANIFEST" 2>/dev/null || echo 0)
+  LINES=$(echo "$LINES" | tr -d '[:space:]')
+  # piso >=9 (ADR-021): igualdade temporal proibida; espelho do piso >=5 da 005
+  if [ -z "$LINES" ] || [ "$LINES" -lt 9 ] 2>/dev/null; then
+    FR14_OK=0; EVID14="${EVID14}manifest com $LINES linhas (esperado >=9); "
   elif ! sha256sum -c "$MANIFEST" >/dev/null 2>&1; then
     FR14_OK=0; EVID14="${EVID14}sha256sum -c reprovou; "
   fi

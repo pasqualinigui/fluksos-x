@@ -98,9 +98,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: `f0-010` fora das FRs de convergência (FR-012/013 excluídas) + cada job espelhado via comando local equivalente (quickstart Cenários 1–2).
 
-- [ ] T014 [US1] Confirmar `pytest-cov==7.1.0` em dev com hash em `uv.lock` (presente desde 005 — verificar pin exato, sem re-adicionar) + `uv sync`; confirmar `uv run pytest --cov --cov-fail-under=90 -q` → 0 (FR-006; medido 95%)
-- [ ] T015 [US1] Estender `.github/workflows/ci.yml`: 8 jobs (nomes únicos/estáveis, `verify` preservado), SHA pins + comentário (`checkout v7.0.1`, `setup-python v7.0.0`, `setup-uv v10.0.1` SHA `20cfd1bf…`, `gitleaks-action v3.0.0` SHA `e0c47f4f…`, `trivy-action v0.36.0` `aquasecurity/`), job `secrets` via `gitleaks/gitleaks-action` modo `detect`, `setup-uv v10.0.1` + `uv sync --frozen`, matriz + `fail-fast: false`, `timeout-minutes`, sem `continue-on-error` (FR-001..005/010)
-- [ ] T016 [US1] Escrever `commitlint.config.js` (11 tipos) + intervalo por evento (`--from ${{ github.event.pull_request.base.sha || github.event.before }} --to ${{ github.event.pull_request.head.sha || github.sha }}`, com `fetch-depth: 0`) + validar 100% do histórico + 3 sintéticas inválidas com regra nomeada (FR-007; quickstart Cenário 3)
+- [x] T014 [US1] Confirmar `pytest-cov==7.1.0` em dev com hash em `uv.lock` (presente desde 005 — verificar pin exato, sem re-adicionar) + `uv sync`; confirmar `uv run pytest --cov --cov-fail-under=90 -q` → 0 (FR-006; medido 95%)
+- [x] T015 [US1] Estender `.github/workflows/ci.yml`: 8 jobs (nomes únicos/estáveis, `verify` preservado), SHA pins + comentário (`checkout v7.0.1`, `setup-python v7.0.0`, `setup-uv v10.0.1` SHA `20cfd1bf…`, `gitleaks-action v3.0.0` SHA `e0c47f4f…`, `trivy-action v0.36.0` `aquasecurity/`), job `secrets` via `gitleaks/gitleaks-action` modo `detect`, `setup-uv v10.0.1` + `uv sync --frozen`, matriz + `fail-fast: false`, `timeout-minutes`, sem `continue-on-error` (FR-001..005/010)
+- [x] T016 [US1] Escrever `commitlint.config.js` (11 tipos) + intervalo por evento (`--from ${{ github.event.pull_request.base.sha || github.event.before }} --to ${{ github.event.pull_request.head.sha || github.sha }}`, com `fetch-depth: 0`) + validar 100% do histórico + 3 sintéticas inválidas com regra nomeada (FR-007; quickstart Cenário 3)
 
 **Checkpoint**: US1 funcional (MVP do item; servidor ainda pendente como 🧑).
 
@@ -112,10 +112,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenários 2–4 (simulação de déficit, sintéticas inválidas, checklist 🧑 revisado a seco).
 
-- [ ] T017 [US2] Simular déficit (limiar artificial acima do medido) → job falha nomeando; restaurar 90 (FR-006; quickstart Cenário 2)
-- [ ] T018 [P] [US3] Validar commitlint contra histórico + sintéticas (FR-007; quickstart Cenário 3)
-- [ ] T019 [US1] Escrever procedimento de branch protection 🧑 versionado em `specs/010-ci-completo/branch-protection.md` (checks frouxos + sem-bypass + sem-force, sem reviews, passos no servidor + evidência a registrar); sem token em arquivo algum (FR-008/009; quickstart Cenário 4)
-- [ ] T020 **VERDE** — executar `scripts/verify/f0-010-ci-completo.sh` rumo a 13/13 (menos 🧑-proteção se pendente, com divergência declarada), preservar `specs/010-ci-completo/evidence/green.txt`, e commitar `feat(ci)` **separado** do T013: `feat(ci): CI completo + branch protection (010)` (plan.md Fase C/D)
+- [x] T017 [US2] Simular déficit (limiar artificial acima do medido) → job falha nomeando; restaurar 90 (FR-006; quickstart Cenário 2)
+- [x] T018 [P] [US3] Validar commitlint contra histórico + sintéticas (FR-007; quickstart Cenário 3)
+- [x] T019 [US1] Escrever procedimento de branch protection 🧑 versionado em `specs/010-ci-completo/branch-protection.md` (checks frouxos + sem-bypass + sem-force, sem reviews, passos no servidor + evidência a registrar); sem token em arquivo algum (FR-008/009; quickstart Cenário 4)
+- [x] T020 **VERDE** — executar `scripts/verify/f0-010-ci-completo.sh` rumo a 13/13 (menos 🧑-proteção se pendente, com divergência declarada), preservar `specs/010-ci-completo/evidence/green.txt`, e commitar `feat(ci)` **separado** do T013: `feat(ci): CI completo + branch protection (010)` (plan.md Fase C/D)
 
 **Checkpoint**: verde em commit próprio, posterior ao vermelho (FR-013 verificará a ordem no log).
 

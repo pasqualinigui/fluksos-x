@@ -70,9 +70,9 @@ declare -A CANON=(
   ["FR-001"]="workflow em .github/workflows/ci.yml YAML valido com chaves top-level"
   ["FR-002"]="diretorio .github/workflows existe"
   ["FR-003"]="job verify runs-on pinado ubuntu-24.04 nao latest"
-  ["FR-004"]="checkout@v7 com fetch-depth 0"
-  ["FR-005"]="setup-python@v7 com python-version 3.12 familia"
-  ["FR-006"]="fronteira sem ruff mypy pytest pip-audit trivy gitleaks uv matrix cache pull_request_target workflow_run"
+  ["FR-004"]="checkout familia v7 com fetch-depth 0 (tag ou SHA+comentario)"
+  ["FR-005"]="setup-python familia v7 com python-version 3.12 familia"
+  ["FR-006"]="fronteira: sem vetores pull_request_target/workflow_run"
   ["FR-007"]="permissions contents read least privilege sem write id-token"
   ["FR-008"]="triggers push e pull_request em [main, develop]"
   ["FR-009"]="job verify estavel com steps Checkout Setup Python 3.12 Run harness"
@@ -178,6 +178,8 @@ if [ ! -f "$CI_YML" ]; then
 else
   CK_V7=0; FD0=0
   grep -q 'uses: actions/checkout@v7' "$CI_YML" && CK_V7=1
+  # ADR-022: SHA pinado com comentario v7.0.1 equivale a @v7 (SHA implica tag)
+  if [ "$CK_V7" = "0" ] && grep -Eq 'uses: actions/checkout@[0-9a-f]{40} +# v7\.0\.1' "$CI_YML"; then CK_V7=1; fi
   grep -q 'fetch-depth: 0' "$CI_YML" && FD0=1
   # garante que fetch-depth pertence ao checkout (proximidade)
   if [ "$CK_V7" = "1" ] && [ "$FD0" = "1" ]; then
@@ -198,6 +200,8 @@ if [ ! -f "$CI_YML" ]; then
 else
   SP_V7=0; PY312=0
   grep -q 'uses: actions/setup-python@v7' "$CI_YML" && SP_V7=1
+  # ADR-022: SHA pinado com comentario v7.0.0 equivale a @v7
+  if [ "$SP_V7" = "0" ] && grep -Eq 'uses: actions/setup-python@[0-9a-f]{40} +# v7\.0\.0' "$CI_YML"; then SP_V7=1; fi
   grep -q "python-version: '3.12'" "$CI_YML" && PY312=1
   # aceita tambem double quotes por robustez mas reprova se ausente
   if [ "$PY312" = "0" ]; then grep -q 'python-version: "3.12"' "$CI_YML" && PY312=1; fi
@@ -217,16 +221,17 @@ else
 fi
 
 # =============================================================================
-# FR-006: fronteira — nenhuma ferramenta de 010 (C1 inclui pull_request_target)
+# FR-006: fronteira — vetores proibidos (ferramentas 010 liberadas por ADR-022)
 # =============================================================================
 if [ ! -f "$CI_YML" ]; then
   fail "FR-006" "${CANON[FR-006]}" "alta" "ci.yml ausente"
 else
   FOUND=""
-  # lista proibida unificada (contracts §6, quickstart 1i)
-  if grep -Eq 'ruff|mypy|pytest|pip-audit|trivy|gitleaks|uv |matrix:|cache:|pull_request_target|workflow_run' "$CI_YML"; then
-    FOUND="$(grep -Eo 'ruff|mypy|pytest|pip-audit|trivy|gitleaks|uv |matrix:|cache:|pull_request_target|workflow_run' "$CI_YML" | sort -u | tr '\n' ' ')"
-    fail "FR-006" "${CANON[FR-006]}" "alta" "ferramenta de 010 antecipada ou vetor proibido: $FOUND"
+  # lista reduzida (ADR-022): só vetores reais; palavras-ferramenta/matriz/cache
+  # pertencem a 010, dona designada (Emenda 1)
+  if grep -Eq 'pull_request_target|workflow_run' "$CI_YML"; then
+    FOUND="$(grep -Eo 'pull_request_target|workflow_run' "$CI_YML" | sort -u | tr '\n' ' ')"
+    fail "FR-006" "${CANON[FR-006]}" "alta" "vetor proibido: $FOUND"
   else
     pass "FR-006" "${CANON[FR-006]}"
   fi
