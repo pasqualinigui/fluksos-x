@@ -299,7 +299,9 @@ if [ -n "$(git config --local --get core.hooksPath 2>/dev/null || true)" ]; then
   FR10_OK=0; EVID10="${EVID10}core.hooksPath local definido (ganchos fora de .git/); "
 fi
 if [ -f "$HOOKYML" ]; then
-  if grep -Eq '^[^#]*:[ ]*/[^ ]' "$HOOKYML" 2>/dev/null; then
+  # caminho absoluto HOST (dois-pontos + espaco + barra); montagem container
+  # ($PWD:/w, sem espaco) nao e escrita no host e nao casa aqui
+  if grep -Eq '^[^#]*:[ ]+/[^ ]' "$HOOKYML" 2>/dev/null; then
     FR10_OK=0; EVID10="${EVID10}caminho absoluto no config (escrita fora do repo); "
   fi
   if grep -Eq '~' "$HOOKYML" 2>/dev/null; then

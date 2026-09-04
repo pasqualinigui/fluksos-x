@@ -101,10 +101,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: isca com violação `ruff` em cópia descartável → saída ≠ 0 com job nomeado; sem isca → 0 (quickstart Cenário 1).
 
-- [ ] T017 [US1] `uv add --dev lefthook==2.1.12` + `uv sync` (hash em `uv.lock`); confirmar `uv run lefthook version` → `2.1.12` (FR-001, research D2)
-- [ ] T018 [US1] Escrever `lefthook.yml`: `min_version: 2.1.12`, `pre-commit` fail-fast FR-003 (somente-leitura), sem `remotes`/`self-update` (FR-002/003/006)
-- [ ] T019 [US1] `uv run lefthook install` + `validate` + `check-install` verdes + `git status --short` limpo exceto `lefthook.yml`/dev/lock/oráculo (install só toca `.git/hooks/`, FR-007/010; quickstart Cenário 3)
-- [ ] T020 [P] [US1] Teste independente US1 em cópia descartável com isca `ruff` (quickstart Cenário 1) — repo real nunca recebe isca
+- [x] T017 [US1] `uv add --dev lefthook==2.1.12` + `uv sync` (hash em `uv.lock`); confirmar `uv run lefthook version` → `2.1.12` (FR-001, research D2)
+- [x] T018 [US1] Escrever `lefthook.yml`: `min_version: 2.1.12`, `pre-commit` fail-fast FR-003 (somente-leitura), sem `remotes`/`self-update` (FR-002/003/006)
+- [x] T019 [US1] `uv run lefthook install` + `validate` + `check-install` verdes + `git status --short` limpo exceto `lefthook.yml`/dev/lock/oráculo (install só toca `.git/hooks/`, FR-007/010; quickstart Cenário 3)
+- [x] T020 [P] [US1] Teste independente US1 em cópia descartável com isca `ruff` (quickstart Cenário 1) — repo real nunca recebe isca
 
 **Checkpoint**: US1 funcional e testável independentemente (MVP do item).
 
@@ -116,14 +116,14 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: `lefthook run pre-push` → 0 com harness 9/9 (ainda sem os ajustes? — os ajustes entram nesta fase antes do verde final); quickstart Cenários 2–4.
 
-- [ ] T021 [US2] Declarar `pre-push` em `lefthook.yml` (harness `f0-*.sh` + `trivy fs` condicional FR-004) e validar `lefthook run pre-push` → 0 (FR-005; quickstart Cenário 2)
-- [ ] T022 [US2] Validar caminho Trivy: com Docker executa, sem Docker skip documentado (FR-004; quickstart Cenário 4)
-- [ ] T023 [P] [US3] Validar o procedimento de setup do quickstart Cenário 3 em clone/cópia descartável (comandos já escritos — executar e confirmar `validate` + `check-install`)
-- [ ] T024 [P] [US3] Confirmar `.github/` intocado (`git diff --name-only` sem `.github/`) e escape `LEFTHOOK=0` funcional (FR-008/009; quickstart Cenário 6)
-- [ ] T025 [US1+US2+US3] Aplicar os 5 ajustes ADR-018 em `f0-004`/`f0-005`/`f0-006`/`f0-007`/`f0-008` (forma exata da tabela, padrão `uv.lock`) — **somente nesta fase, somente estes pontos** (restrição 3; plan.md Fase C:4)
-- [ ] T026 Regenerar `scripts/verify/manifest.sha256` (9/9) citando ADR-018 na mensagem do verde + `for f in scripts/verify/f0-*.sh` 9/9 (plan.md Fase C:5)
-- [ ] T027 [P] Rodar cadeia completa: `uv run ruff check .` + `format --check` + `uv run mypy --strict .` + `uv run pip-audit` + `uv run pytest -q` — tudo 0 (higiene pré-verde)
-- [ ] T028 **VERDE** — executar `scripts/verify/f0-009-lefthook.sh` 16/16, preservar `specs/009-lefthook/evidence/green.txt`, e commitar `feat(harness)` **separado** do T016: `feat(harness): add lefthook 2.1.12 pre-commit orchestration (009)` (plan.md Fase C/D)
+- [x] T021 [US2] Declarar `pre-push` em `lefthook.yml` (harness `f0-*.sh` + `trivy fs` condicional FR-004) e validar `lefthook run pre-push` → 0 (FR-005; quickstart Cenário 2)
+- [x] T022 [US2] Validar caminho Trivy: com Docker executa, sem Docker skip documentado (FR-004; quickstart Cenário 4)
+- [x] T023 [P] [US3] Validar o procedimento de setup do quickstart Cenário 3 em clone/cópia descartável (comandos já escritos — executar e confirmar `validate` + `check-install`)
+- [x] T024 [P] [US3] Confirmar `.github/` intocado (`git diff --name-only` sem `.github/`) e escape `LEFTHOOK=0` funcional (FR-008/009; quickstart Cenário 6)
+- [x] T025 [US1+US2+US3] Aplicar os 5 ajustes ADR-018 em `f0-004`/`f0-005`/`f0-006`/`f0-007`/`f0-008` (forma exata da tabela, padrão `uv.lock`) — **somente nesta fase, somente estes pontos** (restrição 3; plan.md Fase C:4)
+- [x] T026 Regenerar `scripts/verify/manifest.sha256` (9/9) citando ADR-018 na mensagem do verde + `for f in scripts/verify/f0-*.sh` 9/9 (plan.md Fase C:5)
+- [x] T027 [P] Rodar cadeia completa: `uv run ruff check .` + `format --check` + `uv run mypy --strict .` + `uv run pip-audit` + `uv run pytest -q` — tudo 0 (higiene pré-verde)
+- [x] T028 **VERDE** — executar `scripts/verify/f0-009-lefthook.sh` 16/16, preservar `specs/009-lefthook/evidence/green.txt`, e commitar `feat(harness)` **separado** do T016: `feat(harness): add lefthook 2.1.12 pre-commit orchestration (009)` (plan.md Fase C/D)
 
 **Checkpoint**: verde em commit próprio, posterior ao vermelho (FR-016 verificará a ordem no log).
 

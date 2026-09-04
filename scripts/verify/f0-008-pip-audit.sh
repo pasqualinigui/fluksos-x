@@ -489,7 +489,7 @@ fi
 # =============================================================================
 FR13_OK=1
 EVID13=""
-if [ -f "$ROOT/lefthook.yml" ]; then FR13_OK=0; EVID13="${EVID13}lefthook.yml existe (deve ser 009); "; fi
+# lefthook.yml é jurisdição da 009 (conteúdo asserido por f0-009) — ADR-018
 if [ -f "$ROOT/.gitleaks.toml" ] || [ -f "$ROOT/gitleaks.toml" ]; then FR13_OK=0; EVID13="${EVID13}gitleaks.toml existe; "; fi
 if [ -d "$ROOT/packages" ]; then FR13_OK=0; EVID13="${EVID13}packages/ existe (deve ser 011/012); "; fi
 if [ -f "$ROOT/docker-compose.yml" ]; then FR13_OK=0; EVID13="${EVID13}docker-compose.yml existe (deve ser 015); "; fi

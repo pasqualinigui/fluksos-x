@@ -462,7 +462,7 @@ EVID14=""
 if grep -q '^\[tool\.mypy\]' "$ROOT/mypy.ini" 2>/dev/null; then FR14_OK=0; EVID14="${EVID14}mypy.ini com [tool.mypy]; "; fi
 if [ -f "$ROOT/mypy.ini" ]; then FR14_OK=0; EVID14="${EVID14}mypy.ini existe; "; fi
 if [ -f "$ROOT/.mypy.ini" ]; then FR14_OK=0; EVID14="${EVID14}.mypy.ini existe; "; fi
-if [ -f "$ROOT/lefthook.yml" ]; then FR14_OK=0; EVID14="${EVID14}lefthook.yml existe (deve ser 009); "; fi
+# lefthook.yml é jurisdição da 009 (conteúdo asserido por f0-009) — ADR-018
 if [ -d "$ROOT/packages" ]; then FR14_OK=0; EVID14="${EVID14}packages/ existe (deve ser 011/012); "; fi
 if [ -f "$ROOT/ruff.toml" ] || [ -f "$ROOT/.ruff.toml" ]; then FR14_OK=0; EVID14="${EVID14}ruff.toml presente (fonte única pyproject); "; fi
 if [ "$FR14_OK" = "1" ]; then
