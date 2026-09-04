@@ -9,13 +9,13 @@ Harness 10/10 + manifest 10/10 · `uv sync` verde.
 ## Cenário 1 — Settings de env limpo (SC-001, FR-003)
 
 ```bash
-env -i PATH="$PATH" HOME="$HOME" uv run python3 -c "
+env -i PATH="$PATH" HOME="$HOME" FKX_ENV=dev uv run python3 -c "
 from fkx_core import load_settings
 s = load_settings()
 print(type(s.env).__name__, type(s.api_secret).__name__)
 print(repr(s.api_secret))  # esperado: mascarado, nunca o valor
 "
-# esperado: tipos corretos + máscara; var obrigatória ausente → ConfigError nomeado
+# esperado: tipos corretos + máscara; FKX_ENV ausente → ConfigError nomeado
 ```
 
 ## Cenário 2 — Estado mescla pelo reducer (SC-002, FR-004)

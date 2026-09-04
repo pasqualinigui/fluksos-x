@@ -1401,3 +1401,83 @@ tocado; nenhum outro oráculo é tocado.
   sem depender desta conversa: ADR-020 aponta, E11–E18 fundamentam.
 - A 010 não é afetada: seu conjunto de entrada permanece o fechado no checkpoint
   009 (contratos 008/009, ADR-009/015–017/019).
+
+---
+
+## ADR-023 — Pré-autorização de fronteira da 011: `packages/` admitido + `--all-packages` obrigatório
+
+**Data**: 2026-09-04 · **Item**: `011` (0.6), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 011 + `uv sync` puro removendo
+`fkx-core`/`pydantic` do `.venv` (observado: `- python-dotenv`, `- fkx-core`;
+`uv run --no-sync` sem módulo) + `specs/011-packages-core/plan.md`
+(declaração) · **Efeito**: autoriza os ajustes abaixo **exclusivamente no
+commit verde da 011 (Fase C)**.
+
+### Contexto
+
+Dois conflitos genuínos. (1) Cinco oráculos (004–008) proíbem `packages/` —
+e a 011 **é** `packages/core` por desenho (item 0.6 do plano). (2) Descoberto no
+verde: `uv sync` puro **remove** membros do workspace sob raiz virtual
+(`[tool.uv] package = false`); sem `--all-packages`, CI (`uv sync --frozen`
+em 6 jobs) e dev perdem `fkx_core` → `pytest` morre em collection ERROR.
+A verificação "sync passou" (`Resolved/Checked`) sem `uv pip list`/import é
+vácua — lição de método registrada: **saída de gerenciador não é prova de
+instalação; import é**.
+
+### Ajustes autorizados (forma exata, só na Fase C)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `f0-004/005/006/007/008` (fronteira `packages/`) | admitir `packages/core/` com `pyproject.toml` de membro (jurisdição 011); resto proibido; padrão ADR-018 |
+| 2 | `.github/workflows/ci.yml` (010, 6 jobs com sync) | `uv sync --frozen` → `uv sync --frozen --all-packages`; substring preservada (FR-003/010 intactos); sem tocar jobs, pins ou triggers |
+
+Manifest regenerado na Fase C citando esta ADR. Qualquer outro vermelho
+herdado = conflito novo, ADR própria, nunca fix direto.
+
+### Consequências
+
+- Quarta execução do procedimento ADR-017. Padrão de setup do repo passa a ser
+  `uv sync --all-packages` (documentado no quickstart da 011); `uv sync` puro
+  é armadilha conhecida a partir desta ADR.
+- Lição permanente: comandos de sync/listagem provam intenção; **import prova
+  instalação** (vale para todo verificador futuro que dependa de pacote).
+
+---
+
+## ADR-024 — Pré-autorização de refinamento da 011: `py.typed` + `ErrorDetail` (achados do verde)
+
+**Data**: 2026-09-04 · **Item**: `011` (0.6), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: `mypy --strict .` reprovando (`import-untyped`, PEP 561)
++ FR-005 exigindo `BaseModel` com spec sem modelo concreto · **Efeito**:
+autoriza os ajustes abaixo **exclusivamente no commit verde da 011 (Fase C)**.
+
+### Contexto
+
+Dois achados genuínos do harness sobre o próprio item, ambos descobertos pelo
+vermelho/verde antes de qualquer merge: (1) sem `py.typed`, o pacote instalado
+é opaco ao mypy (PEP 561) — `f0-007` FR-008/009 pegou; (2) FR-005 exigindo
+`BaseModel` mas a spec sem modelo concreto — `ErrorDetail(field, reason)`
+fecha a lacuna com papel real (forma estruturada de `FkxError`, base da
+observabilidade X e do futuro Guardião 3.8), sem especulação.
+
+### Ajustes autorizados (forma exata, só na Fase C)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `packages/core/src/fkx_core/py.typed` | marcador PEP 561 vazio (empacotamento, não código) |
+| 2 | `f0-011` FR-002 (próprio oráculo, ainda pré-verde) | whitelist admite `py.typed`; escopo de "nada além" = módulos `.py` (marcadores fora do escopo, registrado aqui — sem reescrita de spec) |
+| 3 | `models.py` + `exceptions.py` + `__init__.py` | `ErrorDetail` + `FkxError.detail()` + export; teste de roundtrip |
+
+Manifest regenerado na Fase C citando esta ADR. Nada de outros itens é tocado.
+
+### Consequências
+
+- Quinta execução do procedimento ADR-017 (primeira sobre o próprio item em
+  construção — ainda pré-verde, sem pair vermelho afetado: o vermelho capturou
+  `models.py` ausente, e `ErrorDetail` nasce dentro do verde que o apaga).
+- Lição: checklist de empacotamento PEP 561 entra no template mental de pacotes
+  futuros (012+): `pyproject` + `py.typed` + import desde o esqueleto.
+- Lição de ferramenta: appends em `decisions.md` ancoram SEMPRE no tail
+  verificado na hora (âncora em texto do meio insere no meio; re-ancorar no
+  mesmo texto duplica) — falha cometida duas vezes nesta sessão, pega pelo
+  `grep ^## ADR-` antes do commit.
