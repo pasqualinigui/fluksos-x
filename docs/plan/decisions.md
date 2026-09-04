@@ -1187,3 +1187,45 @@ obrigatório.
 - M4 (texto T013 auto-referente na 005, oráculo correto): registro, sem ação.
 - B2 (Trivy ⏭️ sem Docker na 008): validação plena transferida à 010 (ou 015).
 - B3 (CI em servidor não-evidenciado, resíduo 003-T031): revalidar na 010.
+
+---
+
+## ADR-018 — Pré-autorização de fronteira da 009 (primeira execução do procedimento ADR-017)
+
+**Data**: 2026-09-04 · **Item**: `009` (0.5), fase PLAN · **Estado**: aceita ·
+**Evidência**: `docs/plan/research/f0-009-lefthook.md` (Q·fronteira) +
+`specs/009-lefthook/plan.md` (declaração de impacto) · **Efeito**: autoriza os
+ajustes abaixo **exclusivamente no commit verde da 009 (Fase C)**, nunca antes,
+nunca depois, nunca além desta lista.
+
+### Contexto
+
+A 009 cria `lefthook.yml` + `lefthook==2.1.12` em dev por desenho — e cinco
+asserções de oráculos anteriores proíbem exatamente isso (levantamento mecânico
+`grep -n lefthook scripts/verify/f0-00*.sh`). Sem ajuste, o harness reprovaria
+estado correto; com ajuste silencioso, repetiríamos o achado A1
+(`f0-audit-005-008.md`). É o conflito de contrato entre specs que a ADR-002 manda
+subir para decisão — esta ADR é essa decisão, **prévia a qualquer merge**.
+
+### Ajustes autorizados (forma exata: padrão `0e7b077`, legitimidade via `uv.lock`)
+
+| # | Oráculo | Ajuste |
+|---|---|---|
+| 1 | `f0-004` FR-012 | admitir `lefthook` em pyproject/groups **se** `name = "lefthook"` em `uv.lock`; admitir `lefthook.yml` (conteúdo = jurisdição da 009) |
+| 2 | `f0-005` FR-015 | admitir existência de `lefthook.yml` |
+| 3 | `f0-006` FR-014 | idem |
+| 4 | `f0-007` FR-014 | idem |
+| 5 | `f0-008` FR-013 | idem |
+
+Manifest regenerado na Fase C **citando esta ADR** (é a ponte exigida pela
+ADR-017, não "regeneração silenciosa"). Qualquer vermelho herdado fora destes 5
+pontos após o verde é conflito novo e sobe para ADR própria — nunca para fix
+direto.
+
+### Consequências
+
+- A FR-012 da 009 (oráculo asserir PLAN + esta ADR) nasce verificável desde o
+  vermelho: antes da Fase C ela reprova (ajustes ainda não aplicados — correto,
+  o estado ainda não os comporta); no verde, aprova.
+- Estabelece o molde reutilizável: PLAN declara → ADR autoriza → verde aplica →
+  manifest cita. A 010 (gitleaks, CI) e a 011/012 (`packages/`) herdam o molde.
