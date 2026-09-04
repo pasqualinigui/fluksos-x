@@ -93,3 +93,85 @@ antes do 2.10 existir.
 Alimenta o item **2.6** (`agents/tools/*`) e a **Emenda 3** futura (Fase 2). Nenhuma
 spec da Fase 0 muda por este documento (princípio IV: norma sobre artefato que só
 existe na Fase 2 nasceria agora como especulação).
+
+---
+
+## Apêndice — Achados multi-harness (2026-09-04, sessão pós-009)
+
+> Vereditos contra fonte primária (site + repo + API GitHub, fetch 2026-09-04).
+> Insumos datados, não decisões. Roteamento normativo em ADR-020. Nada aqui altera
+> Fase 0, plano ou itens — consumo ocorre no RESEARCH de cada item destino.
+
+### E11 — ECC (`affaan-m/ECC`, MIT, 247k★): ecossistema, não motor
+
+Skills/agentes/hooks + learning loop para harnesses alheios; TDD e conformidade
+por orientação/score, sem portão executável. Colheitas: registry com
+checksums/autoria (→ Emenda 3, lacuna #1); ciclo de vida de instinto com
+decay/prune (→ 3.8/3.9, com trava determinística); rule-packs AgentShield
+(→ 3.8/010 referência). Rejeitado: catálogo bulk (bloat), auto-instalação por
+score (classe ADR-002), sprawl multi-harness.
+
+### E12 — `harness/harness` (Apache-2.0, 38k★): nada a importar
+
+Plataforma DevOps completa (SCM + CI/CD + ambientes + registries). Consumimos CI,
+não construímos plataforma (ADR-009, IX). No máximo dialeto futuro para o agente
+DevOps 3.7. Monitorar.
+
+### E13 — `deepseek-ai/deepseek-harness` (MIT, TS, dev preview): mecanismos sim, framework não
+
+"Everything is a plugin" (Cordis). Colheitas: log de sessão append-only +
+invariante "model-visible means logged" asserida em runtime (→ Fase 3
+`memory/shadow.py`); seams definição/provedor/consumidor (→ Emenda 3,
+vocabulário do IX); composição profiles/bundles/patches (→ Emenda 3, catálogo);
+`verify-application-entrypoints` e headless runner (validam nossos self-checks e
+`fkx run --headless`). Rejeitado: framework Cordis/TS (D3 travou LangGraph),
+instabilidade de preview, Web UI/IM.
+
+### E14 — `nexu-io/open-design` (Apache-2.0): conteúdo de domínio
+
+Pack de skills de design (alternativa Claude Design). Mesma classe das skills
+Supabase: mora nos **projetos**, nunca no motor. Corolário: packs de domínio
+versionados são unidade real de distribuição (3ª evidência da tese
+mecanismo/conteúdo, com E6 e E11).
+
+### E15 — `bytedance/deer-flow` (MIT, Python 3.12+, LangGraph, 81k★): o veio operacional
+
+`subagents.max_total_per_run` (→ 2.10, mecanismo de teto por run); `make doctor`
+(→ 4.5, valida até no nome); `support-bundle` redigido com zip de evidência
+(nossa convenção `evidence/` + Lei Zero praticada); MCP hardening — timeout por
+tool, prefixo anti-colisão, escrita atômica, segredos só via superfície secrets
+(→ Emenda 3, lacunas #1/#2); sandbox em modos + acesso host por política
+(→ 2.6 shell sandboxeada); `X-Trace-Id` correlação não-lookup com sobrescrita
+(→ 3.4); `goals` + compactação (→ 4.2 / `core/context.py`). Rejeitado: IM
+channels, Gateway multi-worker, provedores BytePlus, sizing de deploy (ops
+alheia).
+
+### E16 — Tabela de disposição (achado → consumidor)
+
+| Achado | Origem | Item consumidor | Consumir em |
+|---|---|---|---|
+| Invariante de log model-visible | E13 | 3.1/3.3 (`memory/shadow.py`) | RESEARCH do item |
+| Vocabulário seam triplo | E13 | Emenda 3 | redação da emenda |
+| Composição versionada em camadas | E13 | Emenda 3, catálogo | redação da emenda |
+| Registry checksums/autoria | E11 | Emenda 3, lacuna #1 | redação da emenda |
+| Ciclo de vida de instinto c/ limiar | E11 | 3.8 + 3.9 | RESEARCH dos itens |
+| Rule-packs red/blue-team | E11 | 3.8 / gitleaks-010 | RESEARCH dos itens |
+| Teto por run (`max_total_per_run`) | E15 | 2.10 | RESEARCH do item |
+| MCP hardening (timeout/prefixo/atômico/secrets) | E15 | Emenda 3, lacunas #1/#2 | redação da emenda |
+| Sandbox em modos + política host | E15 | 2.6 tools | RESEARCH do item |
+| `X-Trace-Id` correlação | E15 | 3.4 observabilidade | RESEARCH do item |
+| Goals + compactação | E15 | 4.2 / `core/context.py` | RESEARCH dos itens |
+| `make doctor`, `support-bundle` | E15 | 4.5 / convenção evidência | corroboração, sem ação |
+| Dialeto pipeline Harness | E12 | 3.7 (observação) | sem ação |
+| Packs de domínio versionados | E14 | tese mecanismo/conteúdo | corroboração, sem ação |
+
+### E17 — Backlog vigiado (pós-MVP, exigirá ADR se um dia entrar)
+
+Agendador de tarefas (deer-flow): superfície nova (motor headless + cron),
+fora do ciclo canônico atual. Observar; proposta futura passa por spec própria.
+
+### E18 — Regra de consumo (anti-memória)
+
+Cada item consumidor MUST citar e avaliar a entrada correspondente no próprio
+RESEARCH; ANALYZE que ignorar roteamento sem registro = achado (norma: ADR-020).
+Nada deste apêndice se aplica por lembrança desta conversa.
