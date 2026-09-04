@@ -1481,3 +1481,47 @@ Manifest regenerado na Fase C citando esta ADR. Nada de outros itens é tocado.
   verificado na hora (âncora em texto do meio insere no meio; re-ancorar no
   mesmo texto duplica) — falha cometida duas vezes nesta sessão, pega pelo
   `grep ^## ADR-` antes do commit.
+
+---
+
+## ADR-025 — Hierarquia de fontes, triangulação mínima e roteamento dos limites honestos
+
+**Data**: 2026-09-04 · **Item**: nenhum (checkpoint não-item, pré-012) ·
+**Estado**: aceita · **Evidência**: convenção praticada nos researches 005–011
+(cabeçalho P0–P3) + sessão estratégica pós-011 (50k usuários, legados).
+
+### Problema
+
+A hierarquia de fontes existia como convenção, não como norma: nada impedia um
+RESEARCH futuro de citar blog obscuro como fonte única de versão — e limites
+honestos (carga só se prova no alvo; sem env, verificação parcial; sem env
+sanitizado, sem resgate) viviam em conversa, não em artefato (violação VII por
+omissão).
+
+### Decisão
+
+**1. Hierarquia normativa (vale para todo RESEARCH, motor e projetos gerados).**
+P0 = registry API + executado + arquivos do repo · P1 = docs oficiais +
+releases · P2 = engenharia big-tech/padrões · P3 = comunidade (só com
+corroboração P0/P1). Proibido como fonte única: sem data, sem autoria
+verificável, SEO-farm.
+
+**2. Triangulação mínima.** Versão ou comportamento externo exige ≥2 fontes
+independentes incluindo P0. Alegação com fonte única é achado em ANALYZE
+(no mínimo MEDIUM; HIGH se versão de supply chain).
+
+**3. Roteamento dos limites (structural-honest, não removível por design).**
+(a) Carga/escala: afirmação exige medição; instrumento (k6 ou outro) é detalhe
+do item DevOps (Fase 2), a decidir no RESEARCH dele — sem vencedor antecipado.
+(b) Todo sistema gerado sai com matriz de verificação *provado-vs-declarado*
+como artefato obrigatório; modo de verificação limitada declara-se no
+`interview` (requisito de desenho do ciclo: 4.2/4.6/CONVERGE). (c) Resgate sem
+env sanitizado não opera (portão de ciclo futuro, Lei Zero já proíbe o dado).
+(d) Ferramenta de carga e demais vigiados: backlog E17/ADR-020.
+
+### Consequências
+
+- Nenhum código, oráculo, spec ou plano muda por esta ADR — ela normatiza
+  processo e roteia futuro. Primeira norma nascida de sessão estratégica,
+  não de auditoria: o molde checkpoint serve aos dois.
+- ANALYZE que ignorar fonte única sem registro = achado (fecha o loop com o §2).
