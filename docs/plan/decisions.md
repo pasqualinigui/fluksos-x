@@ -1275,3 +1275,52 @@ carga são evidência de tendência, não veredito.
 **4. Procedimento futuro.** Flake com 2+ amostras na mesma FR vira defeito
 investigado (não mais "ambiental por padrão"); quem alegar ambiental apresenta
 tabela amostra/isolado como a acima.
+
+---
+
+## ADR-020 — Roteamento normativo dos achados multi-harness (anti-esquecimento)
+
+**Data**: 2026-09-04 · **Item**: nenhum (checkpoint não-item, pós-009) ·
+**Estado**: aceita · **Evidência**: `docs/plan/research/f0-skills-mcp-2026-09.md`
+Apêndice E11–E18 (ECC, `harness/harness`, `deepseek-harness`, `open-design`,
+`deer-flow`; vereditos contra fonte primária, fetch 2026-09-04).
+
+### Problema
+
+Achados estratégicos sem consumidor nomeado apodrecem em memória de conversa —
+exatamente o que o princípio VII proíbe ("a mesma falha não possa repetir-se",
+aqui na forma: o mesmo aprendizado não possa perder-se). O apêndice registra;
+esta ADR **obriga o consumo**.
+
+### Decisão
+
+**1. Tabela de roteamento (fonte: E16).** Cada takeaway tem item consumidor e
+momento de consumo fixados — invariante de log model-visible → 3.1/3.3;
+seam triplo, composição em camadas, registry checksums, MCP hardening →
+Emenda 3; ciclo de vida de instinto → 3.8/3.9; rule-packs → 3.8/010;
+teto por run → 2.10; sandbox em modos → 2.6; trace-id → 3.4;
+goals/compactação → 4.2/`core/context.py`.
+
+**2. Regra de consumo.** O RESEARCH do item consumidor MUST citar e avaliar a
+entrada correspondente; especificação que use o mecanismo sem a citação viola
+rastreabilidade (VIII). ANALYZE que ignorar roteamento sem registro = achado
+no mínimo MEDIUM. "Ficou para depois" sem transferência a item nomeado = a
+mesma violação.
+
+**3. Rejeições com motivo (não re-litigar).** Framework Cordis/TS (D3),
+catálogo skills em bulk (bloat), auto-instalação por score (classe ADR-002),
+IM channels, Gateway multi-worker, plataforma Harness como dependência,
+packs de domínio no motor (tese mecanismo/conteúdo, E14). Reabertura exige
+evidência nova, não releitura.
+
+**4. Vigiado, não agendado.** Agendador de tarefas (E17): observação pós-MVP;
+entrada no plano só por spec própria + ADR.
+
+### Consequências
+
+- Nenhum plano, spec ou oráculo muda por esta ADR — ela governa o futuro,
+  não reescreve passado nem antecipa norma sobre artefato inexistente (IV).
+- Qualquer chat/agente que chegue ao item X encontra obrigação + evidência
+  sem depender desta conversa: ADR-020 aponta, E11–E18 fundamentam.
+- A 010 não é afetada: seu conjunto de entrada permanece o fechado no checkpoint
+  009 (contratos 008/009, ADR-009/015–017/019).
