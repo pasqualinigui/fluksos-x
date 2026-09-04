@@ -188,3 +188,12 @@ Task: "Confirmar .github intocado + escape LEFTHOOK=0"
 ### Rejeitado
 
 Verde sem vermelho separado (M3-recorrente); ajuste de fronteira fora da Fase C ou além dos 5 pontos (A1-recorrente); `git add` de isca no repo real (Lei Zero: isca só em cópia descartável, `trap` de remoção).
+
+---
+
+## Phase 7: Convergence (converge skill, 2026-09-04)
+
+**Purpose**: fechar os 2 gaps parciais restantes; nada aqui reabre escopo.
+
+- [x] T034 [US3] Provar recusa de `min_version`: baixar `lefthook_2.1.11_Linux_x86_64.gz` em /tmp, conferir sha256 `435aff51fc767a7f135717a4e3e4f3282c15e0a4ca4e2dfd1b54ef8241ee5f3f` (research Q3), executar o binário 2.1.11 contra `lefthook.yml` (`min_version: 2.1.12`), confirmar recusa com erro de versão, preservar saída em `specs/009-lefthook/evidence/min_version_refusal.txt`, limpar /tmp (US3/AC2, FR-001) (partial)
+- [x] T035 Medir `time uv run lefthook run pre-commit` (repo verde) e registrar wall time em `specs/009-lefthook/evidence/latencia.txt` com data e carga (`uptime`), sem teto inventado — calibragem por medição (SC-006) (partial)

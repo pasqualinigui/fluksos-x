@@ -77,7 +77,7 @@ Colaborador novo clona, sincroniza e instala ganchos com comandos documentados; 
 **Acceptance Scenarios**:
 
 1. **Given** clone limpo com `uv.lock` íntegro, **When** procedimento de setup documentado, **Then** `lefthook validate` e `lefthook check-install` saem zero.
-2. **Given** `lefthook.yml` com `min_version` acima do binário, **When** qualquer execução, **Then** o próprio lefthook recusa com erro de versão (pin declarativo verificado pela ferramenta).
+2. **Given** `lefthook.yml` com `min_version` acima do binário, **When** execução de hooks (`run`/`install`), **Then** o próprio lefthook recusa com erro de versão (exceção medida: `validate` não impõe — evidência `min_version_refusal.txt`, 2026-09-04).
 
 ---
 

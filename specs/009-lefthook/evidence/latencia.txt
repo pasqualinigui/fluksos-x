@@ -1,0 +1,3 @@
+# latencia pre-commit (SC-006) — 2026-09-04
+wall=10s (summary interno 9.10s), exit=0, 5/5 jobs verdes, repo verde limpo
+comando: uv run lefthook run pre-commit --force (forca todos os jobs; sem staged, hooks dariam skip em ~0s)
