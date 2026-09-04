@@ -1,0 +1,14 @@
+✅ FR-001   pydantic+settings runtime packages/core + hash lock
+✅ FR-002   membro UV + 4 modulos + init nada alem
+✅ FR-003   settings FKX_ + SecretStr + ConfigError
+✅ FR-004   TypedDict canais/reducers sem Pydantic state
+✅ FR-005   modelos Pydantic sem logica
+✅ FR-006   FkxError + 3 sem except nu
+✅ FR-007   ruff + mypy zeros src/fkx_core
+✅ FR-008   testes tests/test_fkx_core verdes TDD
+✅ FR-009   env example cobre vars env nunca
+✅ FR-010   contrato: list 12 exit2 2x <5s
+✅ FR-011   manifest 11/11 + self-check f0-001..010
+✅ FR-012   README 011 hash + zero [ ] + vermelho-verde
+
+Resultado: 12/12 asserções aprovadas — CONFORME

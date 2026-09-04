@@ -20,7 +20,7 @@
 | `008` | **0.12** | F0 | pip-audit + Trivy | ✅ concluída (`62d2a91`) |
 | `009` | **0.5** | F0 | Lefthook 2.1.12 | ✅ concluída (`c5caf14`) |
 | `010` | **0.14** | F0 | CI completo (ci-completo) + branch protection | ✅ concluída (`b89f804`) |
-| `011` | **0.6** | F0 | `packages/core` | ⏳ |
+| `011` | **0.6** | F0 | `packages/core` (packages-core) | ✅ concluída (`770b136`) |
 | `012` | **0.7** | F0 | `packages/cli` | ⏳ |
 | `013` | **0.15** | F0 | Automação de release | ⏳ |
 | `014` | **0.16** | F0 | Atualização de dependências | ⏳ |

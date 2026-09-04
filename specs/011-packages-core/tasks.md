@@ -136,11 +136,11 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 **Purpose**: oráculo verde, fronteira admitida via ADR prévia, lista fechada.
 
 - [x] T024 **ADR PRÉVIA** — redigir ADR-023 em `docs/plan/decisions.md` (molde ADR-018/021/022): admitir `packages/core/` com `pyproject.toml` de membro nos oráculos 004–008 que asserem `packages/` ausente (jurisdição da 011; resto proibido); forma exata dos diffs; aplicação SÓ em T025. Sem esta ADR, T025 não executa (plan.md Fase C + restrição 3)
-- [ ] T025 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-011-core.sh` rumo a 12/12 + ADR-023 aplicada SÓ agora + manifest 11/11 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T013: `feat(packages): packages core kernel (011)` (plan.md Fase C/D)
-- [ ] T026 `specs/README.md` `011 ✅` + hash do commit T025 (inquebrável FR-011; quickstart Cenário 5)
-- [ ] T027 Re-executar harness 11/11 + manifest 11/11 + quickstart "validação completa em um comando" (quickstart Cenário 5)
-- [ ] T028 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (010→011, harness 11/11, próximo 012)
-- [ ] T029 [P] Troubleshooting do quickstart (import falha, mypy reclama, segredo em log) + commit de convergência `docs(specs)`
+- [x] T025 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-011-core.sh` rumo a 12/12 + ADR-023 aplicada SÓ agora + manifest 11/11 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T013: `feat(packages): packages core kernel (011)` (plan.md Fase C/D)
+- [x] T026 `specs/README.md` `011 ✅` + hash do commit T025 (inquebrável FR-011; quickstart Cenário 5)
+- [x] T027 Re-executar harness 11/11 + manifest 11/11 + quickstart "validação completa em um comando" (quickstart Cenário 5)
+- [x] T028 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (010→011, harness 11/11, próximo 012)
+- [x] T029 [P] Troubleshooting do quickstart (import falha, mypy reclama, segredo em log) + commit de convergência `docs(specs)`
 
 ---
 

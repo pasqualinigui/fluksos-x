@@ -1,0 +1,4 @@
+🔴 FR-011   manifest 11/11 + self-check f0-001..010
+           evidencia: f0-007-mypy.sh --quiet reprovou (rc=1); 
+
+Resultado: 11/12 asserções aprovadas — 1 violação(ões) (critica: 0, alta: 1, media: 0) — NAO CONFORME
