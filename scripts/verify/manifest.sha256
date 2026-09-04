@@ -7,3 +7,4 @@ d10c61e8623fcf3f7c706ab8ca7387303c2d5282da0afaee50bf5c6401b6f7d4  scripts/verify
 40c70e7db3e4745d69bfdd1cc0e280599342b4a3a014e473780fdecf2b3207b6  scripts/verify/f0-007-mypy.sh
 a70a4f63cca08dbc501165d2798747fbba0f1572eedf2571488a588a01db20e8  scripts/verify/f0-008-pip-audit.sh
 fc75f1d3131f127457318ba7d0015938eae0afcd9056e475daacf8ce46ad7beb  scripts/verify/f0-009-lefthook.sh
+36276ba501fdc57bd40b86f1683d51bf2742294df544ec3ddc00f48c08f90d72  scripts/verify/f0-010-ci-completo.sh

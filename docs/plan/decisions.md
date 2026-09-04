@@ -1316,6 +1316,39 @@ evidência nova, não releitura.
 **4. Vigiado, não agendado.** Agendador de tarefas (E17): observação pós-MVP;
 entrada no plano só por spec própria + ADR.
 
+---
+
+## ADR-021 — Pré-autorização de fronteira da 010: piso no lugar de igualdade (f0-009 FR-014)
+
+**Data**: 2026-09-04 · **Item**: `010` (0.14), fase TESTS 🔴 · **Estado**: aceita ·
+**Evidência**: run vermelho da 010 (`f0-009 --quiet` rc=1 por `LINES==9` com
+manifest legítimo de 10 linhas) + `specs/010-ci-completo/plan.md` (declaração de
+impacto) · **Efeito**: autoriza UM ajuste, **exclusivamente no commit verde da
+010 (Fase C)**.
+
+### Contexto
+
+A 009 escreveu sua asserção de manifest com igualdade (`LINES=="9"`) em vez do
+piso usado pela 005 (`-lt 5`, i.e. `>=5`) — asserção temporal: verdadeira no dia
+da convergência, falsa no dia seguinte por acréscimo legítimo. É a classe A1/A2
+exata, desta vez **descoberta pelo próprio vermelho da 010 antes de qualquer
+merge** — o procedimento ADR-017 funcionou como desenhado (detecção pré-merge,
+não pós-fix). Ironia registrada sem maquiagem: o auditor carregava a classe que
+auditou; o mecanismo a pegou de todo modo.
+
+### Ajuste autorizado (forma exata, espelho da 005)
+
+Em `scripts/verify/f0-009-lefthook.sh` (FR-014): trocar igualdade por piso
+(`>=9`) + manter `sha256sum -c` (a integridade real). Comentário citando esta
+ADR. Manifest regenerado na Fase C da 010 citando esta ADR. Nada mais na 009 é
+tocado; nenhum outro oráculo é tocado.
+
+### Consequências
+
+- A partir da 010, igualdade sobre contagem de manifest é padrão proibido em
+  oráculos novos (piso + formato + `sha256sum -c`, molde 005/010).
+- A FR-012 da 010 já nasce nesse padrão (`>=10`).
+
 ### Consequências
 
 - Nenhum plano, spec ou oráculo muda por esta ADR — ela governa o futuro,
