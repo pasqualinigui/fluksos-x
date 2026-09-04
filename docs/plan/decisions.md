@@ -1318,6 +1318,50 @@ entrada no plano só por spec própria + ADR.
 
 ---
 
+## ADR-022 — Pré-autorização de fronteira da 010 (003: SHA ⊃ tag; fronteira reduzida aos vetores)
+
+**Data**: 2026-09-04 · **Item**: `010` (0.14), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 010 (f0-003 FR-004/005/006 reprovam sobre
+`ci.yml` estendido correto) + `specs/010-ci-completo/plan.md` (declaração
+complementada) · **Efeito**: autoriza os ajustes abaixo **exclusivamente no
+commit verde da 010 (Fase C)**.
+
+### Contexto
+
+Três conflitos genuínos, todos previstos pela classe mas não pela tabela (falha
+de completude do PLAN da 010, registrada sem maquiagem — a FR-012 do oráculo
+novo pegou o que a tabela esqueceu, que é exatamente para o que ela existe):
+
+1. **FR-004/005 (003) exigem `@v7` literal.** SHA pins (`@3d3c42e5… # v7.0.1`)
+   são estritamente mais fortes que tag major mutável para a intenção da 003
+   ("versão verificada da família v7"). Exigir o literal eternizaria a forma
+   mais fraca — inversão da intenção pela letra.
+2. **FR-006 (003) proíbe o vocabulário inteiro da 010** (`ruff|mypy|…|uv
+   |matrix:|cache:`) no `ci.yml`. A 010 é a dona designada do arquivo (Emenda 1);
+   a proibição era verdade temporal (fronteira), não invariante. O invariante
+   real são os **vetores** (`pull_request_target`, `workflow_run`).
+
+### Ajustes autorizados (forma exata, só na Fase C)
+
+| # | Oráculo | Ajuste |
+|---|---|---|
+| 1 | `f0-003` FR-004 | aceitar `actions/checkout@<40hex> # v7.0.1` como equivalente a `@v7` (SHA ⊃ tag); manter `fetch-depth: 0` + proximidade; atualizar descrição CANON para "família v7 (tag ou SHA+comentário)" |
+| 2 | `f0-003` FR-005 | aceitar `actions/setup-python@<40hex> # v7.0.0` idem; manter `python-version 3.12` + veto `3.x`; atualizar descrição idem |
+| 3 | `f0-003` FR-006 | reduzir lista proibida a `pull_request_target\|workflow_run`; remover palavras-ferramenta (dono atual: 010); atualizar descrição para "fronteira: sem vetores proibidos" |
+
+Manifest regenerado na Fase C citando esta ADR. Qualquer outro vermelho herdado
+fora destes pontos = conflito novo, ADR própria, nunca fix direto.
+
+### Consequências
+
+- Segunda execução do procedimento ADR-017 (primeira: ADR-018/009). O molde
+  PLAN-declara → ADR-autoriza → verde-aplica → manifest-cita está estabelecido.
+- Lição de método para auditoria pós-012: tabelas de impacto devem varrer
+  **assertions literais** (grep por nome de ferramenta/versão nos oráculos
+  anteriores), não só arquivos — a 010 varreu arquivos e perdeu 3 literais.
+
+---
+
 ## ADR-021 — Pré-autorização de fronteira da 010: piso no lugar de igualdade (f0-009 FR-014)
 
 **Data**: 2026-09-04 · **Item**: `010` (0.14), fase TESTS 🔴 · **Estado**: aceita ·
