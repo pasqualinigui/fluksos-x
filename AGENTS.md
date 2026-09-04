@@ -6,7 +6,7 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 0 (bootstrap), item 009 de 016 concluído (harness 9/9 verde). Ferramentas ativas: ruff 0.16.5 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12; CI completo + branch protection (010) é o próximo.
+**Estado**: Fase 0 (bootstrap), item 010 de 016 concluído (harness 10/10 verde). Ferramentas ativas: ruff 0.16.5 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12 + CI completo; `packages/core` (011) é o próximo.
 
 ## How to operate
 

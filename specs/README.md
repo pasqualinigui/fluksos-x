@@ -19,7 +19,7 @@
 | `007` | **0.3** | F0 | MyPy 2.3.1 strict | ✅ concluída (`a60c5b4`) |
 | `008` | **0.12** | F0 | pip-audit + Trivy | ✅ concluída (`62d2a91`) |
 | `009` | **0.5** | F0 | Lefthook 2.1.12 | ✅ concluída (`c5caf14`) |
-| `010` | **0.14** | F0 | CI completo + branch protection | ⏳ |
+| `010` | **0.14** | F0 | CI completo (ci-completo) + branch protection | ✅ concluída (`b89f804`) |
 | `011` | **0.6** | F0 | `packages/core` | ⏳ |
 | `012` | **0.7** | F0 | `packages/cli` | ⏳ |
 | `013` | **0.15** | F0 | Automação de release | ⏳ |

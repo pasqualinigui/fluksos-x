@@ -125,11 +125,11 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: inquebráveis, lista fechada, primeira validação em servidor.
 
-- [ ] T021 `specs/README.md` `010 ✅` + hash do commit T020 (inquebrável FR-013; quickstart Cenário 5)
-- [ ] T022 Re-executar harness 10/10 + manifest 10/10 + quickstart "validação completa em um comando" (quickstart Cenários 5–6)
-- [ ] T023 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (009→010, harness 10/10, próximo 011)
-- [ ] T024 [P] Executar cenário 🧑 (proteção no servidor + PR de teste travando + push direto recusado) OU registrar divergência declarada se pendente (SC-005 honesto; fecha resíduo B3 com primeira execução real)
-- [ ] T025 [P] Troubleshooting do quickstart (runner sem Docker ⏭️, check ambíguo, histórico inválido) + commit de convergência `docs(specs)`
+- [x] T021 `specs/README.md` `010 ✅` + hash do commit T020 (inquebrável FR-013; quickstart Cenário 5)
+- [x] T022 Re-executar harness 10/10 + manifest 10/10 + quickstart "validação completa em um comando" (quickstart Cenários 5–6)
+- [x] T023 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (009→010, harness 10/10, próximo 011)
+- [x] T024 [P] Executar cenário 🧑 (proteção no servidor + PR de teste travando + push direto recusado) OU registrar divergência declarada se pendente (SC-005 honesto; fecha resíduo B3 com primeira execução real)
+- [x] T025 [P] Troubleshooting do quickstart (runner sem Docker ⏭️, check ambíguo, histórico inválido) + commit de convergência `docs(specs)`
 
 ---
 
