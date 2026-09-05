@@ -106,10 +106,16 @@ Projetos que usavam a flag antiga precisam atualizar seus scripts.
 
 | Linha | Papel |
 |---|---|
-| `main` | Estado estável e publicável. Recebe apenas integrações vindas de `develop` |
-| `develop` | Linha de integração contínua. Recebe as linhas de funcionalidade |
-| `feature/*` | Trabalho isolado. Deriva de `develop` e retorna a ela |
-| `hotfix/*` | Correção urgente. Deriva de `main` e retorna a `main` e a `develop` |
+| `main` | Linha de integração única, estável e publicável. Recebe as linhas de funcionalidade por proposta de mudança, com os 10 checks obrigatórios verdes |
+| `develop` | Espelho protegido de `main`. Existe porque o oráculo `f0-001` FR-002 exige a linha; é sincronizada a partir de `main` e não recebe `feature/*` diretamente |
+| `feature/*` | Trabalho isolado. Deriva de `main` e retorna a `main` |
+| `hotfix/*` | Correção urgente. Deriva de `main` e retorna a `main`, com `develop` re-sincronizada em seguida |
+
+> Os papéis acima valem desde **ADR-032**, que fechou a pergunta deixada em
+> aberto pela ADR-028: `develop` nunca foi linha de integração de nada (70
+> commits atrás, 0 à frente), e a norma passou a declarar o que a prática faz.
+> Reabertura prevista: segundo colaborador com escrita, ou necessidade de linha
+> de estabilização para release.
 
 ### Nome de linha de funcionalidade
 

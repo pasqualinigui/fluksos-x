@@ -1931,3 +1931,54 @@ erro que o próximo agente repetiria ao "documentar melhor" um artefato medido.
 - Fica o precedente de método: alegação de "flake ambiental" exige medição
   pareada antes/depois. A ADR-019 defendeu 3 sessões de silêncio com ~7% de uma
   amostra heterogênea; 40 execuções dirigidas ao vetor mostraram 25%.
+
+---
+
+## ADR-032 — Destino de `develop`: espelho protegido, não segunda linha de integração
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, pós-ADR-031) ·
+**Estado**: aceita · **Origem**: pergunta deixada explicitamente em aberto pela
+ADR-028 §3 (*"seu destino — reavivar com fluxo por PR ou migrar a asserção —
+decide-se junto da condição de saída, nunca antes"*). A condição de saída
+disparou no adendo da própria ADR-028: fluxo por PR em vigor. A pergunta
+venceu. · **Decisão do mantenedor**: sessão 2026-09-05.
+
+### Fato medido
+
+`develop` está **70 commits atrás de `main` e 0 à frente**: nunca foi linha de
+integração de nada. Os cinco PRs da história servidora (#1–#5) saíram de
+`feature/*` e entraram em `main`. `CONTRIBUTING.md` §2, porém, declara
+`feature/*` derivando de `develop` e retornando a ela — divergência que a
+ADR-028 nomeou e não resolveu.
+
+### Decisão
+
+**1. `main` é a linha de integração única.** `feature/*` deriva de `main` e
+retorna a `main` por PR com os 10 checks obrigatórios. É o que já acontece; a
+norma passa a dizer o que a prática faz, em vez do contrário.
+
+**2. `develop` permanece como espelho protegido de `main`.** Existe porque
+`f0-001` FR-002 exige a linha, e a asserção **não é tocada** (regra 5: nenhum
+item modifica oráculo anterior; e migrar a asserção para fazer sumir uma linha
+seria derrotá-la). É sincronizada a partir de `main` e não recebe `feature/*`
+diretamente.
+
+**3. `CONTRIBUTING.md` §2 é emendado** para declarar exatamente isso. A
+divergência declarada pela ADR-028 deixa de existir — não por tolerância, mas
+por correção do artefato normativo (princípio VII).
+
+### Por que não adotar `develop` como linha de integração
+
+Com 1 mantenedor e 1 agente, uma segunda linha acrescenta um merge sem leitor:
+ninguém estabiliza em `develop` o que já passou por 10 checks obrigatórios em
+`feature/*`. A 013 deriva versionamento semântico de Conventional Commits sobre
+a linha de integração — uma linha torna a derivação inequívoca; duas exigiriam
+decidir qual delas versiona. A proteção já está aplicada nas duas linhas, então
+manter `develop` protegida não custa nada e preserva a opção.
+
+### Condição de reabertura
+
+Segundo colaborador com acesso de escrita, **ou** necessidade de linha de
+estabilização para release (se a 013 revelar que publicar de `main` mistura
+trabalho em curso com o que se publica). Qualquer das duas reabre esta ADR;
+nenhuma delas se aplica hoje.
