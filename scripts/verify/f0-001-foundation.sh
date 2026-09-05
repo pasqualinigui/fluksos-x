@@ -137,9 +137,11 @@ if [ "$HAS_REPO" != "0" ]; then
   fail "FR-002" "linha de integracao develop existe" "media" "sem repositorio"
   fail "FR-003a" "identidade de autoria definida em escopo local" "media" "sem repositorio"
 else
-  BRANCH="$(git -C "$ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")"
-  check "FR-001" "repositorio existe e linha principal e main" "media" \
-        "$([ "$BRANCH" = "main" ] && echo 0 || echo 1)" "linha atual: ${BRANCH:-<nenhuma>}"
+  # ADR-029: mede a existencia da linha principal (propriedade do repo),
+  # nunca a sessao (HEAD) — enunciado sempre disse "a linha principal e main"
+  git -C "$ROOT" show-ref --verify --quiet refs/heads/main
+  check "FR-001" "repositorio existe e linha principal e main" "media" "$?" \
+        "refs/heads/main existe; linhas: $(git -C "$ROOT" for-each-ref --format='%(refname:short)' refs/heads | sort | tr '\n' ' ')"
 
   git -C "$ROOT" show-ref --verify --quiet refs/heads/develop
   check "FR-002" "linha de integracao develop existe" "media" "$?" \

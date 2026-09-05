@@ -1673,3 +1673,42 @@ junto da condição de saída, nunca antes.
 - A divergência deixa de ser silenciosa: ou cabe nesta exceção, ou é achado.
 - A proteção da 010 (PR + checks), quando aplicada (A1 → 013), exigirá na
   prática o fluxo por PR — as duas dívidas se encontram e se pagam juntas.
+
+> **Adendo 2026-09-05 (migração servidor):** condição de saída antecipada —
+> proteção aplicada em `pasqualinigui/fluksos-x` + cenário 🧑 executado (PR com
+> defeito travado, push direto recusado). Exceção `main`-direto **encerrada**;
+> fluxo passa a `feature/*` + PR nesta sessão. Ver ADR-029 (dívida que o novo
+> fluxo expôs) e `specs/010-ci-completo/branch-protection.md` (evidência).
+
+---
+
+## ADR-029 — Correção de enunciado: FR-001 mede a linha, não a sessão
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, migração
+servidor) · **Estado**: aceita · **Origem**: 5ª lacuna da ADR-007 + cenário 🧑
+A1 (pre-push travou em `feature/*` por `linha atual: feature/f0-a1-proof`).
+
+### Contexto
+
+O enunciado diz *"a linha principal é `main`"* (propriedade do repositório);
+a implementação media *"estou em `main` agora"* (propriedade da sessão).
+Sob fluxo `main`-direto, as duas leituras coincidiam e o defeito dormia; sob
+fluxo por PR (obrigatório pós-proteção), o oráculo reprova push legítimo —
+a exceção da ADR-007 venceu pelo motivo errado e a dívida veio cobrar.
+
+### Decisão (forma exata, única mudança autorizada neste arquivo)
+
+Em `scripts/verify/f0-001-foundation.sh`, bloco GRUPO A: trocar a medida de
+HEAD (`symbolic-ref ... BRANCH = main`) por existência de
+`refs/heads/main` (`show-ref --verify --quiet`, espelho da FR-002 e do teste
+`test_main_branch_exists` da 005, que já pagava a detecção). Enunciado e
+descrição CANON inalterados — a implementação passa a dizer o que o
+enunciado sempre disse. Manifest regenerado citando esta ADR. Nada mais
+neste oráculo é tocado; nenhum outro oráculo é tocado.
+
+### Consequências
+
+- Sétima execução do procedimento ADR-017 (primeira sobre o item 001 —
+  intocável desde a convergência; a forma é a mesma das anteriores).
+- O pagamento da 005 (teste de existência) e a correção desta ADR se somam:
+  detecção + comportamento, sem contradição.
