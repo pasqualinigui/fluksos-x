@@ -1525,3 +1525,49 @@ env sanitizado não opera (portão de ciclo futuro, Lei Zero já proíbe o dado)
   processo e roteia futuro. Primeira norma nascida de sessão estratégica,
   não de auditoria: o molde checkpoint serve aos dois.
 - ANALYZE que ignorar fonte única sem registro = achado (fecha o loop com o §2).
+
+---
+
+## ADR-026 — Pré-autorização de fronteira da 012: `packages/cli/` admitido
+
+**Data**: 2026-09-05 · **Item**: `012` (0.7), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run 10/12 da 012 (`f0-004/005/006/007/008/011`
+reprovam sobre estado correto) + `specs/012-packages-cli/plan.md`
+(declaração) · **Efeito**: autoriza os ajustes abaixo **exclusivamente no
+commit verde da 012 (Fase C)**.
+
+### Contexto
+
+Seis conflitos genuínos, todos previstos na tabela Q10 do research
+(`docs/plan/research/f0-012-packages-cli.md`, levantamento mecânico
+`grep -n "packages" scripts/verify/f0-00*.sh`). A 012 **é** `packages/cli`
+por desenho (item 0.7 do plano); cinco oráculos asserem `packages/` só-com-
+`core/` e um assere `cli/` ausente. Sem ajuste, o harness reprovaria estado
+correto; com ajuste silencioso, repetiríamos o achado A1
+(`f0-audit-005-008.md`).
+
+### Ajustes autorizados (forma exata, só na Fase C)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `f0-004` FR-012 | `grep -v -x "core"` → `grep -v -x -e "core" -e "cli"` + exigir `packages/cli/pyproject.toml` de membro quando `cli/` presente (jurisdição 012); resto proibido; padrão ADR-023 |
+| 2 | `f0-005` FR-015 | idem (forma da linha 590) |
+| 3 | `f0-006` FR-014 | idem (forma da linha 434) |
+| 4 | `f0-007` FR-014 | idem (forma da linha 467) |
+| 5 | `f0-008` FR-013 | idem (forma da linha 495) |
+| 6 | `f0-011` FR-002 (linha 146) | `packages/cli existe (deve ser 012)` → admitir `cli/` com `pyproject.toml` de membro (guarda cumprida); resto da FR intacto |
+
+Legitimidade via `uv.lock` (padrão ADR-018): `fkx-cli` + `typer` + `rich`
+presentes no lock. Manifest regenerado na Fase C citando esta ADR.
+Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix
+direto.
+
+### Consequências
+
+- Sexta execução do procedimento ADR-017. A FR-012 da 012 (oráculo asserir
+  PLAN + esta ADR) aprova no verde.
+- Achados laterais da Fase C (fora da tabela acima, sem tocar oráculo
+  alheio): `[tool.uv.sources] fkx-core = { workspace = true }` obrigatório
+  para dep membro→membro (`uv lock` recusa sem ele); re-sync
+  `--all-packages` obrigatório após criar `src/` (sync com só-pyproject
+  instala `dist-info` sem `.pth` editável → `import fkx_cli` falha).

@@ -143,7 +143,8 @@ else
   done
   EXTRA=$(ls "$SRCDIR" 2>/dev/null | grep -v -x -e "__init__.py" -e "config.py" -e "state.py" -e "models.py" -e "exceptions.py" -e "py.typed" -e "__pycache__" | tr '\n' ' ' || true)
   if [ -n "$EXTRA" ]; then FR2_OK=0; EVID2="${EVID2}modulos alem dos 4: $EXTRA (Q8); "; fi
-  if [ -d "$ROOT/packages/cli" ]; then FR2_OK=0; EVID2="${EVID2}packages/cli existe (deve ser 012); "; fi
+  # ADR-026: packages/cli/ membro admitido (jurisdicao 012); guarda cumprida
+  if [ -d "$ROOT/packages/cli" ] && [ ! -f "$ROOT/packages/cli/pyproject.toml" ]; then FR2_OK=0; EVID2="${EVID2}packages/cli sem pyproject.toml de membro (ADR-026); "; fi
 fi
 if [ "$FR2_OK" = "1" ]; then pass "FR-002" "${CANON[FR-002]}"; else fail "FR-002" "${CANON[FR-002]}" "alta" "$EVID2"; fi
 

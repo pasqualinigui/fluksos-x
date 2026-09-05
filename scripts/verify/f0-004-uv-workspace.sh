@@ -374,9 +374,11 @@ FR12_OK=1
 EVID12=""
 if [ -d "$PACKAGES" ]; then
   # ADR-023: packages/core/ membro admitido (jurisdição 011); resto proibido
+  # ADR-026: packages/cli/ membro admitido (jurisdição 012); resto proibido
   if [ ! -f "$PACKAGES/core/pyproject.toml" ]; then FR12_OK=0; EVID12="${EVID12}packages/ sem core/pyproject.toml de membro (ADR-023); "; fi
-  EXTRA_PKG=$(ls "$PACKAGES" 2>/dev/null | grep -v -x "core" | tr '\n' ' ' || true)
-  if [ -n "$EXTRA_PKG" ]; then FR12_OK=0; EVID12="${EVID12}packages/ com conteudo alem de core/: $EXTRA_PKG (ADR-023); "; fi
+  if [ -d "$PACKAGES/cli" ] && [ ! -f "$PACKAGES/cli/pyproject.toml" ]; then FR12_OK=0; EVID12="${EVID12}packages/ com cli/ sem pyproject.toml de membro (ADR-026); "; fi
+  EXTRA_PKG=$(ls "$PACKAGES" 2>/dev/null | grep -v -x -e "core" -e "cli" | tr '\n' ' ' || true)
+  if [ -n "$EXTRA_PKG" ]; then FR12_OK=0; EVID12="${EVID12}packages/ com conteudo alem de core/+cli/: $EXTRA_PKG (ADR-023/026); "; fi
 fi
 # verifica pyproject sem tool adiantada
 # Nota 005/006/007: pytest (005), ruff (006) e mypy (007) via [dependency-groups]/[tool.*] são legítimos

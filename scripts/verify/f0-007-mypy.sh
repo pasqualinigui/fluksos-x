@@ -464,7 +464,8 @@ if [ -f "$ROOT/mypy.ini" ]; then FR14_OK=0; EVID14="${EVID14}mypy.ini existe; ";
 if [ -f "$ROOT/.mypy.ini" ]; then FR14_OK=0; EVID14="${EVID14}.mypy.ini existe; "; fi
 # lefthook.yml é jurisdição da 009 (conteúdo asserido por f0-009) — ADR-018
 if [ -d "$ROOT/packages" ] && [ ! -f "$ROOT/packages/core/pyproject.toml" ]; then FR14_OK=0; EVID14="${EVID14}packages/ sem core/pyproject.toml de membro (ADR-023); "; fi
-if [ -n "$(ls "$ROOT/packages" 2>/dev/null | grep -v -x "core" | tr -d '[:space:]' || true)" ]; then FR14_OK=0; EVID14="${EVID14}packages/ com conteudo alem de core/ (ADR-023); "; fi
+if [ -d "$ROOT/packages/cli" ] && [ ! -f "$ROOT/packages/cli/pyproject.toml" ]; then FR14_OK=0; EVID14="${EVID14}packages/ com cli/ sem pyproject.toml de membro (ADR-026); "; fi
+if [ -n "$(ls "$ROOT/packages" 2>/dev/null | grep -v -x -e "core" -e "cli" | tr -d '[:space:]' || true)" ]; then FR14_OK=0; EVID14="${EVID14}packages/ com conteudo alem de core/+cli/ (ADR-023/026); "; fi
 if [ -f "$ROOT/ruff.toml" ] || [ -f "$ROOT/.ruff.toml" ]; then FR14_OK=0; EVID14="${EVID14}ruff.toml presente (fonte única pyproject); "; fi
 if [ "$FR14_OK" = "1" ]; then
   pass "FR-014" "${CANON[FR-014]}"

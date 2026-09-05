@@ -97,9 +97,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 1 (help, sem-args, `--nope` → exit 2 medido sem pipe).
 
-- [ ] T013 [US1] Adicionar `typer==0.27.2` + `rich==15.0.0` como runtime de `packages/cli/pyproject.toml` (membro, `[project.scripts] fkx = "fkx_cli.main:app"`) + `uv sync --frozen --all-packages` (hash em `uv.lock`; sync puro é armadilha ADR-023) (FR-001/002, research D1/D4)
-- [ ] T014 [P] [US1] Escrever testes `tests/test_fkx_cli_help.py` (help exit 0 + marcadores, sem-args ≡ help, `--nope` exit 2 + dica) via `CliRunner` — REPROVANDO sem o módulo (TDD)
-- [ ] T015 [US1] Implementar `packages/cli/src/fkx_cli/main.py` (callback-raiz `app`, `add_completion=False`, `pretty_exceptions_show_locals=False`) + `__init__.py` (exporta `app`) + `py.typed` vazio até T014 passar (FR-002/003/005, data-model App)
+- [x] T013 [US1] Adicionar `typer==0.27.2` + `rich==15.0.0` como runtime de `packages/cli/pyproject.toml` (membro, `[project.scripts] fkx = "fkx_cli.main:app"`) + `uv sync --frozen --all-packages` (hash em `uv.lock`; sync puro é armadilha ADR-023) (FR-001/002, research D1/D4)
+- [x] T014 [P] [US1] Escrever testes `tests/test_fkx_cli_help.py` (help exit 0 + marcadores, sem-args ≡ help, `--nope` exit 2 + dica) via `CliRunner` — REPROVANDO sem o módulo (TDD)
+- [x] T015 [US1] Implementar `packages/cli/src/fkx_cli/main.py` (callback-raiz `app`, `add_completion=False`, `pretty_exceptions_show_locals=False`) + `__init__.py` (exporta `app`) + `py.typed` vazio até T014 passar (FR-002/003/005, data-model App)
 
 **Checkpoint**: US1 funcional e testável independentemente (MVP do item).
 
@@ -111,8 +111,8 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 2 (valor == `version` do membro, sync canônico).
 
-- [ ] T016 [P] [US2] Escrever testes `tests/test_fkx_cli_version.py` (exit 0, só `X.Y.Z`, igual à declarada) — REPROVANDO sem a flag (TDD)
-- [ ] T017 [US2] Implementar callback `--version` em `packages/cli/src/fkx_cli/main.py` via `importlib.metadata.version("fkx-cli")` (fonte única `[project].version`, sem `__version__` duplicado) até T016 passar (FR-004, data-model Version)
+- [x] T016 [P] [US2] Escrever testes `tests/test_fkx_cli_version.py` (exit 0, só `X.Y.Z`, igual à declarada) — REPROVANDO sem a flag (TDD)
+- [x] T017 [US2] Implementar callback `--version` em `packages/cli/src/fkx_cli/main.py` via `importlib.metadata.version("fkx-cli")` (fonte única `[project].version`, sem `__version__` duplicado) até T016 passar (FR-004, data-model Version)
 
 ---
 
@@ -122,9 +122,9 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Independent Test**: quickstart Cenário 3 (greps zerados; domínio → 1).
 
-- [ ] T018 [P] [US3] Escrever testes `tests/test_fkx_cli_errors.py` (domínio → exit 1 + causa nomeada; `escape()` em markup dinâmico; callbacks anotados) — REPROVANDO sem o mapeamento (TDD)
-- [ ] T019 [US3] Implementar mapeamento `FkxError` → `CliFault(exit 1)` em `packages/cli/src/fkx_cli/main.py` com `escape()` em dado dinâmico até T018 passar (FR-006/009, data-model CliFault)
-- [ ] T020 [US1+US2+US3] Fechar `packages/cli/src/fkx_cli/__init__.py` (superfície: `app`) e revisar `packages/cli/src/fkx_cli/main.py` (zero `except:` nu, callbacks tipados) (FR-002/007, data-model Superfície)
+- [x] T018 [P] [US3] Escrever testes `tests/test_fkx_cli_errors.py` (domínio → exit 1 + causa nomeada; `escape()` em markup dinâmico; callbacks anotados) — REPROVANDO sem o mapeamento (TDD)
+- [x] T019 [US3] Implementar mapeamento `FkxError` → `CliFault(exit 1)` em `packages/cli/src/fkx_cli/main.py` com `escape()` em dado dinâmico até T018 passar (FR-006/009, data-model CliFault)
+- [x] T020 [US1+US2+US3] Fechar `packages/cli/src/fkx_cli/__init__.py` (superfície: `app`) e revisar `packages/cli/src/fkx_cli/main.py` (zero `except:` nu, callbacks tipados) (FR-002/007, data-model Superfície)
 
 ---
 
@@ -132,8 +132,8 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 **Purpose**: oráculo verde, fronteira admitida via ADR prévia, lista fechada.
 
-- [ ] T021 **ADR PRÉVIA** — redigir a próxima ADR livre (descobrir o número com `grep ^## ADR- docs/plan/decisions.md` antes de redigir) em `docs/plan/decisions.md` (molde ADR-018/021/022/023): admitir `packages/cli/` com `pyproject.toml` de membro nos oráculos 004 (FR-012), 005 (FR-015), 006 (FR-014), 007 (FR-014), 008 (FR-013) que asserem `packages/` só-com-`core/`, e em 011 (FR-002) que assere `cli/` ausente (jurisdição da 012; resto proibido; legitimidade via `uv.lock`); forma exata dos diffs; aplicação SÓ em T022. Sem esta ADR, T022 não executa (plan.md Fase C + restrição 3)
-- [ ] T022 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-012-cli.sh` rumo a 12/12 + ADR de fronteira aplicada SÓ agora + manifest 12/12 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T012: `feat(packages): packages cli entry point (012)` (plan.md Fase C/D)
+- [x] T021 **ADR PRÉVIA** — redigir a próxima ADR livre (descobrir o número com `grep ^## ADR- docs/plan/decisions.md` antes de redigir) em `docs/plan/decisions.md` (molde ADR-018/021/022/023): admitir `packages/cli/` com `pyproject.toml` de membro nos oráculos 004 (FR-012), 005 (FR-015), 006 (FR-014), 007 (FR-014), 008 (FR-013) que asserem `packages/` só-com-`core/`, e em 011 (FR-002) que assere `cli/` ausente (jurisdição da 012; resto proibido; legitimidade via `uv.lock`); forma exata dos diffs; aplicação SÓ em T022. Sem esta ADR, T022 não executa (plan.md Fase C + restrição 3)
+- [x] T022 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-012-cli.sh` rumo a 12/12 + ADR de fronteira aplicada SÓ agora + manifest 12/12 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T012: `feat(packages): packages cli entry point (012)` (plan.md Fase C/D)
 - [ ] T023 `specs/README.md` `012 ✅` + hash do commit T022 (inquebrável FR-011; quickstart Cenário 5)
 - [ ] T024 Re-executar harness 12/12 + manifest 12/12 + quickstart "validação completa em um comando" (quickstart Cenário 5)
 - [ ] T025 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (011→012, harness 12/12, próximo 013)
