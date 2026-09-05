@@ -55,3 +55,51 @@ def test_main_branch_exists():
     assert r.returncode == 0, (
         "refs/heads/main não existe — FR-001 deve medir branch, não HEAD"
     )
+
+
+def _audit_gap(readme: pathlib.Path, audit_dir: pathlib.Path) -> tuple[int, int, int]:
+    # Trava ADR-027: conta por máquina, nunca por memória.
+    # Retorna (convergidas, cobertas, descobertas).
+    import re
+
+    converged = sum(
+        1
+        for line in readme.read_text(encoding="utf-8").splitlines()
+        if re.match(r"^\| `0", line) and "✅" in line
+    )
+    covered = 0
+    for report in audit_dir.glob("f0-audit-*-*.md"):
+        text = report.read_text(encoding="utf-8")
+        if "Veredito" in text and "Achados" in text and "Destino" in text:
+            m = re.search(r"f0-audit-\d+-(\d+)", report.name)
+            if m:
+                covered = max(covered, int(m.group(1)))
+    return converged, covered, converged - covered
+
+
+def test_audit_cadence():
+    # Estado vivo: falha quando >=4 specs convergidas sem relatório cobrindo.
+    converged, covered, gap = _audit_gap(
+        pathlib.Path("specs/README.md"), pathlib.Path("docs/plan/audit")
+    )
+    assert gap < 4, (
+        f"AUDIT DUE: {converged} convergidas, cobertura até {covered} "
+        f"({gap}/4 sem relatório) — executar auditoria não-item antes de prosseguir (ADR-027)"
+    )
+
+
+def test_audit_cadence_detects_uncovered_range(tmp_path):
+    # Prova 🔴→🟢 do detector sobre fixtures (repo jamais avermelha):
+    # 4 convergidas sem relatório DEVEM ser detectadas.
+    readme = tmp_path / "README.md"
+    readme.write_text(
+        "| `009` | **0.5** | F0 | X | ✅ concluída (`aaa1111`) |\n"
+        "| `010` | **0.14** | F0 | X | ✅ concluída (`bbb2222`) |\n"
+        "| `011` | **0.6** | F0 | X | ✅ concluída (`ccc3333`) |\n"
+        "| `012` | **0.7** | F0 | X | ✅ concluída (`ddd4444`) |\n",
+        encoding="utf-8",
+    )
+    audit_dir = tmp_path / "audit"
+    audit_dir.mkdir()
+    _, _, gap = _audit_gap(readme, audit_dir)
+    assert gap >= 4, "detector cego: 4 descobertas sem relatório e gap < 4"
