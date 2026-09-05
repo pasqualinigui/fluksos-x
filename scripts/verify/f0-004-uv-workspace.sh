@@ -485,10 +485,9 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
     SELF_OK=0; EVID14="${EVID14}exit 2 para uso invalido nao obedecido; "
   fi
   # determinismo: duas execucoes paralelas (wall ~1.9s vs 3.8s sequencial) — economiza ~1.9s para caber em <5s
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
-  wait $P1; C1=$?
-  wait $P2; C2=$?
+  # serial por ADR-031: forma ja vigente em f0-007..012
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1; C1=$?
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1; C2=$?
   if [ -n "${EPOCHSECONDS:-}" ]; then END=$EPOCHSECONDS; else END=$(date +%s 2>/dev/null || echo 0); fi
   ELAPSED=$((END - START))
   if [ "$ELAPSED" -gt 10 ] 2>/dev/null; then

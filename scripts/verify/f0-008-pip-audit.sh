@@ -305,16 +305,28 @@ else
     if ! grep -q 'name = "pip-audit"' "$UVLOCK" 2>/dev/null; then
       fail "FR-007" "${CANON[FR-007]}" "alta" "pip-audit não em uv.lock — não há como executar pip-audit (FR-007)"
     else
-      # dry-run check
-      if ! uv run pip-audit --dry-run 2>&1 | grep -q "would have audited" 2>/dev/null; then
-        out=$(uv run pip-audit --dry-run 2>&1 | head -5 | tr -d '\n' | cut -c1-120)
-        fail "FR-007" "${CANON[FR-007]}" "alta" "pip-audit --dry-run não coletou: $out"
+      # dry-run check — ADR-031 (caminho 1 do research f0-008-fr007-flake):
+      # captura unica em arquivo. A tentativa que DECIDE e a mesma que EVIDENCIA,
+      # e o codigo de saida entra na evidencia (principio X). A forma anterior
+      # gerava a evidencia numa 2a invocacao calma, que continha a string cobrada
+      # e mascarava a assinatura do transiente. Sem retry: a 1a tentativa decide.
+      DRY_OUT="$(mktemp)"; DRY_RC=0
+      uv run pip-audit --dry-run > "$DRY_OUT" 2>&1 || DRY_RC=$?
+      if ! grep -q "would have audited" "$DRY_OUT" 2>/dev/null; then
+        out=$(head -5 "$DRY_OUT" | tr -d '\n' | cut -c1-120)
+        rm -f "$DRY_OUT"
+        fail "FR-007" "${CANON[FR-007]}" "alta" "pip-audit --dry-run não coletou (rc=$DRY_RC): $out"
       else
-        if uv run pip-audit 2>&1 | grep -q "No known vulnerabilities found" 2>/dev/null; then
+        rm -f "$DRY_OUT"
+        AUD_OUT="$(mktemp)"; AUD_RC=0
+        uv run pip-audit > "$AUD_OUT" 2>&1 || AUD_RC=$?
+        if grep -q "No known vulnerabilities found" "$AUD_OUT" 2>/dev/null; then
+          rm -f "$AUD_OUT"
           pass "FR-007" "${CANON[FR-007]}"
         else
           # also allow json with vulns empty (pip-audit prints "No known..." to stderr, json to stdout; grep for dependencies)
-          out=$(uv run pip-audit 2>&1 | head -10 | tr -d '\n' | cut -c1-200)
+          out="rc=$AUD_RC $(head -10 "$AUD_OUT" | tr -d '\n' | cut -c1-200)"
+          rm -f "$AUD_OUT"
           if uv run pip-audit -f json 2>&1 | grep -q '"dependencies"' 2>/dev/null; then
             if uv run pip-audit -f json 2>&1 | grep -q '"vulns": \[\]' 2>/dev/null; then
               pass "FR-007" "${CANON[FR-007]}"
@@ -593,9 +605,9 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   EVIDSC=""
   TMP_SC="$(mktemp -d)"
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5" "$ORACLE6" "$ORACLE7"; do
-    ( FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc" ) &
+    # serial por ADR-031: fan-out paralelo truncava saida de ferramenta externa (25% medido)
+    FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc"
   done
-  wait
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5" "$ORACLE6" "$ORACLE7"; do
     rc=$(cat "$TMP_SC/$(basename "$o").rc" 2>/dev/null || echo 1)
     if [ "$rc" != "0" ]; then

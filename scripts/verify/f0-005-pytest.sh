@@ -397,9 +397,9 @@ if [ "$FR9_OK" = "1" ]; then
     mkdir -p "$TMP9"
   fi
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4"; do
-    ( FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP9/$(basename "$o").rc" ) &
+    # serial por ADR-031: fan-out paralelo truncava saida de ferramenta externa (25% medido)
+    FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP9/$(basename "$o").rc"
   done
-  wait
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3"; do
     rc=$(cat "$TMP9/$(basename "$o").rc" 2>/dev/null || echo 1)
     if [ "$rc" != "0" ]; then
@@ -541,10 +541,9 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
     fi
   fi
   # determinismo: duas execuções paralelas
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
-  wait $P1; C1=$?
-  wait $P2; C2=$?
+  # serial por ADR-031: forma ja vigente em f0-007..012
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1; C1=$?
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1; C2=$?
   if ! cmp -s "$TMPD/r1" "$TMPD/r2" 2>/dev/null || [ "$C1" != "$C2" ]; then
     FR14_OK=0; EVID14="${EVID14}duas execuções divergiram; "
   fi

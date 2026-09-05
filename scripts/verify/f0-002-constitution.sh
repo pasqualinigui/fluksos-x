@@ -505,9 +505,9 @@ else
         "--list enumerou $N_LIST de $N_CANON; --quiet exibiu $Q_OUT aprovacoes (esperado 0)"
 
   TMPD="$(mktemp -d)"
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
-  wait $P1; wait $P2
+  # serial por ADR-031: forma ja vigente em f0-007..012
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1
   cmp -s "$TMPD/r1" "$TMPD/r2"
   check "FR-020c" "${CANON[FR-020c]}" "alta" "$?" \
         "duas execucoes divergiram: $(diff "$TMPD/r1" "$TMPD/r2" | head -3 | tr '\n' ' ')"
