@@ -9,3 +9,4 @@ ffb0a20b5b06faeabb09b91b21830519388b67b9185ae62c14594b67c79d5a07  scripts/verify
 0607c0ca70ca8994f273d337e8ac9ea7f171af5b472d7780891afecc2e521dc6  scripts/verify/f0-009-lefthook.sh
 36276ba501fdc57bd40b86f1683d51bf2742294df544ec3ddc00f48c08f90d72  scripts/verify/f0-010-ci-completo.sh
 0f0528d9bccf13f66770bb288e0a0cbe1c794aa1ef605b85828869ada2aeec1d  scripts/verify/f0-011-core.sh
+bbc8a1b11849ff75432bac7d71c90f6a68788b753609d359b646ca4a7bc301ef  scripts/verify/f0-012-cli.sh
