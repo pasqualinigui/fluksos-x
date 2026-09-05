@@ -1754,6 +1754,17 @@ zero defeito de lógica do produto.
 | 4 | `tests/conftest.py` + sonda `f0-012` + `env` do CI | `COLUMNS=80` (determinismo I, espelho de `LC_ALL=C`; app intacto; terminal estreito real = limite documentado, endurecimento só com relato) |
 | 5 | Manifest | regenerado citando esta ADR |
 
+> **Adendo row 6 (mesma sessão, evidência do run `33949777749`):** job
+> `verify` (legado 003, sem sync) reprova `f0-004` FR-008/009 (`.venv`
+> ausente no runner) — o desenho "harness mínimo sem uv" nunca foi
+> executável desde o item 004 e nunca rodou em servidor até hoje. Ajuste:
+> `verify` ganha `setup-uv` + `uv sync --frozen --all-packages` (igual ao
+> job `harness`); a distinção 003/010 passa a ser histórica, não
+> comportamental. **Adendo flakes:** run `33949777749` registrou o primeiro
+> flake aninhado **no runner limpo** (`f0-007` sob self-check de `f0-011`,
+> 11/12) — a classe A2 não é fenômeno da máquina do mantenedor; insumo do
+> caminho 2.
+
 Manifest regenerado na aplicação citando esta ADR. Qualquer outro vermelho
 no runner fora destes 5 pontos = conflito novo, ADR própria, nunca fix
 direto.
