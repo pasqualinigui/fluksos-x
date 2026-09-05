@@ -1,0 +1,61 @@
+🔴 FR-001   governanca sem campo de preenchimento remanescente
+           evidencia: campos remanescentes: [CONSTITUTION_VERSION] [GOVERNANCE_RULES] [LAST_AMENDED_DATE] [PRINCIPLE_1_DESCRIPTION] [PRINCIPLE_1_NAME] [PRINCIPLE_2_DESCRIPTION] [PRINCIPLE_2_NAME] [PRINCIPLE_3_DESCRIPTION] [PRINCIPLE_3_NAME] [PRINCIPLE_4_DESCRIPTION] [PRINCIPLE_4_NAME] [PRINCIPLE_5_DESCRIPTION] [PRINCIPLE_5_NAME] [PROJECT_NAME] [RATIFICATION_DATE] [SECTION_2_CONTENT] [SECTION_2_NAME] [SECTION_3_CONTENT] [SECTION_3_NAME]
+🔴 FR-002   governanca versionada e ratificacao inaugural e 1.0.0
+           evidencia: versao encontrada: SEM-VERSAO (esperado 1.0.0)
+🔴 FR-003   datas da governanca em formato ISO
+           evidencia: datas fora do formato ISO: [RATIFICATION_DATE] [LAST_AMENDED_DATE]
+🔴 FR-004   dez principios em numeracao romana continua I a X
+           evidencia: esperado I..X, obtido: <nenhum>
+🔴 FR-005a  cada principio contem verbo normativo
+           evidencia: sem verbo normativo: nenhum principio avaliavel — 0 blocos encontrados (esperado 10)
+🔴 FR-005b  cada principio declara criterio de violacao
+           evidencia: sem criterio de violacao: nenhum principio avaliavel — 0 blocos encontrados (esperado 10)
+🔴 FR-006   cada principio declara origem
+           evidencia: sem origem declarada: nenhum principio avaliavel — 0 blocos encontrados (esperado 10)
+🔴 FR-007   governanca declara emenda versionamento e revisao
+           evidencia: subsecoes ausentes: procedimento de emenda politica de versionamento revisao de conformidade
+🔴 FR-008   registro de impacto presente em ocorrencia unica
+           evidencia: ocorrencias do registro de impacto: 0 (esperado 1)
+🔴 FR-015   governanca declara o ciclo canonico com clarificacao
+           evidencia: ciclo canonico com CLARIFY ausente
+🔴 FR-009   orientacao existe no local convencional do formato aberto
+           evidencia: AGENTS.md ausente na raiz do projeto
+🔴 FR-010a  porta de entrada contem identidade operacao e ponteiros
+           evidencia: AGENTS.md ausente
+🔴 FR-010b  porta de entrada nao reproduz principios nem plano
+           evidencia: AGENTS.md ausente
+🔴 FR-011   arquivo do construtor contem a diretiva de importacao
+           evidencia: CLAUDE.md ausente na raiz do projeto
+⏭️ FR-012   porta de entrada nao duplica prosa entre seus arquivos
+           evidencia: porta de entrada incompleta — nao ha par a comparar
+🔴 FR-013   arquivo do construtor e regular e nao link simbolico
+           evidencia: CLAUDE.md ausente ou e link simbolico (exige privilegio de administrador no Windows)
+🔴 FR-014   porta de entrada respeita o orcamento de tamanho
+           evidencia: porta de entrada incompleta
+🔴 FR-016a  documento de contribuicao declara o ciclo atualizado
+           evidencia: etapa de clarificacao ausente no documento de contribuicao
+🔴 FR-016b  nenhum documento normativo mantem o ciclo anterior
+           evidencia: CONTRIBUTING.md: 181:RESEARCH → SPEC → PLAN → TASKS → ANALYZE → TESTS (vermelho) → IMPLEMENT (verde) → CONVERGE 
+🔴 FR-017a  veredito retroativo nomeia os 16 artefatos do item 001
+           evidencia: veredito retroativo ausente em specs/002-constitution-ratification/compliance-001.md
+🔴 FR-017b  nenhum veredito retroativo e nao conforme
+           evidencia: veredito retroativo ausente
+✅ FR-018   derivacao do material transitorio registrada e transcrita
+🔴 FR-019a  material de referencia transitorio nao existe mais
+           evidencia: docs/AGENTS-EXAMPLE.md ainda existe — a remocao e a ultima acao do ciclo (FR-019)
+🔴 FR-019b  nenhuma regra de exclusao referencia o material transitorio
+           evidencia: 48:# `docs/AGENTS-EXAMPLE.md` e material de referencia pessoal do mantenedor. Sera
+           evidencia: 56:docs/AGENTS-EXAMPLE.md
+✅ SC-008   toda exclusao marcada como transitoria tem alvo existente
+✅ FR-020a  codigos de saida obedecem a semantica do contrato
+✅ FR-020b  parametros --quiet e --list obedecem ao contrato
+✅ FR-020c  duas execucoes produzem saida identica
+✅ FR-021a  oraculo do item anterior permanece integro
+✅ FR-021b  oraculo do item anterior continua aprovando
+🔴 FR-022   evidencias vermelha e verde existem e diferem
+           evidencia: evidencia ausente: vermelha=sim, verde=NAO
+✅ FR-023   spec declara contratos entregues e transferidos
+✅ SC-006   oraculo conclui em menos de 5 segundos
+
+Resultado: 9/33 assercoes aprovadas — 23 violacao(oes) (critica: 2, alta: 12, media: 9) — 1 nao aplicaveis — NAO CONFORME
+exit=1

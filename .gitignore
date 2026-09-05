@@ -43,19 +43,6 @@
 .claude/settings.local.json
 
 # ------------------------------------------------------------------------------
-# EXCLUSAO TEMPORARIA — remover no item 002 (ADR-004)
-#
-# `docs/AGENTS-EXAMPLE.md` e material de referencia pessoal do mantenedor. Sera
-# CONSULTADO pelo item 002 para redigir a constitution e o AGENTS.md do motor, e
-# entao descartado. Fica fora do historico ate la por decisao do mantenedor.
-#
-# ESTA ENTRADA E TRANSITORIA. O item 002 DEVE remove-la junto com o arquivo.
-# A obrigacao esta registrada na secao Contratos de
-# specs/001-git-branching-strategy/spec.md, que o item 002 le antes de comecar.
-# ------------------------------------------------------------------------------
-docs/AGENTS-EXAMPLE.md
-
-# ------------------------------------------------------------------------------
 # BASE CANONICA — github/gitignore/Python.gitignore
 # ------------------------------------------------------------------------------
 # Byte-compiled / optimized / DLL files

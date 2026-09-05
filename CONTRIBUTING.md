@@ -106,10 +106,16 @@ Projetos que usavam a flag antiga precisam atualizar seus scripts.
 
 | Linha | Papel |
 |---|---|
-| `main` | Estado estável e publicável. Recebe apenas integrações vindas de `develop` |
-| `develop` | Linha de integração contínua. Recebe as linhas de funcionalidade |
-| `feature/*` | Trabalho isolado. Deriva de `develop` e retorna a ela |
-| `hotfix/*` | Correção urgente. Deriva de `main` e retorna a `main` e a `develop` |
+| `main` | Linha de integração única, estável e publicável. Recebe as linhas de funcionalidade por proposta de mudança, com os 10 checks obrigatórios verdes |
+| `develop` | Espelho protegido de `main`. Existe porque o oráculo `f0-001` FR-002 exige a linha; é sincronizada a partir de `main` e não recebe `feature/*` diretamente |
+| `feature/*` | Trabalho isolado. Deriva de `main` e retorna a `main` |
+| `hotfix/*` | Correção urgente. Deriva de `main` e retorna a `main`, com `develop` re-sincronizada em seguida |
+
+> Os papéis acima valem desde **ADR-032**, que fechou a pergunta deixada em
+> aberto pela ADR-028: `develop` nunca foi linha de integração de nada (70
+> commits atrás, 0 à frente), e a norma passou a declarar o que a prática faz.
+> Reabertura prevista: segundo colaborador com escrita, ou necessidade de linha
+> de estabilização para release.
 
 ### Nome de linha de funcionalidade
 
@@ -178,8 +184,15 @@ ferramentas ainda não existem neste ponto do bootstrap.
 Todo trabalho no motor segue o ciclo determinístico, sem atalho:
 
 ```
-RESEARCH → SPEC → PLAN → TASKS → ANALYZE → TESTS (vermelho) → IMPLEMENT (verde) → CONVERGE
+RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS 🔴 → IMPLEMENT 🟢 → CONVERGE
 ```
+
+> A etapa **CLARIFY** entrou no ciclo a partir do item `002`. Ela existe para
+> fechar ambiguidade **antes** de o planejamento derivar tarefas dela: uma decisão
+> tomada por omissão no plano já nasceu embutida em código, e desfazê-la custa o
+> ciclo inteiro. Na sua estreia ela pegou um limiar de desempenho que havia sido
+> inventado sem fonte — exatamente o tipo de defeito que passa despercebido por
+> parecer preciso.
 
 Regras que sustentam o ciclo:
 
@@ -190,3 +203,11 @@ Regras que sustentam o ciclo:
    conferida contra o registro oficial e a evidência fica em
    `docs/plan/research/`.
 4. **O harness é o oráculo.** Sem saída `0`, não convergiu.
+5. **A spec é insumo do planejamento, nunca sua saída.** Achado descoberto no
+   plano volta à etapa de análise, que o formaliza. Um plano que corrige a spec
+   sozinho faz o defeito desaparecer sem rastro, e a spec passa a concordar com o
+   plano por construção.
+
+> A partir do item `002` a governança em `.specify/memory/constitution.md` está
+> ratificada: as etapas de planejamento e análise julgam contra ela, e violação de
+> princípio é falha **crítica automática**.

@@ -1,0 +1,13 @@
+FR-001   job verify presente e nao renomeado
+FR-002   uses: por SHA + comentario; runner ubuntu-24.04
+FR-003   setup-uv + uv sync --frozen + cache
+FR-004   matriz 3.12+3.13 + fail-fast false
+FR-005   8 jobs nominais unicos
+FR-006   pytest-cov dev + fail-under 90
+FR-007   commitlint 11 tipos + range por evento
+FR-008   procedimento protecao versionado sem token
+FR-009   frouxo + sem-bypass documentados
+FR-010   timeout por job sem mascara
+FR-011   contrato: list 13 exit2 2x <5s
+FR-012   manifest 10/10 + self-check f0-001..009
+FR-013   README 010 hash + zero [ ] + vermelho-verde

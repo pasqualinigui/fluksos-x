@@ -1,0 +1,33 @@
+✅ FR-001   repositorio existe e linha principal e main
+✅ FR-002   linha de integracao develop existe
+✅ FR-003a  identidade de autoria definida em escopo local
+✅ FR-003b  escopo global da maquina nao foi alterado
+✅ FR-004   convencoes declaram os 11 tipos de registro
+✅ FR-005   convencoes declaram escopo opcional e marcacao de incompatibilidade
+✅ FR-006   convencoes declaram formato de nome de linha de funcionalidade
+✅ FR-007   convencoes declaram papeis de main e develop
+✅ FR-006b  linhas de funcionalidade obedecem ao formato de nome
+✅ FR-008a  arquivo de ambiente base e excluido
+✅ FR-008b  variantes de arquivo de ambiente sao excluidas
+✅ FR-009   arquivo-modelo de ambiente permanece versionavel
+✅ FR-010   ambiente virtual e bytecode sao excluidos
+✅ FR-011   caches das ferramentas de qualidade sao excluidos
+✅ FR-012   efemeros do motor excluidos e diretorio-pai preservado
+✅ FR-013   trava de dependencias permanece versionavel
+✅ FR-014   exclusoes geridas pela ferramenta de spec nao sao redeclaradas
+✅ FR-012b  camada hermetica e repositorio real concordam sobre as exclusoes
+✅ FR-023a  artefatos de integracao de agente permanecem versionaveis
+✅ FR-023b  configuracao local de maquina do agente e excluida
+✅ FR-015   registro inicial existe e contem plano e pesquisa
+✅ FR-020a  nenhum arquivo proibido consta do indice
+✅ FR-020b  nenhum arquivo proibido consta do historico
+✅ SC-002   todos os registros satisfazem a gramatica de convencao
+✅ FR-018   oraculo nao contem construcao nao deterministica
+✅ FR-019   oraculo nao invoca ferramenta fora do permitido
+✅ FR-016   codigos de saida obedecem a semantica do contrato
+✅ FR-021   oraculo reprova informativamente sem repositorio
+✅ FR-022   registro de decisoes arquiteturais mapeia specs e itens do plano
+✅ FR-017   cada resultado usa a descricao canonica do seu requisito
+
+Resultado: 30/30 assercoes aprovadas — CONFORME
+exit=0

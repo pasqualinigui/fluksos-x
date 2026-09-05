@@ -373,6 +373,12 @@ fkx interview --export json   # Exporta para JSON (uso programático)
 | 9 | **Deploy target?** Cloud, self-hosted, edge, mobile | Infraestrutura |
 | 10 | **Behavioral Rules?** Como o sistema deve "agir"? | Tom, lógica de negócio |
 
+> **Estas dez não são um formulário** (ADR-013). São as **sementes da árvore de
+> decisão**, distribuídas em rodadas conforme as dependências entre elas: a
+> resposta da 6 (*stack*) muda o que faz sentido perguntar na 7 (*integrações*) e
+> na 9 (*deploy target*). Perguntadas em bloco, ou o usuário responde no vácuo, ou
+> o motor reinterpreta respostas dadas sob premissas que mudaram depois.
+
 **Output:** Gera um arquivo `discovery.json` + `discovery.md` na pasta `.fluksos-x/` que alimenta a **Constitution** e as **Specs** subsequentes.
 
 **Integração no ciclo determinístico:**
@@ -839,6 +845,39 @@ fluksos-x/
 | 0.11 | Criar AGENTS.md (constitution base) | ✅ | Spec-Kit constitution format, invariantes |
 | 0.12 | Setup pip-audit + Trivy | ✅ | CI integration, baseline scan |
 
+#### Emenda 1 — Integração contínua e automação de release (2026-08-30)
+
+> **Origem**: auditoria executada durante o item `002`, registrada em **ADR-009**.
+> O plano original entrega ao motor a capacidade de **gerar** pipelines para os
+> sistemas-alvo (agente DevOps, item 3.7) e **não dá pipeline ao próprio motor**.
+> Todo o enforcement de qualidade era hook local — e hook local é conveniência,
+> não portão: `git commit --no-verify` o desfaz por completo.
+>
+> Os quatro itens abaixo são **acrescentados à Fase 0**. Não substituem nem
+> reordenam nenhum item de 0.1 a 0.12.
+
+| # | Item | Specify Cycle | Pesquisa Prévia Necessária |
+|---|------|-------------|---------------------------|
+| 0.13 | **CI mínimo** — workflow que executa o harness da Fase 0 em runner limpo | ✅ | Sintaxe de workflow, runners, cache; determinismo entre máquina local e runner |
+| 0.14 | **CI completo + branch protection** — Ruff, MyPy, Pytest, pip-audit, gitleaks, portão de cobertura, matriz de versões de Python, `uv sync --frozen`, validação de mensagem de commit | ✅ | Required status checks, rulesets, `uv` em CI, limiar de cobertura, matriz suportada |
+| 0.15 | **Automação de release** — `python-semantic-release`, CHANGELOG, tag, build, publicação no PyPI via **trusted publishing (OIDC)**, SBOM anexado ao release | ✅ | Trusted publishing, ambientes protegidos, `cyclonedx-py`, versionamento a partir de Conventional Commits |
+| 0.16 | **Atualização automática de dependências** — Renovate ou Dependabot, com agrupamento e harness verde obrigatório no merge | ✅ | Agrupamento de atualizações, política de automerge, interação com o lockfile |
+
+**Ordem de execução acordada** (ver **ADR-011**, que fixa o mapa vigente de 16
+posições): `0.13` é executado **imediatamente após** o item `0.11`, antes de todos
+os demais. Os outros três seguem a ordem de dependência:
+
+- `0.14` depois de `0.5` — precisa das ferramentas de qualidade existindo;
+- `0.15` depois de `0.14` **e de `0.7`** — não se publica no PyPI um pacote que
+  ainda não existe;
+- `0.16` depois de `0.15` — precisa do pipeline completo para validar o que entra.
+
+**Razão da inserção antecipada de `0.13`**: o harness cresce por acréscimo desde o
+item `001`, e a integração contínua precisa crescer junto. Um CI que só chega no
+fim da Fase 0 significa que dez itens foram construídos sem rede — e que a
+primeira execução do pipeline terá de validar dez itens de uma vez, em vez de um.
+O CI mínimo depende apenas de shell, git e Python, que já existem.
+
 ### Fase 1: Harness & Indexação (4-6 dias)
 
 | # | Item | Pesquisa Prévia |
@@ -864,6 +903,8 @@ fluksos-x/
 | 2.6 | `agents/tools/*` — todas as tools MCP | MCP server patterns, tool schemas |
 | 2.7 | PostgresSaver setup | LangGraph persistence, migrations |
 | 2.8 | Harness integration no ciclo do agente | Loop determinístico, exit conditions |
+| 2.9 | **Golden tests dos agentes** *(Emenda 2)* — entradas fixas e saídas esperadas versionadas | Snapshot testing com LLM, tolerância a variação, detecção de regressão ao trocar modelo ou prompt |
+| 2.10 | **Teto de custo e latência por sessão** *(Emenda 2)* — limite duro no gateway, com interrupção | Budget tracking no LiteLLM, contagem de tokens, política de corte |
 
 ### Fase 3: Memória & Observabilidade (3-5 dias)
 
@@ -877,13 +918,14 @@ fluksos-x/
 | 3.6 | `agents/researcher.py` — Pesquisador | Tavily API, Crawl4AI setup |
 | 3.7 | `agents/devops.py` — DevOps | kubeval, Docker syntax validation |
 | 3.8 | `guardian/*` — Agente Guardião | Trace analysis, dependency audit |
+| 3.9 | **Política de retenção dos efêmeros** *(Emenda 2)* — expiração de `.fluksos-x/sessions/` e `reports/` | Estratégias de retenção, purga segura, o que preservar para auditoria |
 
 ### Fase 4: CLI/TUI & Polish (3-5 dias)
 
 | # | Item | Pesquisa Prévia |
 |---|------|----------------|
 | 4.1 | Todos os comandos CLI finalizados | Typer subcommand patterns |
-| 4.2 | `fkx interview` (Discovery Interview) | Interview UX patterns |
+| 4.2 | `fkx interview` (Discovery Interview) — **rodadas por fronteira, ver ADR-013** | Algoritmo de fronteira sobre árvore de decisão; taxonomia fixa de cobertura; formato do PRD de saída |
 | 4.3 | TUI interativo (Textual) | Textual CSS, screens, widgets |
 | 4.4 | Sistema de temas | TOML theme format, Rich/Textual theming |
 | 4.5 | `fkx doctor` | System checks, dependency verification |
@@ -892,6 +934,7 @@ fluksos-x/
 | 4.8 | Testes e2e completos | pytest e2e patterns |
 | 4.9 | README.md + CONTRIBUTING.md + docs | Open-source best practices |
 | 4.10 | LiteLLM multi-provider config | Provider setup, fallback config |
+| 4.11 | **Contrato de saída da CLI** *(Emenda 2)* — `--json` com schema versionado e códigos de saída documentados | Versionamento de schema de saída, compatibilidade retroativa, consumo por CI e por outros agentes |
 
 ---
 

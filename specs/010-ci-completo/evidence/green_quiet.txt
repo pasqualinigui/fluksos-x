@@ -1,0 +1,2 @@
+
+Resultado: 13/13 asserções aprovadas — CONFORME

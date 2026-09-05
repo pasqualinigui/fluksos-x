@@ -1,0 +1,29 @@
+# lefthook.yml — orquestração pre-commit do harness (009, item 0.5)
+#
+# Conveniência local com feedback em segundos, NÃO portão (ADR-009):
+#   Bypass documentado: LEFTHOOK=0 git commit / LEFTHOOK=0 git push
+#   Portão real: harness scripts/verify/f0-*.sh + CI required checks (010).
+# Somente-leitura: nenhum job escreve (sem --fix, sem stage_fixed — FR-006).
+min_version: 2.1.12
+
+pre-commit:
+  parallel: false
+  commands:
+    ruff-check:
+      run: uv run ruff check .
+    ruff-format:
+      run: uv run ruff format --check .
+    mypy:
+      run: uv run mypy --strict .
+    pytest:
+      run: uv run pytest -q
+    pip-audit:
+      run: uv run pip-audit
+
+pre-push:
+  parallel: false
+  commands:
+    harness:
+      run: 'for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done'
+    trivy:
+      run: 'sh -c "if command -v trivy >/dev/null 2>&1; then trivy fs --severity HIGH,CRITICAL .; elif command -v docker >/dev/null 2>&1 && docker image inspect aquasec/trivy:0.74.0 >/dev/null 2>&1; then docker run --rm -v $PWD:/w -w /w aquasec/trivy:0.74.0 fs --severity HIGH,CRITICAL .; else echo trivy-skip-sem-Docker-009-FR-004; exit 0; fi"'

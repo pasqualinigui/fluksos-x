@@ -1,0 +1,275 @@
+# =============================================================================
+# Pipeline de integração contínua — fluksos-x
+#
+# O QUE ESTE ARQUIVO É
+#   O portão servidor do motor. O harness local (`scripts/verify/f0-*.sh`) é o
+#   oráculo; o gancho local é conveniência bypassável; **este arquivo é o que
+#   decide**, porque roda em runner limpo e alimenta os required status checks
+#   da proteção de `main` e `develop` (sem-bypass, inclusive admin).
+#   Contrato normativo: `specs/010-ci-completo/spec.md` + ADR-009 (por que o
+#   motor precisa do pipeline que ele ensina a construir).
+#
+# FRONTEIRAS ASSERIDAS POR ORÁCULO
+#   Os oráculos `f0-003` (FR-003, FR-006..FR-012), `f0-009` (FR-009) e `f0-010`
+#   (FR-002, FR-005, FR-010) medem este arquivo por busca literal de texto —
+#   deliberadamente rasa, porque um trecho comentado vira código ao ser
+#   descomentado. Por isso **as construções proibidas não são nomeadas aqui**:
+#   escrevê-las, ainda que em comentário, reprova o harness. A lista vive nos
+#   próprios oráculos e em `specs/003-ci-minimo/spec.md`. Em resumo:
+#     - runner de versão fixa; alias móvel recusado
+#     - gatilhos limitados a integração e proposta de mudança nas duas linhas
+#     - permissão de leitura apenas; escrita e emissão de credencial recusadas
+#     - job `verify` com nome e passos estáveis (é required check da proteção)
+#     - harness por glob, com propagação de código de saída
+#     - nenhuma supressão de erro, nenhum valor variável entre execuções
+#     - todo `uses:` pinado por resumo criptográfico de 40 hex + versão legível
+#     - todo job com teto de tempo
+#   Alterar qualquer um destes pontos exige ADR prévia (ADR-017), nunca fix direto.
+#
+# OS NOVE JOBS, E POR QUE CADA UM EXISTE
+#   verify      harness com saída completa — observabilidade (princípio X)
+#   harness     harness resumido — agregação; o par verify/harness é a distinção
+#               histórica 003/010, hoje sem diferença de setup (ADR-030)
+#   lint        Ruff: linter + conferência de formatação
+#   types       MyPy strict
+#   tests       Pytest na matriz 3.12 + 3.13, sem interrupção na primeira falha
+#   audit       pip-audit (dependências) + Trivy (sistema de arquivos)
+#   secrets     Gitleaks — Lei Zero, princípio V
+#   coverage    portão de cobertura em 90%
+#   commitlint  Conventional Commits no intervalo do evento
+#
+# DETERMINISMO DO PRÓPRIO HARNESS
+#   Os oráculos executam os anteriores em sequência, nunca concorrentemente:
+#   o fan-out paralelo truncava saída de ferramenta externa sob contenção e
+#   reprovava 1 execução em 4 sobre estado correto (ADR-031).
+# =============================================================================
+name: ci
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+# Privilégio mínimo: o pipeline só lê o repositório. A publicação da 013 virá em
+# workflow próprio com o seu próprio escopo, jamais alargando este.
+permissions:
+  contents: read
+
+env:
+  # Determinismo de render da CLI sob Rich/Typer (ADR-030 §4). Espelha o papel de
+  # LC_ALL=C nos oráculos: largura de terminal fixa, saída comparável.
+  COLUMNS: 80
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # verify — harness completo com saída legível (uma linha por asserção).
+  # É o job cujo log um humano lê quando algo reprova.
+  # ---------------------------------------------------------------------------
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Materialize refs + identity
+        run: .github/scripts/materialize-refs.sh
+      - name: Setup Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Run harness
+        # Glob, nunca lista fixa: um item novo acrescenta o seu oráculo e o
+        # pipeline o executa sem editar este arquivo (f0-003 FR-010).
+        run: |
+          for f in scripts/verify/f0-*.sh; do
+            "$f" || exit 1
+          done
+
+  # ---------------------------------------------------------------------------
+  # harness — mesmo oráculo, saída resumida. Só violações aparecem.
+  # ---------------------------------------------------------------------------
+  harness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Materialize refs + identity
+        run: .github/scripts/materialize-refs.sh
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Run harness quiet
+        run: |
+          for f in scripts/verify/f0-*.sh; do
+            "$f" --quiet || exit 1
+          done
+
+  # ---------------------------------------------------------------------------
+  # lint — Ruff como linter e formatador único (item 006).
+  # `format --check` não escreve: o pipeline reprova, não conserta.
+  # ---------------------------------------------------------------------------
+  lint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Ruff check and format
+        run: uv run ruff check . && uv run ruff format --check .
+
+  # ---------------------------------------------------------------------------
+  # types — MyPy strict (item 007). Sem ilha sem tipo em código de produção.
+  # ---------------------------------------------------------------------------
+  types:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Mypy strict
+        run: uv run mypy --strict .
+
+  # ---------------------------------------------------------------------------
+  # tests — matriz 3.12 + 3.13 (a faixa declarada em requires-python).
+  # `fail-fast: false` para ver as duas versões, não só a primeira que cair.
+  # Materializa refs porque há teste que mede `refs/heads/main`.
+  # ---------------------------------------------------------------------------
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Materialize refs + identity
+        run: .github/scripts/materialize-refs.sh
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Pytest
+        run: uv run pytest -q
+
+  # ---------------------------------------------------------------------------
+  # audit — cadeia de suprimentos (item 008): pip-audit nas dependências
+  # Python, Trivy no sistema de arquivos. Ambos gratuitos, ambos bloqueantes.
+  # ---------------------------------------------------------------------------
+  audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Pip audit
+        run: uv run pip-audit
+      - name: Trivy fs
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+
+  # ---------------------------------------------------------------------------
+  # secrets — Lei Zero (princípio V). Segredo não entra no histórico, e o
+  # histórico não se corrige: só se reescreve, e reescrita é incidente.
+  # ---------------------------------------------------------------------------
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Gitleaks detect
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          # Exigido pela v3 da action em PRs (ADR-030 §2). É o token efêmero da
+          # própria execução, não credencial versionada: Lei Zero intacta.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # coverage — portão em 90%. Número escolhido na 010 e asserido por oráculo:
+  # baixá-lo exige ADR, não edição.
+  # ---------------------------------------------------------------------------
+  coverage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Materialize refs + identity
+        run: .github/scripts/materialize-refs.sh
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Coverage gate
+        run: uv run pytest -q --cov --cov-fail-under=90
+
+  # ---------------------------------------------------------------------------
+  # commitlint — Conventional Commits. É o que sustenta o versionamento
+  # semântico automático que a 013 vai derivar do histórico.
+  # Node/npx vêm do runner ubuntu-24.04; sem `setup-node`, nada a pinar.
+  # ---------------------------------------------------------------------------
+  commitlint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Validate commits
+        run: npx --yes @commitlint/cli@21.2.2 --from ${{ github.event.pull_request.base.sha || github.event.before }} --to ${{ github.event.pull_request.head.sha || github.sha }} --verbose

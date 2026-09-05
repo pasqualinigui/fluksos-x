@@ -1,0 +1,24 @@
+🔴 FR-002   uses: por SHA + comentario; runner ubuntu-24.04
+           evidencia: uses: sem SHA: 0/2 (D4); 
+🔴 FR-003   setup-uv + uv sync --frozen + cache
+           evidencia: setup-uv ausente (D3); uv sync --frozen ausente (prova do lock, D3); 
+🔴 FR-004   matriz 3.12+3.13 + fail-fast false
+           evidencia: matriz sem 3.12+3.13 exatos (D5); fail-fast: false ausente (sinal total, CLARIFY); 
+🔴 FR-005   8 jobs nominais unicos
+           evidencia: job harness ausente; job lint ausente; job types ausente; job tests ausente; job audit ausente; job secrets ausente; job coverage ausente; job commitlint ausente; 
+🔴 FR-006   pytest-cov dev + fail-under 90
+           evidencia: --fail-under=90 ausente em ci.yml e pyproject (portao, D6); 
+🔴 FR-007   commitlint 11 tipos + range por evento
+           evidencia: commitlint.config.js ausente; range por evento ausente no job commitlint (ANALYZE M3); 
+🔴 FR-008   procedimento protecao versionado sem token
+           evidencia: branch-protection.md ausente (ANALYZE M2); 
+🔴 FR-009   frouxo + sem-bypass documentados
+           evidencia: procedimento ausente; 
+🔴 FR-010   timeout por job sem mascara
+           evidencia: timeout-minutes ausente (quarentena ADR-019); 
+🔴 FR-012   manifest 10/10 + self-check f0-001..009
+           evidencia: f0-009-lefthook.sh --quiet reprovou (rc=1); 
+🔴 FR-013   README 010 hash + zero [ ] + vermelho-verde
+           evidencia: README sem "010.*ci-completo.*✅.*hash"; tasks.md com 22 [ ] abertas (CONVERGE); par vermelho/verde 010 ausente no log (red= green=); 
+
+Resultado: 2/13 asserções aprovadas — 11 violação(ões) (critica: 0, alta: 11, media: 0) — NAO CONFORME

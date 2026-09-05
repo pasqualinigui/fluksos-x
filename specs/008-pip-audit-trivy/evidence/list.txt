@@ -1,0 +1,16 @@
+FR-001   pip-audit==2.10.1 em [dependency-groups] dev exato
+FR-002   pip-audit.toml nao existe sem config separada
+FR-003   uv.lock contem pip-audit com hash e pip-audit --version 2.10.1 cyclonedx
+FR-004   Trivy 0.74.0 pin aquasec/trivy:0.74.0 documentado nao em dev
+FR-005   uv.lock contem pip-audit e transitivos cyclonedx-python-lib/cachecontrol
+FR-006   pip-audit cache/Trivy DB fora do repo uv.lock nao ignorado
+FR-007   uv run pip-audit 0 sem vulns e --dry-run would have audited
+FR-008   uv run pip-audit -f json e cyclonedx-json validos
+FR-009   Trivy fs skip se Docker ausente 0 quando disponivel
+FR-010   oraculo 12-16 assercoes CANON quiet list FKX EPOCHSECONDS
+FR-011   CI glob inclui f0-008 sem editar ci.yml
+FR-012   CONVERGE tasks.md zero [ ]
+FR-013   fronteira sem lefthook.yml/gitleaks/packages/docker-compose
+FR-014   specs/README.md 008 pip-audit concluida 007 mypy
+FR-015   git ls-files specs/008-pip-audit-trivy/spec.md rastreado
+FR-016   Trivy nao 0.69.4 e pip-audit nao <2.10.1

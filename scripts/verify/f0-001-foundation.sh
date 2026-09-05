@@ -72,6 +72,44 @@ check() { # id desc severidade condicao_ja_avaliada evidencia
   if [ "$4" = "0" ]; then pass "$1" "$2"; else fail "$1" "$2" "$3" "${5:-}"; fi
 }
 
+# --- fonte UNICA de identificadores e descricoes (base da assercao FR-017) ---
+# `--list` imprime daqui, e o relatorio final valida que cada resultado usa
+# exatamente a descricao canonica. Descricao divergente ou duplicada reprova.
+declare -A CANON=(
+  ["FR-001"]="repositorio existe e linha principal e main"
+  ["FR-002"]="linha de integracao develop existe"
+  ["FR-003a"]="identidade de autoria definida em escopo local"
+  ["FR-003b"]="escopo global da maquina nao foi alterado"
+  ["FR-004"]="convencoes declaram os 11 tipos de registro"
+  ["FR-005"]="convencoes declaram escopo opcional e marcacao de incompatibilidade"
+  ["FR-006"]="convencoes declaram formato de nome de linha de funcionalidade"
+  ["FR-007"]="convencoes declaram papeis de main e develop"
+  ["FR-008a"]="arquivo de ambiente base e excluido"
+  ["FR-008b"]="variantes de arquivo de ambiente sao excluidas"
+  ["FR-009"]="arquivo-modelo de ambiente permanece versionavel"
+  ["FR-010"]="ambiente virtual e bytecode sao excluidos"
+  ["FR-011"]="caches das ferramentas de qualidade sao excluidos"
+  ["FR-012"]="efemeros do motor excluidos e diretorio-pai preservado"
+  ["FR-012b"]="camada hermetica e repositorio real concordam sobre as exclusoes"
+  ["FR-013"]="trava de dependencias permanece versionavel"
+  ["FR-014"]="exclusoes geridas pela ferramenta de spec nao sao redeclaradas"
+  ["FR-015"]="registro inicial existe e contem plano e pesquisa"
+  ["FR-018"]="oraculo nao contem construcao nao deterministica"
+  ["FR-019"]="oraculo nao invoca ferramenta fora do permitido"
+  ["FR-020a"]="nenhum arquivo proibido consta do indice"
+  ["FR-020b"]="nenhum arquivo proibido consta do historico"
+  ["FR-022"]="registro de decisoes arquiteturais mapeia specs e itens do plano"
+  ["FR-023a"]="artefatos de integracao de agente permanecem versionaveis"
+  ["FR-023b"]="configuracao local de maquina do agente e excluida"
+  ["SC-002"]="todos os registros satisfazem a gramatica de convencao"
+  ["FR-006b"]="linhas de funcionalidade obedecem ao formato de nome"
+  ["FR-016"]="codigos de saida obedecem a semantica do contrato"
+  ["FR-017"]="cada resultado usa a descricao canonica do seu requisito"
+  ["FR-021"]="oraculo reprova informativamente sem repositorio"
+)
+
+# ordem de exibicao do --list: estavel, nunca a ordem do array associativo
+CANON_ORDER="FR-001 FR-002 FR-003a FR-003b FR-004 FR-005 FR-006 FR-007 FR-008a FR-008b FR-009 FR-010 FR-011 FR-012 FR-012b FR-013 FR-014 FR-015 FR-018 FR-019 FR-020a FR-020b FR-022 FR-023a FR-023b SC-002 FR-006b FR-016 FR-017 FR-021"
 # --- sandbox descartavel + trap (restricao 6) ---------------------------------
 SANDBOX=""
 cleanup() { [ -n "$SANDBOX" ] && [ -d "$SANDBOX" ] && rm -rf -- "$SANDBOX"; }
@@ -81,34 +119,8 @@ trap cleanup EXIT INT TERM HUP
 # --list: enumera sem executar (permite ao item 004 promover a pytest)
 # =============================================================================
 if [ "$LIST" = "1" ]; then
-  cat <<'LISTA'
-FR-001   repositorio existe e linha principal e main
-FR-002   linha de integracao develop existe
-FR-003a  identidade de autoria definida em escopo local
-FR-003b  escopo global da maquina nao foi alterado
-FR-004   convencoes declaram os 11 tipos de registro
-FR-005   convencoes declaram escopo opcional e marcacao de incompatibilidade
-FR-006   convencoes declaram formato de nome de linha de funcionalidade
-FR-007   convencoes declaram papeis de main e develop
-FR-008a  arquivo de ambiente base e excluido
-FR-008b  variantes de arquivo de ambiente sao excluidas
-FR-009   arquivo-modelo de ambiente permanece versionavel
-FR-010   ambiente virtual e bytecode sao excluidos
-FR-011   caches das ferramentas de qualidade sao excluidos
-FR-012   efemeros do motor excluidos e diretorio-pai preservado
-FR-012b  camada hermetica e repositorio real concordam sobre as exclusoes
-FR-013   trava de dependencias permanece versionavel
-FR-014   exclusoes geridas pela ferramenta de spec nao sao redeclaradas
-FR-015   registro inicial existe e contem plano e pesquisa
-FR-018   oraculo nao contem construcao nao deterministica
-FR-019   oraculo nao invoca ferramenta fora do permitido
-FR-020a  nenhum arquivo proibido consta do indice
-FR-020b  nenhum arquivo proibido consta do historico
-FR-022   registro de decisoes arquiteturais mapeia specs e itens do plano
-FR-023a  artefatos de integracao de agente permanecem versionaveis
-FR-023b  configuracao local de maquina do agente e excluida
-SC-002   todos os registros satisfazem a gramatica de convencao
-LISTA
+  for id in $CANON_ORDER; do printf '%-8s %s
+' "$id" "${CANON[$id]}"; done
   exit 0
 fi
 
@@ -125,9 +137,11 @@ if [ "$HAS_REPO" != "0" ]; then
   fail "FR-002" "linha de integracao develop existe" "media" "sem repositorio"
   fail "FR-003a" "identidade de autoria definida em escopo local" "media" "sem repositorio"
 else
-  BRANCH="$(git -C "$ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")"
-  check "FR-001" "repositorio existe e linha principal e main" "media" \
-        "$([ "$BRANCH" = "main" ] && echo 0 || echo 1)" "linha atual: ${BRANCH:-<nenhuma>}"
+  # ADR-029: mede a existencia da linha principal (propriedade do repo),
+  # nunca a sessao (HEAD) — enunciado sempre disse "a linha principal e main"
+  git -C "$ROOT" show-ref --verify --quiet refs/heads/main
+  check "FR-001" "repositorio existe e linha principal e main" "media" "$?" \
+        "refs/heads/main existe; linhas: $(git -C "$ROOT" for-each-ref --format='%(refname:short)' refs/heads | sort | tr '\n' ' ')"
 
   git -C "$ROOT" show-ref --verify --quiet refs/heads/develop
   check "FR-002" "linha de integracao develop existe" "media" "$?" \
@@ -135,8 +149,16 @@ else
 
   L_NAME="$(git -C "$ROOT" config --local --get user.name 2>/dev/null || echo "")"
   L_MAIL="$(git -C "$ROOT" config --local --get user.email 2>/dev/null || echo "")"
+  # ADR-030 Adendo FR-003a: intento = autoria local definida (nunca global);
+  # sob GITHUB_ACTIONS, o par bot e a identidade correta (impersonar quebra forks)
+  L_OK=1
+  if [ -z "$L_NAME" ]; then L_OK=0
+  elif [ "$L_MAIL" = "pasqualini166@gmail.com" ]; then L_OK=1
+  elif [ "${GITHUB_ACTIONS:-}" = "true" ] && [ "$L_NAME" = "github-actions[bot]" ] && [ "$L_MAIL" = "github-actions[bot]@users.noreply.github.com" ]; then L_OK=1
+  else L_OK=0
+  fi
   check "FR-003a" "identidade de autoria definida em escopo local" "media" \
-        "$([ -n "$L_NAME" ] && [ "$L_MAIL" = "pasqualini166@gmail.com" ] && echo 0 || echo 1)" \
+        "$([ "$L_OK" = "1" ] && echo 0 || echo 1)" \
         "local: ${L_NAME:-<vazio>} <${L_MAIL:-<vazio>}>"
 fi
 
@@ -173,8 +195,23 @@ else
         "procurado: padrao feature/f<fase>-<pacote>-<funcionalidade>"
 
   grep -q '`main`' "$CONTRIB" && grep -q '`develop`' "$CONTRIB"
-  check "FR-007" "convencoes declaram papeis de main e develop" "media" "$?" \
+  check "FR-007" "${CANON[FR-007]}" "media" "$?" \
         "procurado: mencao a main e develop"
+fi
+
+# T029 / FR-006b — documentar o formato nao basta: as linhas existentes precisam
+# obedecer a ele. Sem esta assercao, `feature/qualquer-coisa` passa com saida 0.
+if [ "$HAS_REPO" = "0" ]; then
+  BADBR=""
+  while IFS= read -r b; do
+    [ -z "$b" ] && continue
+    printf '%s' "$b" | grep -qE '^feature/f[0-9]+(-[a-z0-9]+){2,}$' || BADBR="${BADBR}${b} "
+  done <<< "$(git -C "$ROOT" for-each-ref --format='%(refname:short)' refs/heads | grep '^feature/' | sort)"
+  check "FR-006b" "${CANON[FR-006b]}" "media" \
+        "$([ -z "$BADBR" ] && echo 0 || echo 1)" \
+        "${BADBR:+fora do padrao feature/f<fase>-<pacote>-<funcionalidade>: $BADBR}"
+else
+  skip "FR-006b" "${CANON[FR-006b]}" "sem repositorio"
 fi
 
 # =============================================================================
@@ -351,7 +388,9 @@ else
 import re, sys
 RX = re.compile(r"^(feat|fix|docs|test|refactor|ci|chore|perf|build|style|revert)"
                 r"(\([a-z0-9][a-z0-9._-]*\))?(!)?: .+")
-bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l)]
+# ADR-030: merges sinteticos do GitHub (PR) nao sao registros de autor
+MERGE = re.compile(r"^Merge [0-9a-f]{40} into \S+|^Merge pull request #[0-9]+ from \S+")
+bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l) and not MERGE.match(l)]
 print("; ".join(sorted(bad)))
 ')"
     check "SC-002" "todos os registros satisfazem a gramatica de convencao" "media" \
@@ -377,6 +416,31 @@ FORBIDDEN="$(grep -nE '^[^#]*\b(pytest|ruff|mypy|lefthook|trivy|gitleaks|uv|pip|
 check "FR-019" "oraculo nao invoca ferramenta fora do permitido" "alta" \
       "$([ -z "$FORBIDDEN" ] && echo 0 || echo 1)" "$FORBIDDEN"
 
+# T032 / FR-016 — semantica dos tres codigos de saida, verificada de fato.
+# `--list` e o parametro invalido nao reexecutam as assercoes, entao nao recursam.
+"$SELF" --list >/dev/null 2>&1;  RC_LIST=$?
+"$SELF" --parametro-invalido >/dev/null 2>&1; RC_BAD=$?
+check "FR-016" "${CANON[FR-016]}" "alta" \
+      "$([ "$RC_LIST" -eq 0 ] && [ "$RC_BAD" -eq 2 ] && echo 0 || echo 1)" \
+      "--list=$RC_LIST (esperado 0), parametro invalido=$RC_BAD (esperado 2)"
+
+# T031 / FR-021 — com o repositorio ja criado, a condicao "sem repositorio" deixou
+# de ser observavel in situ. Reproduz num diretorio descartavel. FKX_ORACLE_NESTED
+# impede recursao infinita: a execucao aninhada pula esta assercao.
+if [ "${FKX_ORACLE_NESTED:-0}" = "1" ]; then
+  skip "FR-021" "${CANON[FR-021]}" "execucao aninhada — evita recursao"
+else
+  NEST="$(mktemp -d)"
+  mkdir -p "$NEST/scripts/verify"
+  cp -- "$SELF" "$NEST/scripts/verify/"
+  NESTOUT="$(FKX_ORACLE_NESTED=1 "$NEST/scripts/verify/$(basename -- "$SELF")" 2>&1)"; RC_NOREPO=$?
+  rm -rf -- "$NEST"
+  printf '%s' "$NESTOUT" | grep -q "nenhum repositorio em"; INFORMATIVO=$?
+  check "FR-021" "${CANON[FR-021]}" "alta" \
+        "$([ "$RC_NOREPO" -eq 1 ] && [ "$INFORMATIVO" -eq 0 ] && echo 0 || echo 1)" \
+        "saida=$RC_NOREPO (esperado 1), mensagem informativa=$([ "$INFORMATIVO" -eq 0 ] && echo sim || echo NAO)"
+fi
+
 DEC="$ROOT/docs/plan/decisions.md"
 if [ -f "$DEC" ] && grep -q "ADR-001" "$DEC" && grep -q '`012`' "$DEC"; then
   pass "FR-022" "registro de decisoes arquiteturais mapeia specs e itens do plano"
@@ -384,6 +448,21 @@ else
   fail "FR-022" "registro de decisoes arquiteturais mapeia specs e itens do plano" "media" \
        "docs/plan/decisions.md ausente ou sem ADR-001 com o mapa 001-012"
 fi
+
+# T030 / FR-017 — o defeito que esta assercao previne ocorreu de fato no portao
+# vermelho deste item: FR-004..FR-007 exibiam descricao generica em vez da propria,
+# e foi detectado por leitura humana, nao pelo harness.
+DESCERR=""
+for i in "${!R_ID[@]}"; do
+  id="${R_ID[$i]}"
+  if [ -z "${CANON[$id]+x}" ]; then
+    DESCERR="${DESCERR}${id}(sem entrada canonica) "
+  elif [ "${R_DESC[$i]}" != "${CANON[$id]}" ]; then
+    DESCERR="${DESCERR}${id}(usou \"${R_DESC[$i]}\") "
+  fi
+done
+check "FR-017" "${CANON[FR-017]}" "alta" \
+      "$([ -z "$DESCERR" ] && echo 0 || echo 1)" "$DESCERR"
 
 # =============================================================================
 # Relatorio (restricao 3: ordem estavel — ordem de declaracao, nunca do FS)

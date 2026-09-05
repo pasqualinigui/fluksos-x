@@ -160,8 +160,16 @@ Motor fkx (Python)
 
 **Todo projeto segue o mesmo ciclo determinístico:**
 ```
-INTERVIEW → CONSTITUTION → RESEARCH → SPEC → PLAN → TASKS → TESTS → IMPLEMENT → HARNESS → QA → DEVOPS → COMMIT → CONVERGE
+INTERVIEW → CONSTITUTION → RESEARCH → SPECIFY → CLARIFY → PLAN → TASKS → ANALYZE → TESTS → IMPLEMENT → HARNESS → QA → DEVOPS → COMMIT → CONVERGE
 ```
+
+> **Emenda 2 (2026-08-30, ADR-012)**: acrescentadas as etapas **CLARIFY** e
+> **ANALYZE**, ausentes na redação original. O motor é construído usando a si
+> mesmo — e o bootstrap adotou as duas depois de elas pegarem defeitos que nenhuma
+> outra etapa pegou: `CLARIFY` encontrou um limiar de desempenho inventado sem
+> fonte, e `ANALYZE` encontrou um critério de sucesso que reprovaria 79 regras
+> corretas. Um ciclo que o motor aplica aos outros e não aplica a si mesmo não é
+> determinístico: é dois processos com o mesmo nome.
 
 O motor não "sabe" todas as linguagens de antemão — ele **pesquisa** (via Agente Pesquisador), **aprende** (via skills + RAG), e **valida** (via harness + LSP + testes). O determinismo vem do **processo**, não do conhecimento prévio.
 

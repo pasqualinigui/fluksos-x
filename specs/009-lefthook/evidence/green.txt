@@ -1,0 +1,18 @@
+✅ FR-001   pin 2.1.12: min_version + dev + uv.lock concordam
+✅ FR-002   lefthook.yml raiz YAML unico sem remotes/self-update
+✅ FR-003   pre-commit fail-fast uv run ordem sem cor forcada
+✅ FR-004   trivy fs so pre-push + skip sem Docker
+✅ FR-005   pre-push contem harness f0-*.sh
+✅ FR-006   somente-leitura sem --fix/stage_fixed
+✅ FR-007   validate + check-install saem 0
+✅ FR-008   escape LEFTHOOK=0 documentado
+✅ FR-009   CI intocado glob inclui f0-009
+✅ FR-010   sem escrita fora do repo nada global
+✅ FR-011   cadencia: f0-audit-005-008 presente + cabecalhos
+✅ FR-012   fronteira: PLAN declara + ADR-018 existe
+✅ FR-013   contrato: list 16 exit2 2x <5s
+✅ FR-014   manifest 9/9 + self-check f0-001..008
+✅ FR-015   specs/README.md 009 lefthook hash
+✅ FR-016   CONVERGE zero [ ] + vermelho-antes-do-verde
+
+Resultado: 16/16 asserções aprovadas — CONFORME

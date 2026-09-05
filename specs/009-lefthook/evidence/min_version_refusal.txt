@@ -1,0 +1,4 @@
+# min_version refusal probe (US3/AC2, FR-001) — 2026-09-04
+# binario 2.1.11 (sha256 435aff51… conferido) contra lefthook.yml com min_version: 2.1.12
+# nota: `validate` NAO impoe min_version (exit 0, "All good"); `run` impoe:
+Error: required lefthook version (2.1.12) is higher than current (2.1.11) at /tmp/lh-211/lh

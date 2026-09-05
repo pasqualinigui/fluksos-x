@@ -1,0 +1,2 @@
+
+Resultado: 12/12 asserções aprovadas — CONFORME

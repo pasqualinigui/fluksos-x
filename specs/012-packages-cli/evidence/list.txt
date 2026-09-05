@@ -1,0 +1,12 @@
+FR-001   typer+rich runtime packages/cli + hash lock, sem click
+FR-002   membro UV + main+init+py.typed + scripts fkx
+FR-003   --help exit 0 marcadores + sem-args ajuda
+FR-004   --version exit 0 so X.Y.Z
+FR-005   opcao invalida exit 2 stderr dica
+FR-006   dep fkx-core sem duplicar + dominio exit 1
+FR-007   ruff + mypy zeros src/fkx_cli
+FR-008   testes tests/test_fkx_cli verdes CliRunner
+FR-009   zero segredo + escape + locals off
+FR-010   contrato: list 12 exit2 2x <5s
+FR-011   manifest 12/12 + self-check f0-001..011
+FR-012   README 012 hash + zero [ ] + vermelho-verde
