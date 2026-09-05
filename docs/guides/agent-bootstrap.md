@@ -23,6 +23,7 @@ cat specs/README.md | grep -E "^\| \`00"          # mapa 16, ✅ vs ⏳
 git log --oneline -3                               # último feat (ex: 62d2a91 008)
 for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done; echo "harness $(ls scripts/verify/f0-*.sh | wc -l)/16"
 uv run ruff check . && uv run mypy --strict . && uv run pip-audit && uv run pytest -q | tail -1
+python3 -c "import re,glob;conv=len([l for l in open('specs/README.md') if re.match(r'^\| \`0',l) and '✅' in l]);cov=max([int(m.group(1)) for f in glob.glob('docs/plan/audit/f0-audit-*-*.md') for m in [re.search(r'f0-audit-\d+-(\d+)',f)] if m]+[0]);print(f'AUDIT DUE ({conv-cov}/4)' if conv-cov>=4 else f'AUDIT OK ({conv-cov}/4)')"  # trava ADR-027: nunca por memoria
 ```
 
 **COMO OPERAR (harness é o oráculo):**

@@ -1571,3 +1571,105 @@ direto.
   para dep membro→membro (`uv lock` recusa sem ele); re-sync
   `--all-packages` obrigatório após criar `src/` (sync com só-pyproject
   instala `dist-info` sem `.pth` editável → `import fkx_cli` falha).
+
+---
+
+## ADR-027 — Trava de cadência da auditoria, segunda geração: sinal líder + portão pytest
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, pós-012) ·
+**Estado**: aceita · **Origem**: achado M2 de `docs/plan/audit/f0-audit-009-012.md`
+(auditoria exigiu 2 lembretes do mantenedor) · **Efeito**: normativo imediato;
+nenhum oráculo, workflow, spec ou plano muda por esta ADR.
+
+### Problema
+
+A ADR-016 posiciona a FR de cadência no oráculo da **5ª** spec: trava tardia,
+que dispara no meio do item seguinte. Nada computa o estado na fronteira
+N+4→N+5. Todos os gatilhos dependiam de contar até quatro — julgamento onde
+deveria haver regra (I, VI). Prova: 2 lembretes.
+
+### Decisão
+
+**1. Sinal líder (toda sessão vê).** O bloco de estado de
+`docs/guides/agent-bootstrap.md` contém one-liner puro-leitura que imprime
+`AUDIT OK (n/4)` ou `AUDIT DUE (4/4)`, computado como no §3. Sessão nova sem
+o sinal = bootstrap desatualizado (achado em auditoria, no mínimo MEDIUM).
+
+**2. Portão pytest (ninguém bypassa sem deixar rastro).**
+`test_audit_cadence` em `tests/test_harness_debts.py`: falha quando
+`convergidas − cobertas ≥ 4` sem relatório cobrindo. Roda no hook pre-commit
+(`pytest -q`) e no job `tests` do CI (required check) — mesma doutrina ADR-009,
+sem tocar workflow nem oráculos (regra 5 intacta; nenhuma ADR de fronteira
+exigida para a trava em si).
+
+**3. Computação determinística (definida aqui, nunca na cabeça do agente).**
+
+- `convergidas` = linhas `✅` no mapa `specs/README.md:9` (fonte ADR-011).
+- `cobertas` = maior `MMM` entre `docs/plan/audit/f0-audit-NNN-MMM.md` com
+  cabeçalhos grepeáveis `Veredito`, `Achados`, `Destino` (formato ADR-014).
+- `convergidas − cobertas < 4` → passa; `≥ 4` → falha nomeando a faixa
+  descoberta (X). A FR da ADR-016 permanece como segunda trava (sem
+  contradição: esta dispara na fronteira, aquela no converge da 5ª).
+
+**4. Doutrina das camadas (o que cada uma pega e por construção perde).**
+
+| Camada | Pega | Por construção perde |
+|---|---|---|
+| Oráculo (harness) | conformidade mecânica: arquivos, pins, exits, bytes, hashes | procedimento (verde por construção), semântica, prosa de planos |
+| pytest TDD | comportamento executável; regressão | decisões de desenho; o spec estar certo |
+| ANALYZE | inconsistência entre artefatos | o que nenhum artefato diz (cobertura varia por item) |
+| Auditoria | semântica, ausência, procedimento, ciclo executado | a própria cadência (esta ADR fecha); perspicácia (mérito do auditor) |
+| Trava de cadência | o esquecimento da auditoria | nada além disso — escopo proposital |
+
+O harness é tão bom quanto as perguntas feitas antes dele existir; a auditoria
+é a camada que inventa perguntas novas. Mecanizá-la garante que aconteça;
+a densidade de achados (§6) mede se foi perspicaz.
+
+**5. Gatilho condicional da Fase 1.** Recalibragem por dado, nunca por
+intuição: se a auditoria pós-016 render **≥3 achados HIGH**, a Fase 1 abre em
+cadência 2 por default. Ponto de dado 009–012: 2 HIGH — gatilho **não**
+dispara (registrado como dado).
+
+### Consequências
+
+- Auditoria sem trava passa a ser dívida rastreável a esta ADR, não conversa.
+- `test_audit_cadence` nasce com TDD sobre fixtures (prova 🔴→🟢 sem o repo
+  jamais avermelhar — repo vermelho travaria todos os commits via hook).
+- Ordem normativa: auditoria devida primeiro (repo sempre verde), mecanismo
+  em seguida. Mecanismo antes da dívida = auto-bloqueio via hook.
+
+---
+
+## ADR-028 — Exceção fundamentada de fluxo: `main` direto na Fase 0 + poda
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, pós-012) ·
+**Estado**: aceita · **Origem**: divergência entre `CONTRIBUTING.md` §2
+(`feature/*` de `develop`, de volta a `develop`) e a prática (tudo direto em
+`main`; `develop`, `003-ci-minimo`, `004-uv-workspace` abandonadas).
+
+### Decisão
+
+**1. Exceção, não licença.** Fluxo `main`-direto vale **somente na Fase 0**,
+fundamentado em: 1 mantenedor + 1 agente, hook integral por commit, histórico
+linear como evidência legível de TDD (molde ADR-007). É a terceira aplicação
+do molde "exceção com prazo e gatilho".
+
+**2. Condição de saída explícita.** Primeiro colaborador com write **ou**
+primeiro PR externo ⇒ fluxo por `feature/*` + PR entra em vigor na mesma
+sessão, por decisão registrada (sem migração silenciosa).
+
+**3. Poda parcial (correção em sessão: poda total era inválida).**
+Ponteiros locais `003-ci-minimo`, `004-uv-workspace` (100% em `main`,
+verificado `git branch --merged`) removidos. `develop` foi removida e
+**restaurada na mesma sessão**: `f0-001` FR-002 exige a existência da linha
+`develop` (30/30 reprovou sem ela) — removê-la quebraria oráculo convergido
+(ADR-002), o que nenhuma ADR de fluxo pode autorizar sem o procedimento de
+fronteira. `develop` permanece como linha exigida pelo harness, ainda que sem
+uso; seu destino (reavivar com fluxo por PR ou migrar a asserção) decide-se
+junto da condição de saída, nunca antes.
+
+### Consequências
+
+- A divergência deixa de ser silenciosa: ou cabe nesta exceção, ou é achado.
+- A proteção da 010 (PR + checks), quando aplicada (A1 → 013), exigirá na
+  prática o fluxo por PR — as duas dívidas se encontram e se pagam juntas.

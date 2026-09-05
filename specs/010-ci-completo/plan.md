@@ -6,7 +6,7 @@
 
 ## Summary
 
-Estender `.github/workflows/ci.yml` (003) para workflow completo com jobs nominais separados (harness, lint, types, tests, audit, secrets, coverage, commitlint), pins SHA, matriz `["3.12","3.13"]` com `fail-fast: false`, `uv sync --frozen`, portão de cobertura `--fail-under=90`, commitlint com os 11 tipos, quarentena ADR-019 — mais procedimento versionado de branch protection clássica (`main`+`develop`, checks frouxos + sem-bypass, sem reviews), aplicado por humano no servidor (🧑). Oráculo `f0-010` com 14 asserções identidade + 10ª linha do manifest. Nenhum oráculo 001–009 tocado salvo via ADR prévia (nenhum conflito previsto — ver fronteira).
+Estender `.github/workflows/ci.yml` (003) para workflow completo com jobs nominais separados (harness, lint, types, tests, audit, secrets, coverage, commitlint), pins SHA, matriz `["3.12","3.13"]` com `fail-fast: false`, `uv sync --frozen`, portão de cobertura `--fail-under=90`, commitlint com os 11 tipos, quarentena ADR-019 — mais procedimento versionado de branch protection clássica (`main`+`develop`, checks frouxos + sem-bypass, sem reviews), aplicado por humano no servidor (🧑). Oráculo `f0-010` com 13 asserções identidade + 10ª linha do manifest. Nenhum oráculo 001–009 tocado salvo via ADR prévia (nenhum conflito previsto — ver fronteira).
 
 ## Technical Context
 
@@ -16,7 +16,7 @@ Estender `.github/workflows/ci.yml` (003) para workflow completo com jobs nomina
 
 **Storage**: arquivos (`.github/workflows/ci.yml`, `commitlint.config.js`, procedimento `.md`); proteção = config de servidor (fora do repo por construção)
 
-**Testing**: oráculo `f0-010-ci-completo.sh` (14 asserções) com par `red.txt`/`green.txt` + primeira execução real em runner (fecha resíduo 003-T031/B3)
+**Testing**: oráculo `f0-010-ci-completo.sh` (13 asserções) com par `red.txt`/`green.txt` + primeira execução real em runner (fecha resíduo 003-T031/B3)
 
 **Target Platform**: runners `ubuntu-24.04` hospedados (com Docker); máquina local sem Docker usa skips ⏭️
 
@@ -39,7 +39,7 @@ Estender `.github/workflows/ci.yml` (003) para workflow completo com jobs nomina
 | III Teste antes | ✅ PASS | `f0-010` vermelho separado antes do verde |
 | IV Dados antes | ✅ PASS | `data-model.md` + `contracts/oracle-cli.md` antes do IMPLEMENT |
 | V Lei Zero | ✅ PASS | zero segredos; oráculo nunca usa token; gitleaks fecha o loop de segredos |
-| VI Oráculo | ✅ PASS | 14 asserções novas; 001–009 intocados (sem conflito previsto) |
+| VI Oráculo | ✅ PASS | 13 asserções novas; 001–009 intocados (sem conflito previsto) |
 | VII Auto-reparo | ✅ PASS | lacunas 5/7/8 da ADR-009 + B2/B3 + resíduo T031 pagos aqui |
 | VIII Elo verificado | ✅ PASS | releases API + docs GitHub + `--help` executados 2026-09-04 |
 | IX Agnosticismo | ✅ PASS | nada de stack-alvo; Actions é toolchain do próprio bootstrap |
@@ -70,7 +70,7 @@ commitlint.config.js                # NOVO (010): preset + 11 tipos do repo
 pyproject.toml                      # EDITAR (010): pytest-cov==7.1.0 em dev
 uv.lock                             # REGENERAR (010): hash pytest-cov
 docs/plan/...                       # procedimento de proteção 🧑 (novo .md versionado)
-scripts/verify/f0-010-ci-completo.sh# NOVO (010): 14 asserções
+scripts/verify/f0-010-ci-completo.sh# NOVO (010): 13 asserções
 scripts/verify/manifest.sha256      # ACRESCER (010): 10ª linha
 specs/README.md                     # EDITAR (010): 010 ✅ + hash
 core.hooksPath / .git global        # INTOCADOS (FR-010/009)
@@ -89,7 +89,7 @@ packages/, release, renovate        # NÃO CRIAR (011/012, 013, 014)
 
 ### Fase B — Oráculo em estado de reprovação 🔴
 
-1. Escrever `f0-010-ci-completo.sh` (14 asserções, identidade) — **arquivo novo**, zero toque em 001–009.
+1. Escrever `f0-010-ci-completo.sh` (13 asserções, identidade) — **arquivo novo**, zero toque em 001–009.
 2. Acrescer 10ª linha ao manifest (acréscimo, ADR-015a).
 3. Executar: vermelhas de comportamento esperadas (jobs ausentes, cov ausente, commitlint ausente, README sem 010 ✅, tasks abertas); guardas verdes.
 4. Preservar `evidence/red.txt` + commit `test(harness)` **separado**.

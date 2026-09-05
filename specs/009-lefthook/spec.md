@@ -8,7 +8,7 @@
 
 **Input**: User description: "Fase 0, item 0.5 (009/016 na ordem de execução): Lefthook — orquestração pre-commit do harness (ruff + mypy strict + pytest + pip-audit + trivy fs condicional), via lefthook.yml versionado, min_version pinado, sem remotes/self-update, sem tocar CI, com pré-autorização de fronteira (ADR-017) e FR de cadência de auditoria (ADR-016)."
 
-**Item do plano**: 0.5 (§17 Fase 0, Itens 0.1–0.12) · **Ordem de execução**: 009 de 016 (ADR-011)
+**Item do plano**: 0.5 (§17 Fase 0, Emenda 1 com 0.13–0.16) · **Ordem de execução**: 009 de 016 (ADR-011)
 **Pesquisa vinculante**: `docs/plan/research/f0-009-lefthook.md` (decisões D1–D10, Q1–Q10, hierarquia de fontes P0–P3)
 **Contrato de entrada**: `specs/008-pip-audit-trivy/spec.md` › Contratos (Transferido à 009) + `docs/plan/audit/f0-audit-005-008.md` + `docs/plan/decisions.md` (ADR-009, ADR-011, ADR-015, ADR-016, ADR-017) + `docs/plan/implementation_plan.md` §§3–4, 15, 17 + `specs/001-git-branching-strategy/contracts/oracle-cli.md`
 
@@ -147,7 +147,7 @@ Colaborador novo clona, sincroniza e instala ganchos com comandos documentados; 
 
 ### Recebido de itens anteriores
 
-- De **008**: `lefthook.yml` com `ruff` + `mypy --strict` + `pytest` + `pip-audit` + `trivy fs` (orquestrar 005–008).
+- De **008**: ferramentas a orquestrar (`ruff` + `mypy --strict` + `pytest` + `pip-audit` + `trivy fs`) + skip-sem-Docker como padrão (o `lefthook.yml` é entregue por este item, não recebido).
 - De **007/006/005**: comandos canônicos (`ruff check`, `ruff format --check`, `mypy --strict`, `pytest -q`) e padrão de oráculo (identidade, inquebráveis, CONVERGE).
 - Da **auditoria 005–008**: relatório vigente (FR-011), exceções A1/M3 como proibições ativas, B2 como skip condicional herdado.
 - Das **ADR-016/017**: trava de cadência e procedimento de fronteira como FRs próprias.

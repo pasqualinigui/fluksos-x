@@ -6,7 +6,7 @@
 
 ## Summary
 
-Criar `packages/core/` (membro UV, módulo `fkx_core`) com `config.py` (settings `FKX_` + `SecretStr`), `state.py` (`TypedDict` status/etapa/erros + reducer), `models.py` (Pydantic), `exceptions.py` (`FkxError` + 3), `pydantic(+settings)` como runtime do pacote, testes em `tests/`, oráculo `f0-011` com 14 asserções identidade + 11ª linha do manifest. Primeiro código de produção sob TDD real; nada de grafo/agentes/CLI.
+Criar `packages/core/` (membro UV, módulo `fkx_core`) com `config.py` (settings `FKX_` + `SecretStr`), `state.py` (`TypedDict` status/etapa/erros + reducer), `models.py` (Pydantic), `exceptions.py` (`FkxError` + 3), `pydantic(+settings)` como runtime do pacote, testes em `tests/`, oráculo `f0-011` com 12 asserções identidade + 11ª linha do manifest. Primeiro código de produção sob TDD real; nada de grafo/agentes/CLI.
 
 ## Technical Context
 
@@ -16,7 +16,7 @@ Criar `packages/core/` (membro UV, módulo `fkx_core`) com `config.py` (settings
 
 **Storage**: arquivos (`packages/core/pyproject.toml`, `src/fkx_core/*.py`); N/A banco
 
-**Testing**: oráculo `f0-011-core.sh` (14 asserções) com par `red.txt`/`green.txt` + `pytest` em `tests/test_fkx_core_*.py` (testpaths existentes)
+**Testing**: oráculo `f0-011-core.sh` (12 asserções) com par `red.txt`/`green.txt` + `pytest` em `tests/test_fkx_core_*.py` (testpaths existentes)
 
 **Target Platform**: pacote Python importável (consumido por 012 e Fase 1+)
 
