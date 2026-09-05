@@ -134,10 +134,10 @@ Três restrições de ordem que **nenhuma tarefa pode violar**:
 
 - [x] T021 **ADR PRÉVIA** — redigir a próxima ADR livre (descobrir o número com `grep ^## ADR- docs/plan/decisions.md` antes de redigir) em `docs/plan/decisions.md` (molde ADR-018/021/022/023): admitir `packages/cli/` com `pyproject.toml` de membro nos oráculos 004 (FR-012), 005 (FR-015), 006 (FR-014), 007 (FR-014), 008 (FR-013) que asserem `packages/` só-com-`core/`, e em 011 (FR-002) que assere `cli/` ausente (jurisdição da 012; resto proibido; legitimidade via `uv.lock`); forma exata dos diffs; aplicação SÓ em T022. Sem esta ADR, T022 não executa (plan.md Fase C + restrição 3)
 - [x] T022 **VERDE** — cadeia `ruff`/`mypy`/`pytest` zeros + `scripts/verify/f0-012-cli.sh` rumo a 12/12 + ADR de fronteira aplicada SÓ agora + manifest 12/12 + preservar `evidence/green.txt` + commitar `feat(packages)` **separado** do T012: `feat(packages): packages cli entry point (012)` (plan.md Fase C/D)
-- [ ] T023 `specs/README.md` `012 ✅` + hash do commit T022 (inquebrável FR-011; quickstart Cenário 5)
-- [ ] T024 Re-executar harness 12/12 + manifest 12/12 + quickstart "validação completa em um comando" (quickstart Cenário 5)
-- [ ] T025 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (011→012, harness 12/12, próximo 013)
-- [ ] T026 [P] Troubleshooting do `specs/012-packages-cli/quickstart.md` (sync sem `--all-packages`, callback sem anotação, help sem Rich) + commit de convergência `docs(specs)`
+- [x] T023 `specs/README.md` `012 ✅` + hash do commit T022 (inquebrável FR-011; quickstart Cenário 5)
+- [x] T024 Re-executar harness 12/12 + manifest 12/12 + quickstart "validação completa em um comando" (quickstart Cenário 5)
+- [x] T025 Confirmar `tasks.md` zero `^- [ ]` + `git log` com vermelho-antes-do-verde + AGENTS.md rolado (011→012, harness 12/12, próximo 013)
+- [x] T026 [P] Troubleshooting do `specs/012-packages-cli/quickstart.md` (sync sem `--all-packages`, callback sem anotação, help sem Rich) + commit de convergência `docs(specs)`
 
 ---
 
