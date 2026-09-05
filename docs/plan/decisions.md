@@ -1764,6 +1764,10 @@ zero defeito de lógica do produto.
 > flake aninhado **no runner limpo** (`f0-007` sob self-check de `f0-011`,
 > 11/12) — a classe A2 não é fenômeno da máquina do mantenedor; insumo do
 > caminho 2.
+> **Adendo matrix (mesma sessão):** contexts exigidos usam os nomes
+> reportados — `tests (3.12)` + `tests (3.13)`, nunca `tests` puro (job de
+> matriz não reporta o nome-base; com `tests` puro o PR trava em BLOCKED
+> com tudo verde — pego na primeira tentativa de merge).
 
 Manifest regenerado na aplicação citando esta ADR. Qualquer outro vermelho
 no runner fora destes 5 pontos = conflito novo, ADR própria, nunca fix

@@ -10,7 +10,10 @@ Para cada padrão (`main`, `develop`):
 
 - [x] Branch name pattern: `main` (respectivamente `develop`)
 - [x] ✅ Require status checks before merging — checks: `verify`, `harness`,
-      `lint`, `types`, `tests`, `audit`, `secrets`, `coverage`, `commitlint`
+      `lint`, `types`, `tests (3.12)`, `tests (3.13)`, `audit`, `secrets`,
+      `coverage`, `commitlint` (matriz reporta `tests (X.Y)` — contexto `tests`
+      puro nunca reporta e travaria tudo em BLOCKED; pego na primeira
+      tentativa de merge desta sessão)
 - [x] ✅ Require branches to be up to date: **DESMARCADO** (checks frouxos —
       decisão CLARIFY 2026-09-04)
 - [x] ✅ Do not allow bypassing the above settings (inclusive admins)
