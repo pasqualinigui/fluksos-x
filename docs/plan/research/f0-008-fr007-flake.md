@@ -59,3 +59,22 @@ Isolado/serial: sempre verde (15/16 CONFORME). Transiente puro, dependente de ca
 A2 passa de "defeito a investigar" para "defeito investigado com causa e
 caminho": contenção sob fan-out paralelo + evidência que mascara a assinatura.
 Pendente: aplicação do caminho 1 (via ADR-017) e experimento do caminho 2.
+
+## Adendo — forense do fan-out (2026-09-05, sessão servidor)
+
+Reprodução dirigida do fan-out (`for o in … & wait`, 9 oráculos): 1/3 bursts
+falha em `f0-007` FR-010 com mecanismo capturado — `mypy --help` parcial
+(contém `strict`, falta `disallow-untyped-calls`); 8/8 seriais verdes;
+6/6 `mypy --help` concorrentes isolados com 320/320 linhas. Ou seja: o
+truncamento só ocorre no burst completo (10 oráculos × ferramentas externas),
+nunca em concorrência homogênea — contenção de recurso compartilhado
+(lock do `uv`/CPU/memória sob ~10GB ocupados), não defeito de lógica.
+
+**Agravante sistêmico (novo, mesma família do item 2):** o padrão
+`OUT=$(uv run … || true)` engole terminação anormal (ex.: 137/OOM) — a
+asserção vê "saída parcial", nunca "processo morto". Toda asserção com
+`|| true` sobre ferramenta externa tem esse ponto cego (princípio X:
+falha deve nomear requisito **e evidência** — aqui a evidência do crash
+é descartada por construção). Endurecimento candidato (via ADR-017, nunca
+direto): capturar `$?` separadamente e evidenciar terminação anormal como
+classe distinta de "saída sem marcador".

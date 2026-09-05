@@ -1637,6 +1637,9 @@ dispara (registrado como dado).
   jamais avermelhar — repo vermelho travaria todos os commits via hook).
 - Ordem normativa: auditoria devida primeiro (repo sempre verde), mecanismo
   em seguida. Mecanismo antes da dívida = auto-bloqueio via hook.
+- **Adendo pós-primeira-execução-servidora:** todo RESEARCH declara o que o
+  item assume sobre o ambiente de execução e onde está a prova executada
+  dessa suposição (lacuna que gerou a ADR-030).
 
 ---
 
@@ -1673,3 +1676,134 @@ junto da condição de saída, nunca antes.
 - A divergência deixa de ser silenciosa: ou cabe nesta exceção, ou é achado.
 - A proteção da 010 (PR + checks), quando aplicada (A1 → 013), exigirá na
   prática o fluxo por PR — as duas dívidas se encontram e se pagam juntas.
+
+> **Adendo 2026-09-05 (migração servidor):** condição de saída antecipada —
+> proteção aplicada em `pasqualinigui/fluksos-x` + cenário 🧑 executado (PR com
+> defeito travado, push direto recusado). Exceção `main`-direto **encerrada**;
+> fluxo passa a `feature/*` + PR nesta sessão. Ver ADR-029 (dívida que o novo
+> fluxo expôs) e `specs/010-ci-completo/branch-protection.md` (evidência).
+
+---
+
+## ADR-029 — Correção de enunciado: FR-001 mede a linha, não a sessão
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, migração
+servidor) · **Estado**: aceita · **Origem**: 5ª lacuna da ADR-007 + cenário 🧑
+A1 (pre-push travou em `feature/*` por `linha atual: feature/f0-a1-proof`).
+
+### Contexto
+
+O enunciado diz *"a linha principal é `main`"* (propriedade do repositório);
+a implementação media *"estou em `main` agora"* (propriedade da sessão).
+Sob fluxo `main`-direto, as duas leituras coincidiam e o defeito dormia; sob
+fluxo por PR (obrigatório pós-proteção), o oráculo reprova push legítimo —
+a exceção da ADR-007 venceu pelo motivo errado e a dívida veio cobrar.
+
+### Decisão (forma exata, única mudança autorizada neste arquivo)
+
+Em `scripts/verify/f0-001-foundation.sh`, bloco GRUPO A: trocar a medida de
+HEAD (`symbolic-ref ... BRANCH = main`) por existência de
+`refs/heads/main` (`show-ref --verify --quiet`, espelho da FR-002 e do teste
+`test_main_branch_exists` da 005, que já pagava a detecção). Enunciado e
+descrição CANON inalterados — a implementação passa a dizer o que o
+enunciado sempre disse. Manifest regenerado citando esta ADR. Nada mais
+neste oráculo é tocado; nenhum outro oráculo é tocado.
+
+### Consequências
+
+- Sétima execução do procedimento ADR-017 (primeira sobre o item 001 —
+  intocável desde a convergência; a forma é a mesma das anteriores).
+- O pagamento da 005 (teste de existência) e a correção desta ADR se somam:
+  detecção + comportamento, sem contradição.
+
+> **Adendo (mesma sessão, antes de qualquer push):** a correção acima move o
+> resumo de `f0-001` (`63412ca7…` → `d00b9299…`), e `f0-002` FR-021a fixa o
+> valor antigo por número (mecanismo ADR-006, anterior ao manifest). Sem
+> atualizar a linha fixada, o pre-push reprova push legítimo em `feature/*`
+> — a cadeia de integridade funcionando como desenhada. Fica autorizada,
+> **exclusivamente**, a atualização da constante `HASH_F0_001` em `f0-002`
+> para o novo resumo (+ comentário citando esta ADR) e a regeneração do
+> manifest. É consequência mecânica da correção acima, não segunda mudança
+> de semântica: nenhuma asserção muda de sentido, só o número fixado
+> acompanha o estado autorizado.
+
+---
+
+## ADR-030 — Remediação da primeira execução servidora (5 gaps, 1 PR)
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, migração
+servidor) · **Estado**: aceita · **Evidência**: run `33946950104` (PR #1) +
+run `33947842158` (PR #2) + reproduções locais (`COLUMNS=0/10`) · **Efeito**:
+autoriza os ajustes abaixo **neste PR**, com re-verde no runner antes do
+merge. Nada além desta tabela é tocado.
+
+### Contexto
+
+Primeira execução do pipeline em servidor encontrou 5 gaps, nenhum detectável
+localmente (princípio VIII nunca tocou o runner em 12 itens — lacuna de método
+registrada na ADR-027 §5). Todos com prova no log; todos de ambiente/setup;
+zero defeito de lógica do produto.
+
+### Ajustes autorizados (forma exata)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `ci.yml` (jobs `verify`, `harness`, `tests`, `coverage`) | step `Materialize refs + identity` após Checkout: `git fetch origin main:refs/heads/main develop:refs/heads/develop` + `git config --local user.name/email github-actions[bot]` (reconstrói o que o oráculo define; setup, não jogo) |
+| 2 | `ci.yml` (job `secrets`) | `env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` (breaking da action v3, README oficial; token da Actions, Lei Zero intacta) |
+| 3 | `f0-001` SC-002 | pular merges sintéticos `^Merge [0-9a-f]{40} into \S+` (leitura formalizada: registro automatizado do GitHub não é registro de autor; commitlint segue validando o intervalo) |
+| 4 | `tests/conftest.py` + sonda `f0-012` + `env` do CI | `COLUMNS=80` (determinismo I, espelho de `LC_ALL=C`; app intacto; terminal estreito real = limite documentado, endurecimento só com relato) |
+| 5 | Manifest | regenerado citando esta ADR |
+
+> **Adendo row 6 (mesma sessão, evidência do run `33949777749`):** job
+> `verify` (legado 003, sem sync) reprova `f0-004` FR-008/009 (`.venv`
+> ausente no runner) — o desenho "harness mínimo sem uv" nunca foi
+> executável desde o item 004 e nunca rodou em servidor até hoje. Ajuste:
+> `verify` ganha `setup-uv` + `uv sync --frozen --all-packages` (igual ao
+> job `harness`); a distinção 003/010 passa a ser histórica, não
+> comportamental. **Adendo flakes:** run `33949777749` registrou o primeiro
+> flake aninhado **no runner limpo** (`f0-007` sob self-check de `f0-011`,
+> 11/12) — a classe A2 não é fenômeno da máquina do mantenedor; insumo do
+> caminho 2.
+> **Adendo matrix (mesma sessão):** contexts exigidos usam os nomes
+> reportados — `tests (3.12)` + `tests (3.13)`, nunca `tests` puro (job de
+> matriz não reporta o nome-base; com `tests` puro o PR trava em BLOCKED
+> com tudo verde — pego na primeira tentativa de merge).
+
+Manifest regenerado na aplicação citando esta ADR. Qualquer outro vermelho
+no runner fora destes 5 pontos = conflito novo, ADR própria, nunca fix
+direto.
+
+> **Nota de execução:** cada edição autorizada em `f0-001` move seu resumo e
+> exige acompanhar `HASH_F0_001` em `f0-002` + manifest (consequência
+> mecânica do Adendo ADR-029, aqui pela edição SC-002). Cadeia verificada
+> pelo próprio pre-push antes de cada push — o mecanismo mordeu duas vezes
+> nesta sessão, ambas a favor da integridade.
+>
+> **Adendo FR-003a (mesma sessão, antes do push):** a asserção fixava o
+> email pessoal do mantenedor — sob CI, a identidade correta é o bot, e
+> exigir impersonação quebraria qualquer fork/runner. Leitura formalizada:
+> presença em escopo local + (email do mantenedor **ou** par bot sob
+> `GITHUB_ACTIONS=true`). O intento (autoria local definida, nunca global)
+> permanece; o valor fixo era overfit, não segurança (Lei Zero trata de
+> segredos; este email já é público no histórico).
+>
+> **Nota de execução (forense do runner):** a causa raiz do §4 não era só
+> largura — Typer força terminal sob `GITHUB_ACTIONS` (`FORCE_TERMINAL`),
+> e o Rich estiliza `-` separado de `-help`, quebrando substring ` --help`
+> na saída com ANSI (prova: `\x1b[1;36m-\x1b[0m\x1b[1;36m-version`). A
+> correção autorizada estende-se a: comparar marcadores sobre saída com
+> ANSI removido (helper `strip_ansi` em `tests/conftest.py` + sonda do
+> oráculo; contrato é sobre conteúdo legível, não bytes de escape).
+> `COLUMNS=80` permanece (largura ~0 corta de verdade — reproduzido).
+> Bônus honesto: Typer 0.27.2 **vendoriza** click (`typer/_click`) — Q3 do
+> research dizia "standalone" pelo `requires_dist`; a conclusão (sem pin
+> `click`) segue válida, o mecanismo estava impreciso.
+
+### Consequências
+
+- O PR que aplica este pacote só converge verde no runner (prova da prova).
+- A1 encontra aqui sua quitação operacional: pipeline executa + portão
+  decide no servidor (evidência em `branch-protection.md`).
+- Pergunta-padrão de ambiente entra no RESEARCH a partir da 013 (adendo
+  ADR-027): *"o que este item assume sobre o ambiente de execução, e onde
+  está a prova executada dessa suposição?"*

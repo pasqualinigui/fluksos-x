@@ -137,9 +137,11 @@ if [ "$HAS_REPO" != "0" ]; then
   fail "FR-002" "linha de integracao develop existe" "media" "sem repositorio"
   fail "FR-003a" "identidade de autoria definida em escopo local" "media" "sem repositorio"
 else
-  BRANCH="$(git -C "$ROOT" symbolic-ref --quiet --short HEAD 2>/dev/null || echo "")"
-  check "FR-001" "repositorio existe e linha principal e main" "media" \
-        "$([ "$BRANCH" = "main" ] && echo 0 || echo 1)" "linha atual: ${BRANCH:-<nenhuma>}"
+  # ADR-029: mede a existencia da linha principal (propriedade do repo),
+  # nunca a sessao (HEAD) — enunciado sempre disse "a linha principal e main"
+  git -C "$ROOT" show-ref --verify --quiet refs/heads/main
+  check "FR-001" "repositorio existe e linha principal e main" "media" "$?" \
+        "refs/heads/main existe; linhas: $(git -C "$ROOT" for-each-ref --format='%(refname:short)' refs/heads | sort | tr '\n' ' ')"
 
   git -C "$ROOT" show-ref --verify --quiet refs/heads/develop
   check "FR-002" "linha de integracao develop existe" "media" "$?" \
@@ -147,8 +149,16 @@ else
 
   L_NAME="$(git -C "$ROOT" config --local --get user.name 2>/dev/null || echo "")"
   L_MAIL="$(git -C "$ROOT" config --local --get user.email 2>/dev/null || echo "")"
+  # ADR-030 Adendo FR-003a: intento = autoria local definida (nunca global);
+  # sob GITHUB_ACTIONS, o par bot e a identidade correta (impersonar quebra forks)
+  L_OK=1
+  if [ -z "$L_NAME" ]; then L_OK=0
+  elif [ "$L_MAIL" = "pasqualini166@gmail.com" ]; then L_OK=1
+  elif [ "${GITHUB_ACTIONS:-}" = "true" ] && [ "$L_NAME" = "github-actions[bot]" ] && [ "$L_MAIL" = "github-actions[bot]@users.noreply.github.com" ]; then L_OK=1
+  else L_OK=0
+  fi
   check "FR-003a" "identidade de autoria definida em escopo local" "media" \
-        "$([ -n "$L_NAME" ] && [ "$L_MAIL" = "pasqualini166@gmail.com" ] && echo 0 || echo 1)" \
+        "$([ "$L_OK" = "1" ] && echo 0 || echo 1)" \
         "local: ${L_NAME:-<vazio>} <${L_MAIL:-<vazio>}>"
 fi
 
@@ -378,7 +388,9 @@ else
 import re, sys
 RX = re.compile(r"^(feat|fix|docs|test|refactor|ci|chore|perf|build|style|revert)"
                 r"(\([a-z0-9][a-z0-9._-]*\))?(!)?: .+")
-bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l)]
+# ADR-030: merges sinteticos do GitHub (PR) nao sao registros de autor
+MERGE = re.compile(r"^Merge [0-9a-f]{40} into \S+")
+bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l) and not MERGE.match(l)]
 print("; ".join(sorted(bad)))
 ')"
     check "SC-002" "todos os registros satisfazem a gramatica de convencao" "media" \

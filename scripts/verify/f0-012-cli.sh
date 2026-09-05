@@ -131,21 +131,28 @@ PROBE_VERSION_EXIT=""; PROBE_VERSION_OUT=""
 PROBE_BAD_EXIT=""; PROBE_BAD_OUT=""
 if [ -f "$MAINPY" ] && [ "$NESTED" != "1" ] && command -v uv >/dev/null 2>&1; then
   TMPD="$(mktemp -d)"
+  # ADR-030 §4: COLUMNS pinado (determinismo de render; runner resolve ~0)
+  COLUMNS=80
+  export COLUMNS
   cat > "$TMPD/probe.py" <<'PYEOF'
+import re
 from typer.testing import CliRunner
 from fkx_cli.main import app
+ANSI = re.compile(r"\x1b\[[0-9;]*m")
+def clean(t):
+    return ANSI.sub("", t)
 r = CliRunner()
 h = r.invoke(app, ["--help"])
 n = r.invoke(app, [])
 v = r.invoke(app, ["--version"])
 b = r.invoke(app, ["--nope"])
 print("help_exit=" + str(h.exit_code))
-print("help_out=" + h.output.replace("\n", "\\n"))
+print("help_out=" + clean(h.output).replace("\n", "\\n"))
 print("noargs_exit=" + str(n.exit_code))
 print("version_exit=" + str(v.exit_code))
-print("version_out=" + v.output.strip().replace("\n", "\\n"))
+print("version_out=" + clean(v.output).strip().replace("\n", "\\n"))
 print("bad_exit=" + str(b.exit_code))
-print("bad_out=" + b.output.replace("\n", "\\n"))
+print("bad_out=" + clean(b.output).replace("\n", "\\n"))
 PYEOF
   if PROBE_RAW="$(uv run --no-sync -- python "$TMPD/probe.py" 2>/dev/null)"; then
     PROBE_RAN=1
