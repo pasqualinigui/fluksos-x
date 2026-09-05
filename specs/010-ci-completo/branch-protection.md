@@ -53,3 +53,9 @@ Para cada padrão (`main`, `develop`):
 - **Dívida exposta pelo novo fluxo:** pre-push travou em `feature/*`
   (`f0-001` media HEAD, não a linha) → corrigida pela ADR-029 na mesma
   sessão (forma exata, manifest citado); `f0-001` 30/30 em feature branch.
+- **Fechamento (PR #2, merge `682dcd8`):** primeira execução servidora
+  exigiu ADR-030 (refs+identidade no setup, token gitleaks, SC-002 sem
+  merges sintéticos, `COLUMNS=80`, `verify` com sync, contexts de matriz).
+  Run final `33951282157`: **10/10 checks verdes** (re-run de `verify`
+  após flake aninhado `f0-007` — classe A2). Merge pela política, sem
+  bypass. A1 **quitada**.

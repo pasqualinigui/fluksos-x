@@ -1764,6 +1764,10 @@ zero defeito de lógica do produto.
 > flake aninhado **no runner limpo** (`f0-007` sob self-check de `f0-011`,
 > 11/12) — a classe A2 não é fenômeno da máquina do mantenedor; insumo do
 > caminho 2.
+> **Adendo merge-PR (mesma sessão):** o padrão cobre também
+> `^Merge pull request #[0-9]+ from \S+` (merge real difere do sintético
+> de checkout) — sem isso, todo merge verde quebraria SC-002 localmente
+> para sempre. Pego pelo próprio pre-push antes do push.
 > **Adendo matrix (mesma sessão):** contexts exigidos usam os nomes
 > reportados — `tests (3.12)` + `tests (3.13)`, nunca `tests` puro (job de
 > matriz não reporta o nome-base; com `tests` puro o PR trava em BLOCKED
