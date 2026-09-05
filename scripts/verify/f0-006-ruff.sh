@@ -363,10 +363,9 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   if [ $? != 2 ]; then
     FR11_OK=0; EVID11="${EVID11}exit 2 para uso inválido não obedecido; "
   fi
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
-  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
-  wait $P1; C1=$?
-  wait $P2; C2=$?
+  # serial por ADR-031: forma ja vigente em f0-007..012
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1; C1=$?
+  FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1; C2=$?
   if [ -n "${EPOCHSECONDS:-}" ]; then END11=$EPOCHSECONDS; else END11=$(date +%s 2>/dev/null || echo 0); fi
   ELAPSED11=$((END11 - START11))
   if [ "$ELAPSED11" -gt 5 ] 2>/dev/null; then
@@ -454,9 +453,9 @@ if [ "${FKX_ORACLE_NESTED:-0}" != "1" ]; then
   EVIDSC=""
   TMP_SC="$(mktemp -d)"
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5"; do
-    ( FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc" ) &
+    # serial por ADR-031: fan-out paralelo truncava saida de ferramenta externa (25% medido)
+    FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc"
   done
-  wait
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5"; do
     rc=$(cat "$TMP_SC/$(basename "$o").rc" 2>/dev/null || echo 1)
     if [ "$rc" != "0" ]; then

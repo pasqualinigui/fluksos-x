@@ -1816,3 +1816,118 @@ direto.
 - Pergunta-padrão de ambiente entra no RESEARCH a partir da 013 (adendo
   ADR-027): *"o que este item assume sobre o ambiente de execução, e onde
   está a prova executada dessa suposição?"*
+
+---
+
+## ADR-031 — Remediação A2: o self-check paralelo é o defeito, não o ambiente
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, remediação da
+dívida A2 da auditoria 009–012) · **Estado**: aceita · **Evidência**: run
+servidor `33979893944` (job `verify`, `f0-010` FR-012) + medição controlada
+de 40 execuções nesta sessão (tabela abaixo) + `docs/plan/research/f0-008-fr007-flake.md`
+(caminhos 1 e 2, já prescritos e não aplicados) · **Efeito**: autoriza os
+ajustes da tabela §3, com re-verde no runner antes do merge. Nada além dela
+é tocado.
+
+### 1. Reenquadramento: o número muda a classe
+
+A ADR-019 classificou a transiência como **ambiental sob carga** com ~7% em
+~60 execuções heterogêneas. A auditoria 009–012 promoveu a `008-FR-007` a
+defeito investigado (§4, 2ª amostra). Esta sessão mediu o vetor diretamente,
+sem carga sintética:
+
+| Oráculo | Execuções | Reprovações | Taxa |
+|---|---|---|---|
+| `f0-011` (self-check de 10) | 20 | 4 | 20% |
+| `f0-012` (self-check de 11) | 20 | 6 | 30% |
+| **Agregado** | **40** | **10** | **25%** |
+
+Um oráculo que reprova 1 vez em 4 sobre estado correto não é oráculo: viola
+o princípio VI (conformidade decidida por código de saída) e o I (determinismo),
+e transforma o portão servidor em sorteio — foi exatamente o que travou os
+merges em `main`. **A causa não é o ambiente: é o fan-out do próprio
+self-check**, que dispara 4–11 oráculos concorrentes, cada um invocando
+ferramentas externas (`uv run`), e colhe saída truncada de processo contendido.
+
+### 2. Por que serializar, e não as alternativas
+
+- **Retry**: proibido (010 FR-010, ADR-019 §3) — transforma vermelho real em
+  verde eventual. Descartado sem medição.
+- **Quarentena documentada**: adia o defeito e mantém o portão instável.
+  Descartada porque a 013 publica artefato no PyPI: portão sorteado é
+  inaceitável a montante de release.
+- **Serializar**: elimina a contenção por construção. **Não é forma nova** —
+  é a forma que os próprios oráculos `007`–`012` já adotaram no par de
+  determinismo (`> r1; C1=$?` seguido de `> r2; C2=$?`), enquanto `002`–`006`
+  mantiveram a paralela. O ajuste harmoniza a base com a forma convergida.
+
+**Custo medido** (não alegado): harness completo **66,8s → 84s** local
+(+17s, média de 5 passagens). A estimativa a priori era +30s; a diferença é que,
+sem contenção, cada oráculo aninhado também roda mais rápido — serializar
+devolve parte do que custa. O `pre-push` paga o mesmo acréscimo. Determinismo
+do portão vale 17s.
+
+### 3. Ajustes autorizados (forma exata)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | Self-check de `f0-005,006,007,008,009,010,011,012` (8 sítios) | trocar `( FKX_ORACLE_NESTED=1 "$o" --quiet …; echo $? > …rc ) &` + `wait` por execução **sequencial** no mesmo laço. Mesmos comandos, mesma coleta de `rc`, mesma asserção, mesma evidência |
+| 2 | Par de determinismo de `f0-002,003,004,005,006` (5 sítios) | trocar `& P1=$!` / `& P2=$!` / `wait` pela forma **serial já vigente** em `007`–`012` |
+| 3 | `f0-008` FR-007 (caminho 1 do research) | capturar a **tentativa única** em arquivo temporário, grepar o arquivo, e evidenciar **a saída que falhou** + o código de saída da ferramenta (hoje a evidência vem de uma 2ª invocação calma, que mascara a assinatura). Sem retry: a 1ª tentativa decide |
+| 4 | `.github/workflows/ci.yml` | comentários e organização, **sem** mudança de comportamento: nenhum job criado/renomeado/removido (8 nominais + `verify`, `verify` primeiro), `uses:` por SHA + comentário, sem `continue-on-error`, sem `--quiet` no bloco `Run harness` do `verify`, sem as palavras `date`/`lefthook` no arquivo (fronteiras `f0-003` FR-012 e `f0-009` FR-009) |
+| 4b | `.github/scripts/materialize-refs.sh` (novo) | o bloco de materialização da ADR-030 §1 está **copiado em 4 jobs**; passa a arquivo único chamado por `run:`. Composite action local está fechada por contrato (`f0-010` FR-002 exige SHA de 40 hex em todo `uses:`), então a forma é script + `run:`. Mesmos comandos, mesma ordem, mesmo nome de step |
+| 5 | `scripts/verify/manifest.sha256` | regenerado citando esta ADR |
+
+Nenhuma asserção muda de sentido; nenhum enunciado CANON é tocado; nenhum
+identificador FR é criado, removido ou remapeado. O que muda é **escalonamento
+de processos** e **de onde vem a evidência** — não o que é medido.
+
+`f0-001` não é tocado: a constante `HASH_F0_001` de `f0-002` permanece.
+
+### 4. Critério de aceitação desta ADR — resultado
+
+| # | Critério | Resultado |
+|---|---|---|
+| 1 | `f0-011` + `f0-012`, 20 execuções cada, mesmo protocolo da §1 | **0/40 reprovações (0%)**, contra 10/40 (25%) antes |
+| 2 | Harness completo 12/12 verde em passagens consecutivas | 5/5 passagens verdes |
+| 3 | `sha256sum -c manifest.sha256` | 12/12 SUCESSO |
+| 4 | Todos os checks verdes no runner, no PR e no push a `main` | ver `specs/010-ci-completo/branch-protection.md` (adendo ADR-031) |
+
+A comparação é **pareada**: mesmo comando, mesma máquina, mesma sessão, mesmo
+número de execuções, medida antes e depois. Não é "rodou e passou".
+
+### 5. O que permanece aberto (roteado, não silenciado)
+
+O ponto cego `OUT=$(uv run … || true)`, que engole terminação anormal (137/OOM)
+em ~50 sítios de 11 oráculos, **não** é tocado aqui: é classe distinta, exige
+varredura ampla sobre oráculos convergidos e não é causa do vermelho servidor.
+Permanece como dívida da **auditoria pós-016**, com insumos neste arquivo e no
+adendo do research. O caminho 1 (§3 linha 3) paga o sítio onde a cegueira já
+custou duas sessões de diagnóstico.
+
+### Nota de execução — a fronteira que morde quem a documenta
+
+A primeira redação do cabeçalho do `ci.yml` **nomeava** as construções proibidas
+(`ubuntu-latest`, `merge_group`, `continue-on-error` e as demais) para explicar
+a fronteira ao leitor. O harness reprovou 5 asserções de `f0-003` de imediato,
+mais 2 em cascata (`f0-004` FR-013, `f0-009`/`f0-010` no self-check): as
+asserções procuram o **literal**, não a construção, e não distinguem comentário
+de código.
+
+Isso não é defeito do oráculo — é a leitura correta: um trecho comentado vira
+código ao ser descomentado, e uma asserção que ignorasse comentários teria de
+interpretar YAML para saber o que está ativo. Quem cedeu foi o texto: o
+cabeçalho passou a descrever cada fronteira **sem escrever o literal**, e
+remete aos oráculos para a lista exata. Registrado aqui porque é a classe de
+erro que o próximo agente repetiria ao "documentar melhor" um artefato medido.
+
+### Consequências
+
+- A2 sai de "defeito investigado" para **defeito corrigido com prova pareada**.
+- A ADR-019 fica **superada na classificação** (ambiental → desenho) e
+  preservada como registro: os dados dela continuam válidos, a leitura não.
+- O terreno da 013 passa a ter portão determinístico — pré-condição de um item
+  que publica artefato assinado.
+- Fica o precedente de método: alegação de "flake ambiental" exige medição
+  pareada antes/depois. A ADR-019 defendeu 3 sessões de silêncio com ~7% de uma
+  amostra heterogênea; 40 execuções dirigidas ao vetor mostraram 25%.

@@ -78,3 +78,41 @@ falha deve nomear requisito **e evidência** — aqui a evidência do crash
 é descartada por construção). Endurecimento candidato (via ADR-017, nunca
 direto): capturar `$?` separadamente e evidenciar terminação anormal como
 classe distinta de "saída sem marcador".
+
+---
+
+## Fechamento — medição pareada e aplicação dos caminhos 1 e 2 (2026-09-05, sessão remediação)
+
+> Este arquivo abre dizendo *"Pendente: aplicação do caminho 1 e experimento do
+> caminho 2"*. Ambos foram executados. Decisão em **ADR-031**.
+
+### O experimento que faltava (caminho 2)
+
+Em vez de carga sintética, o vetor foi medido diretamente: os dois oráculos com
+maior fan-out, 20 execuções cada, sem carga artificial nenhuma.
+
+| Momento | `f0-011` (10 aninhados) | `f0-012` (11 aninhados) | Agregado |
+|---|---|---|---|
+| **Antes** (fan-out paralelo) | 4/20 reprovações | 6/20 reprovações | **10/40 — 25%** |
+| **Depois** (self-check serial) | 0/20 | 0/20 | **0/40 — 0%** |
+
+Custo: harness completo 66,8s → 84s (+17s). A estimativa a priori de +30s era
+pessimista — sem contenção, cada aninhado também roda mais rápido.
+
+**A leitura da ADR-019 cai por aqui.** "Ambiental sob carga" descrevia a
+observação (falhas heterogêneas, isoladas-verdes) mas errava a causa: a carga
+que importava era a que o **próprio oráculo criava**, não a da máquina. Por isso
+nunca reproduzia isolado — isolado não há fan-out.
+
+### Caminho 1 aplicado (`f0-008` FR-007)
+
+A captura passou a ser única: a tentativa que **decide** é a que **evidencia**,
+e o código de saída da ferramenta entra na linha de evidência. O mascaramento
+descrito no item 2 do diagnóstico acima deixa de existir neste sítio.
+
+### O que continua aberto
+
+O ponto cego `OUT=$(uv run … || true)` (terminação anormal engolida) permanece,
+agora como dívida nomeada da auditoria pós-016 — ver ADR-031 §5. Com o fan-out
+removido, a pressão que o tornava visível diminuiu, o que **aumenta** o risco de
+ele apodrecer despercebido: fica o registro.

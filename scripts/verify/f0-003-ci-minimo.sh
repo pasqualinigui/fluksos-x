@@ -389,10 +389,9 @@ else
       pass "FR-012" "${CANON[FR-012]}"
     else
       TMPD="$(mktemp -d)"
-      FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1 & P1=$!
-      FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1 & P2=$!
-      wait $P1; RC1=$?
-      wait $P2; RC2=$?
+      # serial por ADR-031: forma ja vigente em f0-007..012
+      FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r1" 2>&1; RC1=$?
+      FKX_ORACLE_NESTED=1 "$SELF" > "$TMPD/r2" 2>&1; RC2=$?
       if cmp -s "$TMPD/r1" "$TMPD/r2" && [ "$RC1" -eq "$RC2" ]; then
         pass "FR-012" "${CANON[FR-012]}"
       else

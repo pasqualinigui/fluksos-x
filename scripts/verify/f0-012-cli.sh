@@ -372,9 +372,9 @@ fi
 if [ "$NESTED" != "1" ] && [ "$FR11_OK" = "1" ]; then
   TMP_SC="$(mktemp -d)"
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5" "$ORACLE6" "$ORACLE7" "$ORACLE8" "$ORACLE9" "$ORACLE10" "$ORACLE11"; do
-    ( FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc" ) &
+    # serial por ADR-031: fan-out paralelo truncava saida de ferramenta externa (25% medido)
+    FKX_ORACLE_NESTED=1 "$o" --quiet >/dev/null 2>&1; echo $? > "$TMP_SC/$(basename "$o").rc"
   done
-  wait
   for o in "$ORACLE1" "$ORACLE2" "$ORACLE3" "$ORACLE4" "$ORACLE5" "$ORACLE6" "$ORACLE7" "$ORACLE8" "$ORACLE9" "$ORACLE10" "$ORACLE11"; do
     rc=$(cat "$TMP_SC/$(basename "$o").rc" 2>/dev/null || echo 1)
     if [ "$rc" != "0" ]; then
