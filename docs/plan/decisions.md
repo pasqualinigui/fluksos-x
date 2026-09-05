@@ -1712,3 +1712,14 @@ neste oráculo é tocado; nenhum outro oráculo é tocado.
   intocável desde a convergência; a forma é a mesma das anteriores).
 - O pagamento da 005 (teste de existência) e a correção desta ADR se somam:
   detecção + comportamento, sem contradição.
+
+> **Adendo (mesma sessão, antes de qualquer push):** a correção acima move o
+> resumo de `f0-001` (`63412ca7…` → `d00b9299…`), e `f0-002` FR-021a fixa o
+> valor antigo por número (mecanismo ADR-006, anterior ao manifest). Sem
+> atualizar a linha fixada, o pre-push reprova push legítimo em `feature/*`
+> — a cadeia de integridade funcionando como desenhada. Fica autorizada,
+> **exclusivamente**, a atualização da constante `HASH_F0_001` em `f0-002`
+> para o novo resumo (+ comentário citando esta ADR) e a regeneração do
+> manifest. É consequência mecânica da correção acima, não segunda mudança
+> de semântica: nenhuma asserção muda de sentido, só o número fixado
+> acompanha o estado autorizado.
