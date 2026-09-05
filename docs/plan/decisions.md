@@ -1764,6 +1764,11 @@ zero defeito de lógica do produto.
 > flake aninhado **no runner limpo** (`f0-007` sob self-check de `f0-011`,
 > 11/12) — a classe A2 não é fenômeno da máquina do mantenedor; insumo do
 > caminho 2.
+> **Adendo materialize (mesma sessão, runs `main` pós-merge):**
+> `git fetch origin main:refs/heads/main` é recusado com `main` em
+> checkout (runs de push; PRs são detached e passavam). Forma tolerante:
+> `fetch` só tracking refs + `update-ref` se a linha ausente (prova
+> local `MATERIALIZE_LOCAL_OK=0`).
 > **Adendo merge-PR (mesma sessão):** o padrão cobre também
 > `^Merge pull request #[0-9]+ from \S+` (merge real difere do sintético
 > de checkout) — sem isso, todo merge verde quebraria SC-002 localmente

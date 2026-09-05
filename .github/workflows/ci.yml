@@ -21,7 +21,11 @@ jobs:
         # runner entrega merge-ref sem refs/heads/* e sem identidade: reconstrói
         # o que o oráculo define (ADR-030 §1); setup, mesmo papel de uv sync
         run: |
-          git fetch origin main:refs/heads/main develop:refs/heads/develop
+          # push-to-main tem main em checkout (fetch direto recusa); PR e detached.
+          # fetch atualiza tracking refs; update-ref materializa linhas se ausentes.
+          git fetch origin main develop
+          git show-ref --verify --quiet refs/heads/main || git update-ref refs/heads/main origin/main
+          git show-ref --verify --quiet refs/heads/develop || git update-ref refs/heads/develop origin/develop
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
       - name: Setup Python 3.12
@@ -50,7 +54,11 @@ jobs:
       - name: Materialize refs + identity
         # idem verify (ADR-030 §1)
         run: |
-          git fetch origin main:refs/heads/main develop:refs/heads/develop
+          # push-to-main tem main em checkout (fetch direto recusa); PR e detached.
+          # fetch atualiza tracking refs; update-ref materializa linhas se ausentes.
+          git fetch origin main develop
+          git show-ref --verify --quiet refs/heads/main || git update-ref refs/heads/main origin/main
+          git show-ref --verify --quiet refs/heads/develop || git update-ref refs/heads/develop origin/develop
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
       - name: Setup uv
@@ -111,7 +119,11 @@ jobs:
       - name: Materialize refs + identity
         # idem verify (ADR-030 §1; test_main_branch_exists mede refs/heads/main)
         run: |
-          git fetch origin main:refs/heads/main develop:refs/heads/develop
+          # push-to-main tem main em checkout (fetch direto recusa); PR e detached.
+          # fetch atualiza tracking refs; update-ref materializa linhas se ausentes.
+          git fetch origin main develop
+          git show-ref --verify --quiet refs/heads/main || git update-ref refs/heads/main origin/main
+          git show-ref --verify --quiet refs/heads/develop || git update-ref refs/heads/develop origin/develop
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
       - name: Setup uv
@@ -169,7 +181,11 @@ jobs:
       - name: Materialize refs + identity
         # idem verify (ADR-030 §1; mesmos testes git-dependentes)
         run: |
-          git fetch origin main:refs/heads/main develop:refs/heads/develop
+          # push-to-main tem main em checkout (fetch direto recusa); PR e detached.
+          # fetch atualiza tracking refs; update-ref materializa linhas se ausentes.
+          git fetch origin main develop
+          git show-ref --verify --quiet refs/heads/main || git update-ref refs/heads/main origin/main
+          git show-ref --verify --quiet refs/heads/develop || git update-ref refs/heads/develop origin/develop
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
       - name: Setup uv
