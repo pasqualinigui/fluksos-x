@@ -149,8 +149,16 @@ else
 
   L_NAME="$(git -C "$ROOT" config --local --get user.name 2>/dev/null || echo "")"
   L_MAIL="$(git -C "$ROOT" config --local --get user.email 2>/dev/null || echo "")"
+  # ADR-030 Adendo FR-003a: intento = autoria local definida (nunca global);
+  # sob GITHUB_ACTIONS, o par bot e a identidade correta (impersonar quebra forks)
+  L_OK=1
+  if [ -z "$L_NAME" ]; then L_OK=0
+  elif [ "$L_MAIL" = "pasqualini166@gmail.com" ]; then L_OK=1
+  elif [ "${GITHUB_ACTIONS:-}" = "true" ] && [ "$L_NAME" = "github-actions[bot]" ] && [ "$L_MAIL" = "github-actions[bot]@users.noreply.github.com" ]; then L_OK=1
+  else L_OK=0
+  fi
   check "FR-003a" "identidade de autoria definida em escopo local" "media" \
-        "$([ -n "$L_NAME" ] && [ "$L_MAIL" = "pasqualini166@gmail.com" ] && echo 0 || echo 1)" \
+        "$([ "$L_OK" = "1" ] && echo 0 || echo 1)" \
         "local: ${L_NAME:-<vazio>} <${L_MAIL:-<vazio>}>"
 fi
 

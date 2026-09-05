@@ -5,5 +5,14 @@
 # qualquer ambiente (runner resolve ~0 colunas e corta marcadores; Rich le
 # COLUMNS do env, logo default nao basta — forca).
 import os
+import re
 
 os.environ["COLUMNS"] = "80"
+
+_ANSI = re.compile(r"\x1b\[[0-9;]*m")
+
+
+def strip_ansi(text: str) -> str:
+    """Remove sequências ANSI (Typer força terminal no CI: spans de estilo
+    quebram os marcadores em `-` + `-help`; o contrato é sobre conteúdo)."""
+    return _ANSI.sub("", text)

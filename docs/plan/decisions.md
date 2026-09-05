@@ -1763,6 +1763,26 @@ direto.
 > mecânica do Adendo ADR-029, aqui pela edição SC-002). Cadeia verificada
 > pelo próprio pre-push antes de cada push — o mecanismo mordeu duas vezes
 > nesta sessão, ambas a favor da integridade.
+>
+> **Adendo FR-003a (mesma sessão, antes do push):** a asserção fixava o
+> email pessoal do mantenedor — sob CI, a identidade correta é o bot, e
+> exigir impersonação quebraria qualquer fork/runner. Leitura formalizada:
+> presença em escopo local + (email do mantenedor **ou** par bot sob
+> `GITHUB_ACTIONS=true`). O intento (autoria local definida, nunca global)
+> permanece; o valor fixo era overfit, não segurança (Lei Zero trata de
+> segredos; este email já é público no histórico).
+>
+> **Nota de execução (forense do runner):** a causa raiz do §4 não era só
+> largura — Typer força terminal sob `GITHUB_ACTIONS` (`FORCE_TERMINAL`),
+> e o Rich estiliza `-` separado de `-help`, quebrando substring ` --help`
+> na saída com ANSI (prova: `\x1b[1;36m-\x1b[0m\x1b[1;36m-version`). A
+> correção autorizada estende-se a: comparar marcadores sobre saída com
+> ANSI removido (helper `strip_ansi` em `tests/conftest.py` + sonda do
+> oráculo; contrato é sobre conteúdo legível, não bytes de escape).
+> `COLUMNS=80` permanece (largura ~0 corta de verdade — reproduzido).
+> Bônus honesto: Typer 0.27.2 **vendoriza** click (`typer/_click`) — Q3 do
+> research dizia "standalone" pelo `requires_dist`; a conclusão (sem pin
+> `click`) segue válida, o mecanismo estava impreciso.
 
 ### Consequências
 

@@ -1,5 +1,5 @@
-065e33d5e91744490ebd80de8d94b974f840a89c68739c4ccec7833e1ec9a093  scripts/verify/f0-001-foundation.sh
-c50c02d9764335e3a05f53b85d3e65e9e5ed7798c0b4e498cde424a87ac661af  scripts/verify/f0-002-constitution.sh
+f67f11354446cfbbe8bc1793a39ca2c96edfc2e343fb8be57d55a1e6b4dd8680  scripts/verify/f0-001-foundation.sh
+ad22dfa6259ae7782bd12445bb8633737e21291ca91cf64a6aba31fbbbee27a1  scripts/verify/f0-002-constitution.sh
 226085c84fc8caae220d68bec1b2c7d6a2ed0ce0eb92619c7610608ca83ff20e  scripts/verify/f0-003-ci-minimo.sh
 18bcc9cc6a5501fa4222dca968a132fcd1b768938a9401f7263ff4c43cb267c6  scripts/verify/f0-004-uv-workspace.sh
 f86756af92d8c14890909940841d978ed771d1f4d12ae85e24dcc641e0ecd83d  scripts/verify/f0-005-pytest.sh
@@ -9,4 +9,4 @@ d630f57599c9ad233dfd6b87e446647619985841b712a6e7849bb99133af90cd  scripts/verify
 0607c0ca70ca8994f273d337e8ac9ea7f171af5b472d7780891afecc2e521dc6  scripts/verify/f0-009-lefthook.sh
 36276ba501fdc57bd40b86f1683d51bf2742294df544ec3ddc00f48c08f90d72  scripts/verify/f0-010-ci-completo.sh
 94edcf2630eb492993d5c388f223ade3ba4225ee53944c3542977d54f9840cbc  scripts/verify/f0-011-core.sh
-7639ecd03bfb7d3ab1336d184f555efe49983e4a2651abce7bc68aabaf54e628  scripts/verify/f0-012-cli.sh
+b7274effeb5bb3a5c4febb10ba6ca4e634d1f8345585789e1f4df8fa082878ce  scripts/verify/f0-012-cli.sh
