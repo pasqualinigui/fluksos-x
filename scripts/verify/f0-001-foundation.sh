@@ -380,7 +380,9 @@ else
 import re, sys
 RX = re.compile(r"^(feat|fix|docs|test|refactor|ci|chore|perf|build|style|revert)"
                 r"(\([a-z0-9][a-z0-9._-]*\))?(!)?: .+")
-bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l)]
+# ADR-030: merges sinteticos do GitHub (PR) nao sao registros de autor
+MERGE = re.compile(r"^Merge [0-9a-f]{40} into \S+")
+bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l) and not MERGE.match(l)]
 print("; ".join(sorted(bad)))
 ')"
     check "SC-002" "todos os registros satisfazem a gramatica de convencao" "media" \

@@ -131,6 +131,9 @@ PROBE_VERSION_EXIT=""; PROBE_VERSION_OUT=""
 PROBE_BAD_EXIT=""; PROBE_BAD_OUT=""
 if [ -f "$MAINPY" ] && [ "$NESTED" != "1" ] && command -v uv >/dev/null 2>&1; then
   TMPD="$(mktemp -d)"
+  # ADR-030 §4: COLUMNS pinado (determinismo de render; runner resolve ~0)
+  COLUMNS=80
+  export COLUMNS
   cat > "$TMPD/probe.py" <<'PYEOF'
 from typer.testing import CliRunner
 from fkx_cli.main import app

@@ -1637,6 +1637,9 @@ dispara (registrado como dado).
   jamais avermelhar — repo vermelho travaria todos os commits via hook).
 - Ordem normativa: auditoria devida primeiro (repo sempre verde), mecanismo
   em seguida. Mecanismo antes da dívida = auto-bloqueio via hook.
+- **Adendo pós-primeira-execução-servidora:** todo RESEARCH declara o que o
+  item assume sobre o ambiente de execução e onde está a prova executada
+  dessa suposição (lacuna que gerou a ADR-030).
 
 ---
 
@@ -1723,3 +1726,49 @@ neste oráculo é tocado; nenhum outro oráculo é tocado.
 > manifest. É consequência mecânica da correção acima, não segunda mudança
 > de semântica: nenhuma asserção muda de sentido, só o número fixado
 > acompanha o estado autorizado.
+
+---
+
+## ADR-030 — Remediação da primeira execução servidora (5 gaps, 1 PR)
+
+**Data**: 2026-09-05 · **Item**: nenhum (checkpoint não-item, migração
+servidor) · **Estado**: aceita · **Evidência**: run `33946950104` (PR #1) +
+run `33947842158` (PR #2) + reproduções locais (`COLUMNS=0/10`) · **Efeito**:
+autoriza os ajustes abaixo **neste PR**, com re-verde no runner antes do
+merge. Nada além desta tabela é tocado.
+
+### Contexto
+
+Primeira execução do pipeline em servidor encontrou 5 gaps, nenhum detectável
+localmente (princípio VIII nunca tocou o runner em 12 itens — lacuna de método
+registrada na ADR-027 §5). Todos com prova no log; todos de ambiente/setup;
+zero defeito de lógica do produto.
+
+### Ajustes autorizados (forma exata)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `ci.yml` (jobs `verify`, `harness`, `tests`, `coverage`) | step `Materialize refs + identity` após Checkout: `git fetch origin main:refs/heads/main develop:refs/heads/develop` + `git config --local user.name/email github-actions[bot]` (reconstrói o que o oráculo define; setup, não jogo) |
+| 2 | `ci.yml` (job `secrets`) | `env: GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` (breaking da action v3, README oficial; token da Actions, Lei Zero intacta) |
+| 3 | `f0-001` SC-002 | pular merges sintéticos `^Merge [0-9a-f]{40} into \S+` (leitura formalizada: registro automatizado do GitHub não é registro de autor; commitlint segue validando o intervalo) |
+| 4 | `tests/conftest.py` + sonda `f0-012` + `env` do CI | `COLUMNS=80` (determinismo I, espelho de `LC_ALL=C`; app intacto; terminal estreito real = limite documentado, endurecimento só com relato) |
+| 5 | Manifest | regenerado citando esta ADR |
+
+Manifest regenerado na aplicação citando esta ADR. Qualquer outro vermelho
+no runner fora destes 5 pontos = conflito novo, ADR própria, nunca fix
+direto.
+
+> **Nota de execução:** cada edição autorizada em `f0-001` move seu resumo e
+> exige acompanhar `HASH_F0_001` em `f0-002` + manifest (consequência
+> mecânica do Adendo ADR-029, aqui pela edição SC-002). Cadeia verificada
+> pelo próprio pre-push antes de cada push — o mecanismo mordeu duas vezes
+> nesta sessão, ambas a favor da integridade.
+
+### Consequências
+
+- O PR que aplica este pacote só converge verde no runner (prova da prova).
+- A1 encontra aqui sua quitação operacional: pipeline executa + portão
+  decide no servidor (evidência em `branch-protection.md`).
+- Pergunta-padrão de ambiente entra no RESEARCH a partir da 013 (adendo
+  ADR-027): *"o que este item assume sobre o ambiente de execução, e onde
+  está a prova executada dessa suposição?"*
