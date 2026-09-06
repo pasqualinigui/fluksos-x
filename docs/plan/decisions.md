@@ -1982,3 +1982,80 @@ Segundo colaborador com acesso de escrita, **ou** necessidade de linha de
 estabilização para release (se a 013 revelar que publicar de `main` mistura
 trabalho em curso com o que se publica). Qualquer das duas reabre esta ADR;
 nenhuma delas se aplica hoje.
+
+---
+
+## ADR-033 — Roteamento do aviso de versão na CLI, e a rejeição de Changesets
+
+**Data**: 2026-09-06 · **Item**: nenhum (checkpoint não-item, entre CLARIFY e
+PLAN da 013) · **Estado**: aceita · **Origem**: pergunta do mantenedor durante a
+clarificação da 013 (*"vai ter algum changeset ou aviso ali na cli que tem versão
+mais nova?"*) · **Mecanismo**: ADR-020 §2 — *"'ficou para depois' sem
+transferência a item nomeado = violação"*. Esta ADR faz a transferência.
+
+### 1. O achado
+
+A 013 dá ao motor a capacidade de **publicar** versões, mas nada no plano dá ao
+operador a capacidade de **saber** que está desatualizado. Verificado contra a
+fonte (fetch 2026-09-06): o `§20` lista `fkx --version` (imprime a versão
+corrente e nada mais) e `fkx doctor` (*"verifica saúde do ambiente"*); a única
+ocorrência de "auto-update" no plano (`implementation_plan.md:344`) é o Guardião
+monitorando dependências do **projeto-alvo**, não o motor falando de si.
+
+É lacuna real, e nasce agora porque antes da 013 não havia versão publicada
+sobre a qual estar atrasado.
+
+### 2. Por que não entra na 013
+
+Escada: a 013 entrega publicação. Consultar o índice para comparar versões é
+**consumo** do que a 013 produz, com consumidor diferente (o operador em tempo de
+uso, não o mantenedor em tempo de release) e superfície diferente (a CLI, não o
+pipeline). Antecipá-la violaria IV — comportamento especificado sem consumidor.
+
+### 3. Roteamento (consumidor e momento fixados)
+
+| Achado | Item consumidor | Momento de consumo |
+|---|---|---|
+| Aviso de versão desatualizada na CLI | **`fkx doctor`** (Fase 4, CLI/TUI & Polish) | RESEARCH do item que especificar `doctor` MUST citar e avaliar esta ADR |
+
+Pela regra de consumo da ADR-020 §2: especificação que implemente o mecanismo
+sem citar esta entrada viola rastreabilidade (VIII); ANALYZE que ignore o
+roteamento sem registro é achado no mínimo MEDIUM.
+
+### 4. Restrição de determinismo que viaja junto com o achado
+
+O roteamento carrega a restrição, não só a ideia — do contrário o item futuro
+redescobre o problema tarde:
+
+**Uma CLI que consulta a rede tem saída dependente de estado remoto e do momento
+da invocação.** Isso colide com o princípio I (determinismo) e com *Ambiente sob
+demanda* (nada roda em segundo plano). O desenho admissível, quando o item
+chegar:
+
+1. A consulta vive **apenas** em comando que o operador invoca de propósito
+   (`fkx doctor`), nunca em `--help`, `--version` ou em qualquer caminho quente.
+2. Nunca em segundo plano, nunca em processo que sobrevive ao comando.
+3. O resultado é **fato datado** (*"consultado em X; local Y; remoto Z"*), nunca
+   efeito (nunca auto-atualiza, nunca altera estado).
+4. Ausência de rede é resultado normal e nomeado, jamais falha do comando.
+5. Nenhuma telemetria: a consulta lê o índice público, não reporta nada.
+
+### 5. Rejeição com motivo (não re-litigar — molde ADR-020 §3)
+
+**Changesets** (ferramenta de versionamento por pacote do ecossistema Node):
+rejeitada. Motivos, em ordem: (a) introduz **segunda fonte de versão** ao lado do
+`python-semantic-release`, que é a duplicação recusada pela `008/D2` quando
+descartou `requirements.txt` ao lado do `uv.lock`; (b) o research Q4 já fixou
+**lockstep** entre os dois pacotes, que é justamente o problema que Changesets
+existe para não resolver (ela serve a versões independentes); (c) traria
+dependência de outra stack para dentro do motor. Reabertura exige evidência
+nova — versões independentes por pacote deixando de ser hipótese —, não
+releitura.
+
+### Consequências
+
+- A pergunta do mantenedor vira artefato com consumidor nomeado, em vez de
+  memória de conversa. É o que a ADR-020 §2 obriga.
+- O item de Fase 4 recebe a restrição de determinismo **antes** de desenhar, em
+  vez de descobri-la no ANALYZE.
+- A 013 permanece com o escopo que tinha: publicar, não consultar.
