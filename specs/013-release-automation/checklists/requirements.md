@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,35 +31,56 @@
 
 ## Notes
 
-### Iteração 1 — 2026-09-06
+### Iteração 1 — SPECIFY, 2026-09-06
 
 **Falhas corrigidas antes de registrar:**
 
 1. *No implementation details* — a primeira redação nomeava ferramenta e formato
-   dentro dos FRs (`uv publish`, `cyclonedx1.5`, `id-token: write`). Corrigido: os
-   FRs declaram **o que** deve valer ("identidade federada de vida curta",
-   "formato padrão da indústria", "permissão declarada no menor escopo"), e o
-   *como* fica no PLAN. As duas exceções deliberadas são os **pins exatos**
-   (FR-001, FR-013): num item de bootstrap o pin verificado **é** o requisito,
-   pelo princípio VIII — o mesmo padrão das specs 005–012, e a razão pela qual
-   `f0-00X` FR-001 assere versão exata em todas elas.
+   dentro dos FRs. Corrigido: os FRs declaram **o que** deve valer, e o *como*
+   fica no PLAN. As duas exceções deliberadas são os **pins exatos** (FR-001,
+   FR-013): num item de bootstrap o pin verificado **é** o requisito, pelo
+   princípio VIII — mesmo padrão das specs 005–012.
 
 2. *Scope is clearly bounded* — a redação inicial não dizia o que **não** entra.
-   Corrigido no Contexto (014/015/016, imagem de container, canais de
-   pré-lançamento, versões independentes por pacote).
+   Corrigido no Contexto.
 
-**Item ainda aberto — [NEEDS CLARIFICATION] (3, o teto):**
+**Estado ao fim da iteração 1**: 15/16 itens passando; o único aberto era
+`No [NEEDS CLARIFICATION] markers remain`, com 3 marcadores.
 
-| # | FR | Pergunta | Por que não tem padrão razoável |
+### Iteração 2 — CLARIFY, 2026-09-06
+
+Varredura estruturada por taxonomia (`/speckit-clarify`). Achou **2 lacunas de
+alto impacto** que a redação original não continha, além dos 3 marcadores:
+**quem aciona o release** (papéis: Partial) e **aceitação parcial entre os dois
+pacotes** (ciclo de vida: Missing; confiabilidade e falha de serviço externo:
+Partial). Cinco perguntas no total — o teto do fluxo.
+
+| # | Pergunta | Resposta | Onde foi aplicada |
 |---|---|---|---|
-| Q1 | FR-004 | `0.x` na Fase 0, ou `1.0.0` no primeiro release? | O padrão da ferramenta produz `1.0.0` num motor com 12/16 itens da Fase 0 — aceitar o padrão *é* uma decisão de produto, não um detalhe |
-| Q2 | FR-012 | Desenho A (tag como fonte) ou B (proposta de mudança)? | Ambos satisfazem a restrição de não exigir bypass, com custos opostos (dependência nova vs. um PR por release); a pesquisa mediu, não decidiu |
-| Q3 | FR-011 | Inventário efêmero ou versionado? | Versionado aciona ADR-017 sobre 3 asserções da `f0-008`; efêmero não. É escolha entre rastreabilidade no repositório e verdade no artefato |
+| Q1 | Quem decide que uma publicação acontece? | ato deliberado do mantenedor (tag) | FR-006, borda *Integração sem tag*, SC-010 |
+| Q2 | Como a versão alcança a linha protegida? | desenho B — proposta de mudança com os 10 checks | FR-012 |
+| Q3 | Aceitação parcial entre os dois pacotes? | reexecução idempotente, mesma versão | FR-009, US3 cenário 4, 2 bordas, SC-009 |
+| Q4 | `1.0.0` ou `0.x` na Fase 0? | `0.x` enquanto a Fase 0 não fechar | FR-004 |
+| Q5 | Inventário efêmero ou versionado? | efêmero, anexado à publicação | FR-011 |
 
-Nenhuma delas é detalhe técnico: as três mudam escopo, fronteira ou fluxo de
-trabalho. Por isso não foram resolvidas por suposição informada (regra do
-skill: apenas quando existe padrão razoável).
+**Terminologia normalizada**: `release` passa a ser o termo canônico (o mesmo do
+plano, §17 item 0.15), com `liberável` como forma adjetiva. As 24 ocorrências de
+"liberação" foram substituídas; a única remanescente é a nota de glossário em
+*Assumptions*, que registra o termo anterior uma vez, como manda a convenção.
 
-**Estado**: pronto para `/speckit-clarify`. Não prosseguir a `/speckit-plan`
-antes de fechar Q1–Q3 — a constituição posiciona a etapa de clarificação
-**antes** de o planejamento derivar tarefas da ambiguidade.
+**Consequência de escopo registrada**: Q5 = efêmero significa que a 013 **não
+aciona o procedimento ADR-017** — nenhuma asserção de oráculo anterior é tocada.
+Seria o primeiro item desde a 009 nessa condição. Se o PLAN descobrir necessidade
+de versionar os artefatos, a decisão volta ao CLARIFY, não ao PLAN (regra 7).
+
+**Estado**: **16/16 itens passando.** Nenhum marcador aberto.
+
+### Cobertura ainda não resolvida (baixo impacto, deliberadamente não perguntada)
+
+- **Observabilidade do fluxo de release**: princípio X já obriga nomear requisito
+  e evidência; detalhe de saída é desenho do PLAN.
+- **Releases concorrentes**: um mantenedor, uma linha de integração (ADR-032);
+  probabilidade desprezível hoje. Reabre se a condição de saída da ADR-032
+  disparar (segundo colaborador com escrita).
+
+**Pronto para `/speckit-plan`.**

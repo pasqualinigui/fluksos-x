@@ -28,9 +28,11 @@ Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (a 
 
 ### Session 2026-09-06
 
-- Q: O primeiro release publica `1.0.0` (padrão da ferramenta) ou o motor permanece em `0.x` durante a Fase 0? → [NEEDS CLARIFICATION: sem alterar o padrão `allow_zero_version`, o primeiro release salta 0.1.0 → 1.0.0 por acidente de configuração, num motor com 12 de 16 itens da Fase 0 concluídos]
-- Q: Como a versão calculada alcança a linha protegida sem bypass? → [NEEDS CLARIFICATION: desenho A (tag é a fonte, versão dinâmica derivada do VCS, exige dependência nova) ou desenho B (versão é calculada em linha de funcionalidade e entra por proposta de mudança com os 10 checks, custo de uma proposta por release) — research Q7 mediu ambos e descartou o desenho C por conflito com item convergido]
-- Q: O inventário de dependências e a trava exportada são versionados no repositório ou gerados no ato do release? → [NEEDS CLARIFICATION: versionados criam 3 pontos de conflito de fronteira em `f0-008` (procedimento ADR-017) e envelhecem em silêncio a cada mudança de dependência; efêmeros não têm conflito e descrevem exatamente o que foi publicado]
+- Q: Quem — ou o quê — decide que uma publicação acontece? → A: **ato deliberado do mantenedor** (criação da tag). O pipeline MUST NOT criar a tag por conta própria a partir de integração: publicar é irreversível, e o índice recusa sobrescrever versão já aceita.
+- Q: Como a versão calculada alcança a linha de integração protegida sem bypass? → A: **desenho B** — calculada em linha de funcionalidade e integrada por proposta de mudança com os 10 checks obrigatórios. Nenhuma dependência nova; a versão permanece legível no diff. Desenho A (tag como fonte, versão dinâmica) e C (gravação direta) ficam registrados como alternativas rejeitadas — C por conflito com item convergido.
+- Q: Se um pacote for aceito pelo índice e o outro falhar no meio da publicação, o que a especificação exige? → A: **reexecução idempotente** — publica somente o que ainda não foi aceito, na mesma versão, sem reprovar por duplicata e sem consumir novo número. É a única saída que trata a irreversibilidade do índice como fato em vez de tentar contorná-la.
+- Q: O primeiro release publica `1.0.0` ou o motor permanece em `0.x` durante a Fase 0? → A: **`0.x` durante a Fase 0** (`0.1.0 → 0.2.0` no primeiro release). `1.0.0` é compromisso público de estabilidade de superfície, e a Fase 0 não fechou.
+- Q: O inventário de dependências e a trava exportada são versionados no repositório ou gerados no ato do release? → A: **efêmeros** — gerados no ato e anexados à publicação. Descrevem o que foi publicado em vez de descrever um passado, e não acionam o procedimento ADR-017 sobre a `f0-008`.
 
 ---
 
@@ -38,7 +40,7 @@ Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (a 
 
 ### User Story 1 — Versão derivada do histórico, nunca escolhida (Priority: P1)
 
-O mantenedor integra trabalho na linha única usando mensagens convencionais. Ao liberar, a próxima versão **já está determinada** pelo histórico desde a última liberação: correção eleva o dígito de correção, funcionalidade eleva o dígito de funcionalidade, ruptura eleva o dígito maior. Ninguém digita um número.
+O mantenedor integra trabalho na linha única usando mensagens convencionais. Ao fazer um release, a próxima versão **já está determinada** pelo histórico desde o último release: correção eleva o dígito de correção, funcionalidade eleva o dígito de funcionalidade, ruptura eleva o dígito maior. Ninguém digita um número.
 
 **Why this priority**: é o princípio I aplicado à entrega. Enquanto a versão for escolhida por julgamento, o release é opinião — e todo o resto (CHANGELOG, tag, artefato) herda essa arbitrariedade. Sem isto, os demais cenários não têm insumo.
 
@@ -46,7 +48,7 @@ O mantenedor integra trabalho na linha única usando mensagens convencionais. Ao
 
 **Acceptance Scenarios**:
 
-1. **Given** a última liberação registrada e commits de correção desde então, **When** a próxima versão é consultada, **Then** apenas o dígito de correção sobe, e a consulta não altera arquivo, tag ou remoto.
+1. **Given** o último release registrado e commits de correção desde então, **When** a próxima versão é consultada, **Then** apenas o dígito de correção sobe, e a consulta não altera arquivo, tag ou remoto.
 2. **Given** o mesmo estado consultado duas vezes, **When** as duas saídas são comparadas, **Then** são idênticas (determinismo — a versão é função do histórico, não do momento).
 3. **Given** commits que não descrevem mudança liberável, **When** a próxima versão é consultada, **Then** o sistema informa que não há release a fazer, em vez de inventar um incremento.
 
@@ -54,39 +56,40 @@ O mantenedor integra trabalho na linha única usando mensagens convencionais. Ao
 
 ### User Story 2 — Registro de mudanças e versão carimbada em todos os pacotes (Priority: P1)
 
-Ao liberar, o registro de mudanças é gerado a partir das mensagens convencionais, agrupado por tipo, e a versão é carimbada **simultaneamente** em todos os pacotes publicáveis, que caminham juntos.
+No release, o registro de mudanças é gerado a partir das mensagens convencionais, agrupado por tipo, e a versão é carimbada **simultaneamente** em todos os pacotes publicáveis, que caminham juntos.
 
-**Why this priority**: é o que torna a liberação legível para quem consome, e a única defesa contra dois pacotes com versões divergentes que dependem um do outro.
+**Why this priority**: é o que torna o release legível para quem consome, e a única defesa contra dois pacotes com versões divergentes que dependem um do outro.
 
-**Independent Test**: executar a liberação em modo local (sem alcançar remoto algum) e conferir que o registro foi criado com as seções esperadas e que todos os pacotes publicáveis exibem a mesma versão.
+**Independent Test**: executar o release em modo local (sem alcançar remoto algum) e conferir que o registro foi criado com as seções esperadas e que todos os pacotes publicáveis exibem a mesma versão.
 
 **Acceptance Scenarios**:
 
-1. **Given** commits de correção e de funcionalidade desde a última liberação, **When** a liberação é preparada, **Then** o registro de mudanças contém ambas as seções, cada entrada rastreável ao commit de origem.
-2. **Given** dois pacotes publicáveis em `0.1.0`, **When** a liberação eleva a versão, **Then** **todos** exibem a nova versão — nenhum fica para trás.
-3. **Given** uma liberação já registrada, **When** o registro é regenerado, **Then** as entradas anteriores são preservadas, não sobrescritas.
+1. **Given** commits de correção e de funcionalidade desde o último release, **When** o release é preparado, **Then** o registro de mudanças contém ambas as seções, cada entrada rastreável ao commit de origem.
+2. **Given** dois pacotes publicáveis em `0.1.0`, **When** o release eleva a versão, **Then** **todos** exibem a nova versão — nenhum fica para trás.
+3. **Given** um release já registrado, **When** o registro é regenerado, **Then** as entradas anteriores são preservadas, não sobrescritas.
 
 ---
 
 ### User Story 3 — Publicação sem credencial e sem bypass (Priority: P1)
 
-A liberação constrói os artefatos distribuíveis e os publica no índice público autenticando por **identidade federada de vida curta**, emitida no momento da execução. Nenhuma credencial existe em arquivo, e o fluxo **não** requer contornar a proteção da linha.
+O release constrói os artefatos distribuíveis e os publica no índice público autenticando por **identidade federada de vida curta**, emitida no momento da execução. Nenhuma credencial existe em arquivo, e o fluxo **não** requer contornar a proteção da linha.
 
 **Why this priority**: é a Lei Zero (princípio V) no ponto de maior exposição do projeto — publicar é a única operação que fala com o mundo escrevendo. E é onde a proteção conquistada na 010 seria mais tentador afrouxar.
 
-**Independent Test**: verificar que nenhum arquivo versionado contém credencial; verificar que o caminho de publicação declara a permissão de emissão de identidade **apenas** no escopo que publica; verificar que o fluxo de liberação não grava na linha protegida sem passar pelo portão.
+**Independent Test**: verificar que nenhum arquivo versionado contém credencial; verificar que o caminho de publicação declara a permissão de emissão de identidade **apenas** no escopo que publica; verificar que o fluxo de release não grava na linha protegida sem passar pelo portão.
 
 **Acceptance Scenarios**:
 
 1. **Given** o repositório inteiro, **When** varrido por padrões de credencial, **Then** nenhuma é encontrada em arquivo, exemplo ou registro (Lei Zero).
 2. **Given** o caminho de publicação, **When** suas permissões são inspecionadas, **Then** a permissão de emissão de identidade está declarada no menor escopo possível e ausente do restante do pipeline.
-3. **Given** o fluxo de liberação completo, **When** sua rota até a linha protegida é inspecionada, **Then** ela passa pelos checks obrigatórios ou não toca a linha — em nenhuma hipótese exige ator com bypass.
+3. **Given** o fluxo de release completo, **When** sua rota até a linha protegida é inspecionada, **Then** ela passa pelos checks obrigatórios — em nenhuma hipótese exige ator com bypass.
+4. **Given** um release em que um pacote foi aceito pelo índice e o outro falhou, **When** o fluxo é reexecutado sobre a mesma versão, **Then** apenas o pacote que faltava é publicado, sem reprovar por duplicata e sem consumir novo número de versão.
 
 ---
 
 ### User Story 4 — Inventário do que foi publicado (Priority: P2)
 
-Cada liberação carrega um inventário de dependências no formato padrão da indústria, descrevendo exatamente o conjunto publicado, mais a trava exportada em formato interoperável.
+Cada release carrega um inventário de dependências no formato padrão da indústria, descrevendo exatamente o conjunto publicado, mais a trava exportada em formato interoperável.
 
 **Why this priority**: é a cadeia de suprimentos (constitution › *Additional Constraints*) fechando o ciclo que a 008 abriu — auditar o que está no disco tem valor limitado se o que sai não é descrito.
 
@@ -95,17 +98,19 @@ Cada liberação carrega um inventário de dependências no formato padrão da i
 **Acceptance Scenarios**:
 
 1. **Given** a trava de dependências do repositório, **When** o inventário é gerado, **Then** é válido no formato declarado e nomeia a ferramenta que o produziu.
-2. **Given** uma liberação publicada, **When** seus anexos são inspecionados, **Then** o inventário está entre eles, correspondendo ao conjunto liberado.
+2. **Given** um release publicado, **When** seus anexos são inspecionados, **Then** o inventário está entre eles, correspondendo ao conjunto publicado.
 
 ---
 
 ### Edge Cases
 
-- **Nenhuma mudança liberável desde a última tag**: a liberação não acontece e o sistema diz por quê — nunca produz versão vazia nem falha obscura.
+- **Nenhuma mudança liberável desde a última tag**: o release não acontece e o sistema diz por quê — nunca produz versão vazia nem falha obscura.
 - **Execução sem remoto configurado**: a ferramenta de versionamento aborta mesmo em consulta pura (research Q9, provado) — o contrato exige remoto presente, e a falha nomeia isso em vez de parecer defeito de lógica.
 - **Formato do inventário renomeado numa versão futura da ferramenta**: por isso a versão da ferramenta de empacotamento é **pinada** no caminho de release; depender da "mais recente" transformaria uma renomeação silenciosa em release quebrado (research Q9 — lacuna encontrada pela pergunta-padrão de ambiente).
 - **Nome do pacote tomado por terceiro antes da primeira publicação**: a configuração pendente do índice **não reserva** o nome (research Q8) — risco declarado, com data de verificação, não escondido.
-- **Republicação da mesma versão**: o índice recusa sobrescrita; o fluxo trata isso como condição esperada e informativa, nunca mascarando com sucesso falso.
+- **Integração sem tag**: integrar na linha única **não** publica nada. A publicação só existe a partir do ato deliberado que cria a tag — não há caminho pelo qual um merge alcance o índice público sozinho.
+- **Aceitação parcial entre os dois pacotes**: o índice recusa sobrescrever o que já aceitou, e não existe desfazer. A reexecução sobre a mesma versão publica somente o que falta; a versão não é queimada e o estado parcial permanece visível, nunca mascarado por sucesso falso.
+- **Republicação de versão íntegra**: reexecutar um release já completo é operação nula e informativa — nem erro, nem publicação nova.
 - **Artefato de construção entrando no histórico**: as exclusões versionadas já cobrem os diretórios de distribuição (verificado); o oráculo assere positivamente para que uma regressão futura reprove.
 
 ## Requirements *(mandatory)*
@@ -115,15 +120,15 @@ Cada liberação carrega um inventário de dependências no formato padrão da i
 - **FR-001**: O sistema MUST declarar a ferramenta de versionamento semântico com pin exato no grupo de desenvolvimento (`python-semantic-release==10.6.2`, triangulado P0+P1+executado — research Q1) e MUST NOT declará-la como dependência de runtime de pacote publicável.
 - **FR-002**: O sistema MUST declarar, em configuração versionada, que a versão é derivada de Conventional Commits sobre a linha de integração única (ADR-032), com formato de tag declarado e explícito.
 - **FR-003**: O sistema MUST carimbar a versão em **todos** os arquivos de metadados dos pacotes publicáveis em lockstep numa única operação (research Q4, provado em réplica) — versões divergentes entre pacotes interdependentes MUST reprovar.
-- **FR-004**: O sistema MUST fixar o comportamento de versão inicial de modo explícito na configuração, e não por herança do padrão da ferramenta [NEEDS CLARIFICATION: permanecer em `0.x` durante a Fase 0, ou aceitar o salto para `1.0.0` no primeiro release].
-- **FR-005**: O sistema MUST gerar `CHANGELOG.md` a partir das mensagens convencionais, agrupado por tipo, preservando entradas de liberações anteriores.
-- **FR-006**: O sistema MUST prover fluxo de release em arquivo de workflow **próprio**, separado do pipeline de integração, disparado por evento de tag — sem alterar o pipeline de integração, cujas asserções de fronteira (`f0-003` FR-007/FR-008) permanecem verdes por escopo (research Q10).
+- **FR-004**: O sistema MUST declarar explicitamente, em configuração versionada, que a faixa de versão permanece `0.x` enquanto a Fase 0 não fechar — o comportamento MUST NOT ser herdado do padrão da ferramenta, que promoveria o primeiro release a `1.0.0` (decisão CLARIFY 2026-09-06); ruptura em `0.x` MUST NOT forçar promoção automática.
+- **FR-005**: O sistema MUST gerar `CHANGELOG.md` a partir das mensagens convencionais, agrupado por tipo, preservando entradas de releases anteriores.
+- **FR-006**: O sistema MUST prover fluxo de release em arquivo de workflow **próprio**, separado do pipeline de integração, disparado por evento de tag — sem alterar o pipeline de integração, cujas asserções de fronteira (`f0-003` FR-007/FR-008) permanecem verdes por escopo (research Q10). A tag MUST resultar de ato deliberado do mantenedor; o pipeline MUST NOT criá-la automaticamente a partir de integração (decisão CLARIFY 2026-09-06 — publicação é irreversível).
 - **FR-007**: O fluxo de release MUST separar construção e publicação em escopos distintos, e MUST declarar a permissão de emissão de identidade federada **apenas** no escopo que publica (P1 uv + P1 PyPI, independentes — research Q6).
 - **FR-008**: O sistema MUST construir os artefatos distribuíveis de todos os pacotes publicáveis (fonte + binário por pacote) sem que qualquer artefato de construção entre no histórico.
-- **FR-009**: O sistema MUST publicar por identidade federada, sem credencial de longa duração em arquivo, variável versionada ou registro (Lei Zero, princípio V) — a autenticação MUST ser emitida no ato da execução.
+- **FR-009**: O sistema MUST publicar por identidade federada, sem credencial de longa duração em arquivo, variável versionada ou registro (Lei Zero, princípio V) — a autenticação MUST ser emitida no ato da execução. Diante de aceitação parcial (um pacote aceito, outro falho), a reexecução do fluxo sobre a **mesma** versão MUST publicar somente o que ainda não foi aceito, sem reprovar por duplicata e sem consumir novo número de versão (decisão CLARIFY 2026-09-06).
 - **FR-010**: O sistema MUST gerar inventário de dependências em formato padrão da indústria a partir da trava versionada, como fonte única, sem introduzir segunda ferramenta para o mesmo fato (research Q5 — reverte a reserva feita pela 008/D4, com evidência executada).
-- **FR-011**: O sistema MUST anexar o inventário e a trava exportada à liberação publicada [NEEDS CLARIFICATION: gerados no ato do release, ou versionados no repositório — versionados exigem procedimento ADR-017 sobre 3 asserções da `f0-008`].
-- **FR-012**: O caminho pelo qual a versão calculada alcança a linha de integração MUST NOT exigir ator com bypass da proteção nem alteração da proteção vigente [NEEDS CLARIFICATION: desenho A (tag como fonte, versão dinâmica) ou desenho B (proposta de mudança com os 10 checks) — research Q7].
+- **FR-011**: O sistema MUST gerar o inventário e a trava exportada **no ato do release** e anexá-los à publicação, e MUST NOT versioná-los no repositório (decisão CLARIFY 2026-09-06 — mantém o artefato fiel ao conjunto publicado e não aciona o procedimento ADR-017 sobre a `f0-008`).
+- **FR-012**: A versão calculada MUST alcançar a linha de integração por proposta de mudança submetida aos 10 checks obrigatórios (decisão CLARIFY 2026-09-06, desenho B do research Q7), e MUST NOT exigir ator com bypass da proteção nem alteração da proteção vigente.
 - **FR-013**: O sistema MUST pinar a versão da ferramenta de empacotamento usada no fluxo de release, de modo que o formato do inventário não dependa de resolução flutuante (research Q9).
 - **FR-014**: O sistema MUST versionar o procedimento da metade servidora (configuração de publicação federada por pacote e escopo protegido de aprovação) como checklist executável por humano, sem token nem segredo, no molde de `branch-protection.md` (precedente 003-T031/010, research Q8).
 - **FR-015**: O sistema MUST prover oráculo `scripts/verify/f0-013-release.sh` com 12–16 asserções sob o contrato `oracle-cli.md` (identidade FR↔asserção documentada, determinismo, somente leitura, self-check `f0-001…f0-012` **em série** conforme ADR-031, 13ª linha do manifest).
@@ -131,10 +136,10 @@ Cada liberação carrega um inventário de dependências no formato padrão da i
 
 ### Key Entities *(include if feature involves data)*
 
-- **Release**: unidade liberável; atributos: versão derivada, tag, registro de mudanças, artefatos, inventário. Não existe sem histórico convencional que a determine.
-- **Version**: número único e compartilhado por todos os pacotes publicáveis de uma liberação; derivado, nunca digitado.
+- **Release**: unidade publicável; atributos: versão derivada, tag, registro de mudanças, artefatos, inventário. Não existe sem histórico convencional que a determine.
+- **Version**: número único e compartilhado por todos os pacotes publicáveis de um release; derivado, nunca digitado.
 - **Changelog**: registro cumulativo por tipo de mudança; cada entrada rastreável ao commit de origem.
-- **Artefato distribuível**: forma-fonte e forma-binária por pacote publicável; efêmero no repositório, permanente na liberação.
+- **Artefato distribuível**: forma-fonte e forma-binária por pacote publicável; efêmero no repositório, permanente no release.
 - **Inventário de dependências**: descrição do conjunto publicado, derivada da trava versionada como fonte única.
 
 ## Success Criteria *(mandatory)*
@@ -142,13 +147,15 @@ Cada liberação carrega um inventário de dependências no formato padrão da i
 ### Measurable Outcomes
 
 - **SC-001**: A partir de um histórico dado, a próxima versão é obtida por regra e é idêntica em duas consultas consecutivas — zero julgamento humano no número.
-- **SC-002**: Todos os pacotes publicáveis exibem a mesma versão após a liberação, em 100% das execuções.
+- **SC-002**: Todos os pacotes publicáveis exibem a mesma versão após o release, em 100% das execuções.
 - **SC-003**: Zero credencial de longa duração em qualquer arquivo versionado; a varredura de segredos do pipeline permanece verde.
 - **SC-004**: O fluxo de release completo não exige nenhuma alteração da proteção vigente nem ator com bypass — verificável por inspeção do fluxo e da configuração de proteção.
-- **SC-005**: Cada liberação publicada carrega inventário de dependências válido no formato declarado.
+- **SC-005**: Cada release publicado carrega inventário de dependências válido no formato declarado.
 - **SC-006**: Harness 13/13 + manifest 13/13 + `tasks.md` zero `[ ]` + par vermelho→verde em commits separados.
 - **SC-007**: Oráculo executa 2× com saída byte-idêntica, cada execução abaixo de 5 segundos (padrão de determinismo dos oráculos anteriores).
 - **SC-008**: 🧑 Cenário humano — a metade servidora é executada com checklist versionado preenchido com saídas verbatim (a divergência declarada é saída aceitável; a divergência silenciosa não é — precedente 010/SC-005).
+- **SC-009**: Diante de aceitação parcial, a reexecução sobre a mesma versão completa o release em 100% dos casos sem consumir novo número de versão.
+- **SC-010**: Nenhuma integração na linha única produz publicação sem o ato deliberado que cria a tag — verificável por inspeção do gatilho do fluxo.
 
 ## Assumptions
 
@@ -158,6 +165,7 @@ Cada liberação carrega um inventário de dependências no formato padrão da i
 - As asserções do pipeline de integração são escopadas ao seu próprio arquivo (verificado mecanicamente — research Q10), portanto um workflow de release novo não as toca.
 - A verificação de identidade federada **não é reproduzível localmente**: só o executor remoto emite o token. É limite honesto declarado (ADR-025 §3), roteado ao cenário 🧑, e não será alegado como provado sem execução no servidor.
 - Nomes exatos de arquivos, chaves de configuração, nomes de escopo do fluxo e ordem interna dos passos são desenho do PLAN, não desta especificação.
+- **Termo canônico**: `release` (o mesmo do plano, §17 item 0.15), com `liberável` como sua forma adjetiva. Anteriormente referido também como "liberação" nesta spec; normalizado nesta sessão de clarificação.
 
 ## Contratos
 
