@@ -158,7 +158,7 @@ conteúdo dos dois SBOMs campo a campo; se o CLARIFY exigir campo específico
 
 **Fonte (P0, executada):** `uv publish --help` → `--trusted-publishing
 [automatic|always|never]`, `--dry-run`, `--check-url`, `--no-attestations`
-(*"Do not upload attestations"* — logo, **attestations PEP 740 são o padrão**).
+(*"Do not upload attestations for the published files"*).
 
 **Fonte (P0, executada):** `uv publish --dry-run "<dist>/*"` → verifica e lista os
 4 artefatos, **sem credencial e sem publicar**. Elo verificado (princípio VIII).
@@ -174,12 +174,60 @@ alcance o build.
 *"GitHub Actions will refuse to give you an OIDC token"*; permissão **no nível do
 job** é *"strongly encouraged, as it reduces unnecessary credential exposure"*.
 
-**Achado:** `uv publish` cobre o caso completo. Consequência de cadeia de
-suprimentos que decide a favor dele: **zero actions novas para pinar** — o
-`release.yml` usa apenas `actions/checkout` e `astral-sh/setup-uv`, ambas já
-pinadas por SHA no `ci.yml`. `pypa/gh-action-pypi-publish` seria uma terceira
-action de terceiro no caminho da credencial OIDC, sem entregar nada que o `uv`
-não entregue.
+**Fonte (P1) — procedência, o ponto que decide:** docs PyPI ›
+*Attestations › Producing attestations* nomeia quem produz atestado PEP 740:
+**`pypa/gh-action-pypi-publish`** (*"attestations are generated and uploaded
+automatically by default, with no additional configuration necessary"*),
+`pypi-attestations`, `actions/attest` e `twine --attestations`. **`uv` não
+consta da lista.**
+
+**Fonte (P1, uv) — confirmação pelo lado oposto:** docs uv › *Publishing* —
+*"uv publish does not currently generate attestations; attestations must be
+created separately before publishing"*. O `uv publish` apenas **envia** arquivos
+`[distribuição].publish.attestation` que já existam ao lado da distribuição.
+
+**Fonte (P0, rastreador):** `astral-sh/uv` issues **#19489** *"Generate PEP 740
+attestations"* e **#15618** *"uv publish: create attestations"* — ambas
+**abertas** em 2026-09-06. Geração é pedido de funcionalidade, não comportamento.
+
+**Fonte (P1):** README da `pypa/gh-action-pypi-publish` — sobe de `dist/` por
+padrão; sob trusted publishing dispensa usuário e senha; exige
+`id-token: write`; *"Generating signed digital attestations for all the
+distribution files and uploading them all together is now on by default for all
+projects using Trusted Publishing"*.
+
+**Fonte (P0, executada — pin):** `v1.14.2` (release de 2026-07-29) é **tag
+anotada**; o SHA do objeto de tag (`a892a5a6…`) **não** é pinável. Commit:
+`dc37677b2e1c63e2034f94d8a5b11f265b73ba33`.
+
+**Achado (corrigido — ver §Correção abaixo):** a construção fica com
+`uv build --all-packages`; a **publicação** fica com a action oficial da PyPA,
+porque ela é a única das duas que **produz** o atestado de procedência. O
+argumento de "zero actions novas para pinar" não sobrevive à medição: o
+repositório já pina **5** actions por SHA (`checkout`, `setup-python`,
+`setup-uv`, `trivy-action`, `gitleaks-action`); a sexta é a oficial nomeada pela
+documentação do próprio índice. Trocar procedência verificável por uma action a
+menos é mau negócio para um projeto cuja tese é que conformidade se decide por
+verificação, não por confiança.
+
+### Correção de método (princípio VII — registra a causa, não só o conserto)
+
+A primeira redação desta Q6 afirmava *"attestations PEP 740 são o padrão"* do
+`uv publish`, e concluía que a action seria supérflua. A afirmação foi
+**inferida da existência da flag `--no-attestations`** — nenhuma fonte foi
+consultada sobre o comportamento. A flag descreve envio, não geração, e a
+diferença era a única coisa que importava.
+
+O defeito não foi de fonte errada: foi de **inferência apresentada como fato**
+dentro de uma linha rotulada `Fonte (P0, executada)`. O rótulo dizia
+"executada" porque o `--help` foi de fato executado; o que não foi executado nem
+consultado foi a conclusão pendurada nele, entre parênteses.
+
+Regra que este achado acrescenta ao método, para além deste item: **em linha de
+`Fonte`, só entra o que a fonte diz.** Consequência derivada vai para `Achado`,
+onde é visivelmente conclusão e não citação. Uma inferência dentro de uma
+citação é indistinguível de evidência na releitura — que é exatamente como esta
+passou pelo SPECIFY e pelo CLARIFY sem ser pega.
 
 ---
 
@@ -323,9 +371,13 @@ regenera o arquivo quando o lock muda.
 - **D2.** Build e SBOM por `uv` (`uv build --all-packages`, `uv export --format
   cyclonedx1.5`): **`cyclonedx-bom` descartado** com registro (Q5). Reverte a
   reserva feita pela 008/D4, com fonte executada.
-- **D3.** Publicação por `uv publish` com `--trusted-publishing`, em job separado
-  do build, com `permissions: id-token: write` **no nível do job** (Q6). Zero
-  actions novas para pinar.
+- **D3.** Construção por `uv build --all-packages`; **publicação pela action
+  oficial `pypa/gh-action-pypi-publish`** (`v1.14.2`, commit
+  `dc37677b2e1c63e2034f94d8a5b11f265b73ba33`), em job separado do build, com
+  `permissions: id-token: write` **no nível do job** (Q6). Motivo: é a única das
+  duas vias que **produz** atestado de procedência PEP 740 — o `uv publish` só
+  enviaria atestado gerado por outro. Supersede a redação anterior desta decisão,
+  que era inferência (ver Q6 › *Correção de método*).
 - **D4.** Versionamento em **lockstep** dos dois pacotes via `version_toml` com os
   três `pyproject.toml` (Q4). Versões independentes ficam registradas como
   alternativa rejeitada, não como omissão.

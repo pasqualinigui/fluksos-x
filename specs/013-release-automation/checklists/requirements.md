@@ -83,4 +83,26 @@ de versionar os artefatos, a decisão volta ao CLARIFY, não ao PLAN (regra 7).
   probabilidade desprezível hoje. Reabre se a condição de saída da ADR-032
   disparar (segundo colaborador com escrita).
 
-**Pronto para `/speckit-plan`.**
+### Iteração 3 — correção de procedência, 2026-09-06
+
+Pergunta do mantenedor sobre OIDC/Sigstore expôs **erro de método no RESEARCH**,
+não na spec: a Q6 afirmava que `uv publish` sobe atestados PEP 740 por padrão.
+Era inferência a partir da flag `--no-attestations`, apresentada dentro de uma
+linha rotulada `Fonte (P0, executada)`.
+
+Verificado contra a fonte: `uv publish` **não gera** atestado (docs uv, e as
+issues `astral-sh/uv#19489` e `#15618` abertas); a documentação do PyPI nomeia
+`pypa/gh-action-pypi-publish` como quem gera e envia por padrão sob trusted
+publishing.
+
+**Efeito na spec**: FR-009 ganha a cláusula de procedência; US3 ganha o cenário 5
+(verificação por terceiro); SC-011 acrescentado; Contexto e Contratos atualizados.
+Contagem de FRs permanece **16** — a procedência é propriedade do ato de publicar,
+não requisito novo, então foi dobrada no FR-009 em vez de romper a faixa 12–16.
+
+**Regra de método que o achado acrescenta**: em linha de `Fonte`, só entra o que
+a fonte diz; consequência derivada vai para `Achado`. Uma inferência dentro de
+uma citação é indistinguível de evidência na releitura — foi assim que esta
+passou pelo SPECIFY e pelo CLARIFY sem ser pega.
+
+**Estado**: 16/16 itens passando. **Pronto para `/speckit-plan`.**
