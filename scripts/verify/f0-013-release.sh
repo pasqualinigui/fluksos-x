@@ -3,15 +3,16 @@
 # Oraculo de conformidade — Fase 0, item 013 (0.15): automacao de release
 #
 # Contrato de assercoes deste item:
-#   specs/013-release-automation/spec.md (16 FRs, 11 SCs, 4 US + CLARIFY 5/5)
+#   specs/013-release-automation/spec.md (17 FRs, 11 SCs, 4 US + CLARIFY 5/5)
 #   specs/013-release-automation/plan.md (Fases A-E, D1-D9, fronteira Q10)
-#   specs/013-release-automation/contracts/oracle-cli.md (mapa identidade 16 FRs)
+#   specs/013-release-automation/contracts/oracle-cli.md (mapa identidade 17 FRs)
 #
 # Contrato de INTERFACE (normativo, herdado):
 #   specs/001-git-branching-strategy/contracts/oracle-cli.md
 #
 # Pesquisa vinculante:
 #   docs/plan/research/f0-013-release-automation.md (Q1-Q10 D1-D9, 2026-09-06)
+#   docs/plan/research/f0-013-click-cve.md (Q1-Q9 E1-E7, emenda 2026-09-07)
 #   specs/013-release-automation/research.md (9 decisoes consolidadas)
 #
 # Guardas x comportamento (contrato §3, nota L2):
@@ -19,7 +20,7 @@
 #     FR-015 (contrato auto-verificavel), FR-016 (README accretion +
 #     self-check herdado: ambos verdadeiros antes do codigo por construcao)
 #   Comportamento (carregam o vermelho 14/16):
-#     FR-001..014
+#     FR-001..014, FR-017
 #
 # Restricoes (contrato §5 do item 001), todas obrigatorias:
 #   1. Apenas shell, git e Python 3.12 stdlib (+ cadeia 005-012 via uv run).
@@ -43,6 +44,11 @@
 #   D7 artefatos efemeros, nao versionados (Q10)
 #   D8 dois pending publishers + GitHub environment (Q8)
 #   D9 pin uv no workflow (Q9)
+#
+# Emenda ADR-034 verificada 2026-09-07 (research f0-013-click-cve.md):
+#   E1 override-dependencies click>=8.3.3,<8.5.0 (Q1/Q6/Q7) -> FR-017
+#   E2 --ignore-vuln vedado pela Regra 5: mexeria no f0-008 (Q5)
+#   E5 o commit vermelho leva script E 13a linha do manifest (Q8)
 # =============================================================================
 
 set -uo pipefail
@@ -90,11 +96,12 @@ declare -A CANON=(
   ["FR-012"]="fluxo nao grava main sem PR"
   ["FR-013"]="setup-uv com version pinado"
   ["FR-014"]="checklist server-side presente"
-  ["FR-015"]="contrato: list 16 exit2 2x <5s self-check serie"
+  ["FR-015"]="contrato: list 17 exit2 2x <5s self-check serie"
   ["FR-016"]="README 013 hash + zero [ ] + vermelho-verde"
+  ["FR-017"]="override click>=8.3.3,<8.5.0 + lock resolve >=8.3.3"
 )
 
-CANON_ORDER="FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-007 FR-008 FR-009 FR-010 FR-011 FR-012 FR-013 FR-014 FR-015 FR-016"
+CANON_ORDER="FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-007 FR-008 FR-009 FR-010 FR-011 FR-012 FR-013 FR-014 FR-015 FR-016 FR-017"
 
 PYPROJECT="$ROOT/pyproject.toml"
 UVLOCK="$ROOT/uv.lock"
@@ -382,13 +389,13 @@ fi
 if [ "$FR14_OK" = "1" ]; then pass "FR-014" "${CANON[FR-014]}"; else fail "FR-014" "${CANON[FR-014]}" "alta" "$EVID14"; fi
 
 # =============================================================================
-# FR-015: contrato auto-verificavel (list 16, exit2, 2x <5s, self-check serie)
+# FR-015: contrato auto-verificavel (list 17, exit2, 2x <5s, self-check serie)
 # =============================================================================
 FR15_OK=1; EVID15=""
 LIST_COUNT=$(bash "$SELF" --list 2>/dev/null | wc -l || true)
 LIST_COUNT=$(echo "$LIST_COUNT" | tr -d '[:space:]')
-if [ "$LIST_COUNT" != "16" ]; then
-  FR15_OK=0; EVID15="${EVID15}--list enumera $LIST_COUNT != 16; "
+if [ "$LIST_COUNT" != "17" ]; then
+  FR15_OK=0; EVID15="${EVID15}--list enumera $LIST_COUNT != 17; "
 fi
 INVALID_RC=0
 bash "$SELF" --invalido > /dev/null 2>&1 || INVALID_RC=$?
@@ -457,6 +464,46 @@ elif [ ! "$RED_LINE" -gt "$GREEN_LINE" ] 2>/dev/null; then
   FR16_OK=0; EVID16="${EVID16}verde precede vermelho no log (red=$RED_LINE green=$GREEN_LINE); "
 fi
 if [ "$FR16_OK" = "1" ]; then pass "FR-016" "${CANON[FR-016]}"; else fail "FR-016" "${CANON[FR-016]}" "alta" "$EVID16"; fi
+
+# =============================================================================
+# FR-017: override minimo de click (ADR-034) + lock resolvendo a versao corrigida
+#
+# Duas metades, ambas obrigatorias: a DECLARACAO (pyproject) e o EFEITO (uv.lock).
+# So a declaracao provaria intencao; so o efeito nao impediria o override sumir e
+# o lock seguir correto por acaso ate a proxima resolucao.
+#
+# O especificador e comparado por IGUALDADE, nao por prefixo: alargar o override
+# (tirar o teto, baixar o piso) reprova aqui, que e a trava 1 da ADR-034 §5.
+# =============================================================================
+FR17_OK=1; EVID17=""
+if [ ! -f "$PYPROJECT" ]; then
+  FR17_OK=0; EVID17="${EVID17}pyproject.toml ausente; "
+else
+  if ! python3 -c '
+import tomllib, sys
+d = tomllib.load(open(sys.argv[1], "rb"))
+ovr = d.get("tool", {}).get("uv", {}).get("override-dependencies", [])
+assert ovr == ["click>=8.3.3,<8.5.0"], ovr
+' "$PYPROJECT" 2>/dev/null; then
+    FR17_OK=0; EVID17="${EVID17}override-dependencies != [\"click>=8.3.3,<8.5.0\"] (ADR-034/E1); "
+  fi
+fi
+if [ ! -f "$UVLOCK" ]; then
+  FR17_OK=0; EVID17="${EVID17}uv.lock ausente; "
+else
+  if ! python3 -c '
+import re, sys
+s = open(sys.argv[1], encoding="utf-8").read()
+m = re.search(r"^\[\[package\]\]\nname = \"click\"\nversion = \"([^\"]+)\"", s, re.M)
+assert m, "click ausente do lock"
+v = tuple(int(x) for x in m.group(1).split(".")[:3])
+assert v >= (8, 3, 3), m.group(1)
+' "$UVLOCK" 2>/dev/null; then
+    LOCKV=$(grep -A1 '^name = "click"$' "$UVLOCK" 2>/dev/null | grep '^version = ' | head -1 | cut -d'"' -f2)
+    FR17_OK=0; EVID17="${EVID17}uv.lock resolve click ${LOCKV:-?} < 8.3.3 (PYSEC-2026-2132); "
+  fi
+fi
+if [ "$FR17_OK" = "1" ]; then pass "FR-017" "${CANON[FR-017]}"; else fail "FR-017" "${CANON[FR-017]}" "alta" "$EVID17"; fi
 
 # =============================================================================
 # Relatório

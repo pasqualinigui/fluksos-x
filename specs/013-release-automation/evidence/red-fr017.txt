@@ -1,0 +1,21 @@
+✅ FR-001   python-semantic-release==10.6.2 em dev + hash lock
+✅ FR-002   commit_parser conventional + tag_format v{version}
+✅ FR-003   version_toml 3 caminhos lockstep
+✅ FR-004   allow_zero_version + major_on_zero
+✅ FR-005   changelog_file configurado
+✅ FR-006   release.yml proprio + tag trigger
+✅ FR-007   jobs build+publish separados + id-token so publish
+✅ FR-008   uv build --all-packages + dist no gitignore
+✅ FR-009   pypa action pinada + zero credencial
+✅ FR-010   uv export cyclonedx1.5 + cyclonedx-bom ausente
+✅ FR-011   pylock+SBOM efemeros nao versionados
+✅ FR-012   fluxo nao grava main sem PR
+✅ FR-013   setup-uv com version pinado
+✅ FR-014   checklist server-side presente
+✅ FR-015   contrato: list 17 exit2 2x <5s self-check serie
+🔴 FR-016   README 013 hash + zero [ ] + vermelho-verde
+           evidencia: tasks.md com 6 [ ] abertas (CONVERGE); 
+🔴 FR-017   override click>=8.3.3,<8.5.0 + lock resolve >=8.3.3
+           evidencia: override-dependencies != ["click>=8.3.3,<8.5.0"] (ADR-034/E1); uv.lock resolve click 8.1.8 < 8.3.3 (PYSEC-2026-2132); 
+
+Resultado: 15/17 asserções aprovadas — 2 violação(ões) (critica: 0, alta: 2, media: 0) — NAO CONFORME
