@@ -1,0 +1,90 @@
+# =============================================================================
+# Pipeline de release — fluksos-x
+#
+# O QUE ESTE ARQUIVO É
+#   O fluxo de publicação do motor. Constrói os artefatos e publica no PyPI
+#   por identidade federada (OIDC), sem credencial de longa duração.
+#   Contrato normativo: specs/013-release-automation/spec.md + research Q1-Q10.
+#
+# FRONTEIRAS
+#   Este workflow é próprio e não altera ci.yml (fronteira Q10). Gatilho: tag.
+#   Jobs separados: build (construção) e publish (publicação OIDC).
+#   Permissão id-token: write restrita ao job publish (FR-007, Lei Zero).
+#
+# OS DOIS JOBS, E POR QUE CADA UM EXISTE
+#   build       constrói artefatos (uv build) + SBOM CycloneDX + pylock
+#   publish     publica no PyPI por OIDC (pypa/gh-action-pypi-publish)
+#
+# DETERMINISMO
+#   setup-uv com version: pinado (D9/Q9) para formato SBOM estável.
+#   Actions pinadas por SHA (40 hex) + versão legível.
+# =============================================================================
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # build — construção dos artefatos distribuíveis + SBOM + pylock
+  # ---------------------------------------------------------------------------
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          enable-cache: true
+          version: "0.12.1"
+      - name: Sync frozen
+        run: uv sync --frozen --all-packages
+      - name: Build packages
+        run: uv build --all-packages -o dist/
+      - name: Generate SBOM (CycloneDX 1.5)
+        run: uv export --format cyclonedx1.5 --all-packages -o dist/sbom.cyclonedx.json
+      - name: Generate pylock
+        run: uv export --format pylock.toml --all-packages -o dist/pylock.toml
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: release-artifacts
+          path: dist/
+
+  # ---------------------------------------------------------------------------
+  # publish — publicação no PyPI por identidade federada (OIDC)
+  # ---------------------------------------------------------------------------
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment:
+      name: release
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
+        with:
+          name: release-artifacts
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
+        with:
+          packages-dir: dist/
+          skip-existing: true
+          verbose: true
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@bd77c077858b8d561b7a36cbe48ef4cc642ca39d # v2.2.2
+        with:
+          subject-path: dist/*.whl
