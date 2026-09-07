@@ -83,6 +83,12 @@ warn_return_any = false
 
 [tool.uv]
 package = false
+# ADR-034 / FR-017 — PYSEC-2026-2132 (CVE-2026-7246): python-semantic-release
+# 10.6.2 declara `click<8.5.0,~=8.1.0`, que prende o click em 8.1.8. O piso 8.3.3
+# e a primeira versao corrigida; o teto <8.5.0 preserva o limite que o proprio PSR
+# declara. Mitigacao com condicao de saida: quando o PSR relaxar ~=8.1.0, a 014
+# remove este override e o FR-017. Ver docs/plan/research/f0-013-click-cve.md.
+override-dependencies = ["click>=8.3.3,<8.5.0"]
 
 [tool.semantic_release]
 allow_zero_version = true
