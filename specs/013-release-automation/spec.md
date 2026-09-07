@@ -9,7 +9,7 @@
 **Input**: User description: "Fase 0, item 0.15 (013/016 na ordem de execução): automação de release — versionamento semântico derivado de Conventional Commits, CHANGELOG, tag, build dos pacotes publicáveis, publicação no PyPI via trusted publishing (OIDC) e SBOM anexado ao release, sem credencial em arquivo algum e sem bypass da proteção de linha."
 
 **Item do plano**: 0.15 (§17 Fase 0, Emenda 1) · **Ordem de execução**: 013 de 016 (ADR-011)
-**Pesquisa vinculante**: `docs/plan/research/f0-013-release-automation.md` (Q1–Q10, decisões D1–D9, hierarquia P0–P3 da ADR-025, pergunta-padrão de ambiente da ADR-027 §5)
+**Pesquisa vinculante**: `docs/plan/research/f0-013-release-automation.md` (Q1–Q10, decisões D1–D9, hierarquia P0–P3 da ADR-025, pergunta-padrão de ambiente da ADR-027 §5) + `docs/plan/research/f0-013-click-cve.md` (Q1–Q9, decisões E1–E7, emenda 2026-09-07)
 **Contrato de entrada**: `specs/012-packages-cli/spec.md` › Contratos + `specs/010-ci-completo/spec.md` › Contratos + `docs/plan/decisions.md` (ADR-009, ADR-011, ADR-015, ADR-017, ADR-025, ADR-027, ADR-030, ADR-031, ADR-032) + `docs/plan/implementation_plan.md` §§3–4, 15, 17 + `specs/001-git-branching-strategy/contracts/oracle-cli.md`
 
 ---
@@ -18,7 +18,7 @@
 
 O motor tem dois pacotes publicáveis (`fkx-core` da 011, `fkx-cli` da 012, ambos `0.1.0`), um portão servidor com 10 checks obrigatórios sem-bypass (010 + ADR-032) e mensagens de commit validadas (010 FR-007) — **mas nenhuma forma de entregar o que constrói**. Hoje a versão é texto estático repetido em três arquivos, não existe CHANGELOG, e a única maneira de alguém instalar o motor é clonar o repositório. A 010 registrou explicitamente que validava mensagens para "proteger o `semantic-release` de 013"; este é o item que cobra essa dívida.
 
-O item entrega **exclusivamente**: configuração de versionamento semântico derivado de Conventional Commits sobre a linha de integração única, geração de `CHANGELOG.md`, carimbo da versão nos pacotes publicáveis, construção dos artefatos distribuíveis, publicação no índice público por identidade federada (sem credencial de longa duração) com atestado de procedência, inventário de dependências (SBOM) anexado ao release, e oráculo `f0-013` com 12–16 asserções. Não cria atualização automática de dependências (**014**), `docker-compose` (**015**), `docs/tree.md` (**016**), imagem de container, canais de pré-lançamento, nem versões independentes por pacote.
+O item entrega **exclusivamente**: configuração de versionamento semântico derivado de Conventional Commits sobre a linha de integração única, geração de `CHANGELOG.md`, carimbo da versão nos pacotes publicáveis, construção dos artefatos distribuíveis, publicação no índice público por identidade federada (sem credencial de longa duração) com atestado de procedência, inventário de dependências (SBOM) anexado ao release, e oráculo `f0-013` com 12–17 asserções. Não cria atualização automática de dependências (**014**), `docker-compose` (**015**), `docs/tree.md` (**016**), imagem de container, canais de pré-lançamento, nem versões independentes por pacote.
 
 Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (a versão é *derivada por regra* do histórico, nunca escolhida por julgamento; o formato do inventário é pinado, não "o mais recente"); **II** especificação precede código; **III** vermelho→verde em commits separados; **IV** o formato dos artefatos declarado antes de gerá-los; **V** Lei Zero (nenhuma credencial em arquivo, identidade federada de vida curta); **VI** harness é o oráculo, e a fronteira dos itens anteriores só se ajusta por ADR prévia; **VIII** todo pin e todo comportamento externo verificado com evidência executada em `docs/plan/research/f0-013-release-automation.md`; **IX** o item versiona **este** motor e não presume nada sobre a stack de sistemas-alvo; **X** falha nomeia `FR-XXX` e a evidência observada.
 
@@ -132,8 +132,9 @@ Cada release carrega um inventário de dependências no formato padrão da indú
 - **FR-012**: A versão calculada MUST alcançar a linha de integração por proposta de mudança submetida aos 10 checks obrigatórios (decisão CLARIFY 2026-09-06, desenho B do research Q7), e MUST NOT exigir ator com bypass da proteção nem alteração da proteção vigente.
 - **FR-013**: O sistema MUST pinar a versão da ferramenta de empacotamento usada no fluxo de release, de modo que o formato do inventário não dependa de resolução flutuante (research Q9).
 - **FR-014**: O sistema MUST versionar o procedimento da metade servidora (configuração de publicação federada por pacote e escopo protegido de aprovação) como checklist executável por humano, sem token nem segredo, no molde de `branch-protection.md` (precedente 003-T031/010, research Q8).
-- **FR-015**: O sistema MUST prover oráculo `scripts/verify/f0-013-release.sh` com 12–16 asserções sob o contrato `oracle-cli.md` (identidade FR↔asserção documentada, determinismo, somente leitura, self-check `f0-001…f0-012` **em série** conforme ADR-031, 13ª linha do manifest).
+- **FR-015**: O sistema MUST prover oráculo `scripts/verify/f0-013-release.sh` com 12–17 asserções sob o contrato `oracle-cli.md` (identidade FR↔asserção documentada, determinismo, somente leitura, self-check `f0-001…f0-012` **em série** conforme ADR-031, 13ª linha do manifest).
 - **FR-016**: `specs/README.md` MUST conter `013` `✅` com hash do commit de convergência, e `tasks.md` MUST fechar com zero tarefas `[ ]` e par vermelho→verde em commits separados.
+- **FR-017**: Quando dependência declarada por este item impuser, por teto transitivo, versão de pacote com vulnerabilidade conhecida e publicada, o sistema MUST corrigir a resolução por override versionado em `pyproject.toml`, com especificador **mínimo** — piso na primeira versão corrigida e teto preservando o limite superior que o pacote a montante declara — e MUST NOT alcançar o mesmo fim suprimindo o achado na ferramenta de auditoria, porque a supressão exigiria alterar o oráculo `f0-008`, de item anterior (Regra 5; research emenda Q5/E2). O override MUST valer exclusivamente para `click`, no especificador `click>=8.3.3,<8.5.0` (ADR-034), e a trava versionada MUST resolver `click` em versão `>= 8.3.3`. A mitigação MUST ser removida — override e este requisito — quando o pacote a montante relaxar o teto, obrigação transferida à **014** (ADR-034 §5).
 
 ### Key Entities *(include if feature involves data)*
 
@@ -176,7 +177,7 @@ Cada release carrega um inventário de dependências no formato padrão da indú
 - Versionamento semântico derivado do histórico + `CHANGELOG.md` + carimbo em lockstep nos pacotes publicáveis.
 - Fluxo de release próprio, disparado por tag, com construção e publicação em escopos separados, identidade federada de vida curta e atestado de procedência por artefato.
 - Inventário de dependências e trava exportada, a partir da trava versionada como fonte única.
-- Oráculo `f0-013` (12–16 asserções) + 13ª linha do manifest + `specs/README.md` `013 ✅`.
+- Oráculo `f0-013` (12–17 asserções) + 13ª linha do manifest + `specs/README.md` `013 ✅`.
 - Checklist versionado da metade servidora (publicação federada por pacote + escopo de aprovação).
 
 ### Recebido de itens anteriores

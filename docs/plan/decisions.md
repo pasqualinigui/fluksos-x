@@ -2059,3 +2059,230 @@ releitura.
 - O item de Fase 4 recebe a restrição de determinismo **antes** de desenhar, em
   vez de descobri-la no ANALYZE.
 - A 013 permanece com o escopo que tinha: publicar, não consultar.
+
+---
+
+## ADR-034 — Teto transitivo do `click`: override mínimo, asserido, com condição de saída
+
+**Data**: 2026-09-07 · **Item**: 013 (emenda pós-convergência) · **Estado**: aceita
+· **Origem**: `PYSEC-2026-2132` publicado após a convergência do 013, derrubando 3
+dos 10 checks obrigatórios no PR #16 · **Pesquisa vinculante**:
+`docs/plan/research/f0-013-click-cve.md` (Q1–Q9, E1–E7, 2026-09-07).
+
+### 1. O fato, e o que ele não é
+
+`python-semantic-release==10.6.2` declara `click<8.5.0,~=8.1.0`, que resolve em
+`>=8.1.0,<8.2.0` e prende o `click` em 8.1.8. O `PYSEC-2026-2132`
+(`CVE-2026-7246`) é injeção de comando em `click.edit()`, corrigida em 8.3.3.
+
+**Não é defeito de entrega do 013.** O item entregou exatamente o que especificou,
+e o research de 2026-09-06 já registrara o teto `~=8.1.0` e a entrada do `click`
+no `uv.lock` (Q1). O advisory não existia. Fato novo, não erro velho.
+
+**Não alcança o produto** (research Q3, duas verificações independentes): o `click`
+de topo é do grupo `dev` e não viaja sob `--no-dev`; e o `_click` que o `typer`
+0.27.2 vendoriza **não tem** o módulo do editor — `grep "edit"` nele dá zero. O
+`fkx-cli` publicado não carrega a falha. O vermelho, ainda assim, está certo: o
+`pip-audit` mede o ambiente resolvido, e nele a falha existe.
+
+### 2. Decisão
+
+```toml
+[tool.uv]
+override-dependencies = ["click>=8.3.3,<8.5.0"]
+```
+
+O piso `8.3.3` é a correção. O teto `<8.5.0` **preserva** o limite que o próprio PSR
+declara: o override levanta somente a trava que carrega o CVE, e nada além.
+Verificado de ponta a ponta (Q7): `click` 8.1.8 → 8.4.2 como **único** pacote
+alterado, `pip-audit` limpo, `uv sync --frozen` consistente, `ruff`, `mypy --strict`
+e `f0-008` verdes. Compatibilidade do PSR **medida** em 4 versões do `click`, com
+saída byte-idêntica em 8.4.2 (Q6).
+
+### 3. As três alternativas rejeitadas, com motivo (molde ADR-020 §3)
+
+**Supressão por `--ignore-vuln`** — rejeitada por **governança, antes do mérito**. O
+`pip-audit` 2.10.1 não tem arquivo de configuração (Q5): a supressão só existe em
+linha de comando, e alcançá-la exigiria editar `scripts/verify/f0-008-pip-audit.sh`,
+oráculo de item anterior. É a **Regra 5**. Reabertura exigiria que o `pip-audit`
+ganhasse configuração versionada — não releitura.
+
+**Isolar o PSR fora do workspace** (`uvx` no workflow) — rejeitada por **método**.
+Tiraria o `click` do `uv.lock` e o vermelho junto, mas o PSR continuaria executando
+sobre `click` 8.1.8 na hora do release, agora fora do alcance do `pip-audit`.
+Resolve por invisibilidade, não por correção: troca um vermelho honesto por um verde
+falso, que é precisamente o que o princípio IV proíbe. Quebraria também o FR-001.
+
+**Esperar o upstream** — rejeitada por **indisponibilidade**. 10.6.2 é a última
+publicada (Q4). Sem prazo, e com `main` bloqueada por 10 checks `enforce_admins`.
+
+### 4. Por que emenda ao 013, e não spec nova
+
+O override existe **unicamente** porque o PSR está no grupo `dev`, e o PSR é entrega
+do 013 (FR-001). Uma spec `017` fragmentaria a posse — o 013 ficaria com a
+dependência e o 017 com a correção do teto dela — e criaria item cujo conteúdo
+inteiro é uma linha de `pyproject.toml`. A Regra 9 põe a posse no item que
+introduziu o fato. Precedente direto na mesma linha: PR #13
+(`f0-013-emenda-fr009`) e PR #14 (`f0-013-correcao-procedencia`), ambos amendando o
+013 já especificado.
+
+Estender `scripts/verify/f0-013-release.sh` é permitido: a Regra 5 protege o oráculo
+**anterior**, e este é o do próprio item.
+
+### 5. Condição de saída (a mitigação nasce com prazo e com dono)
+
+O `override-dependencies` é global e silencioso: vale para todo o grafo e não avisa
+quando mascara conflito futuro. Três travas contra virar dívida esquecida:
+
+1. **Especificador mínimo**, asserido **literalmente** pelo `FR-017` — alargar o
+   override exige mexer no oráculo, nunca passa em silêncio.
+2. **Condição de saída explícita**: quando o PSR relaxar `click~=8.1.0`, o override
+   **e** o `FR-017` são removidos, e o oráculo volta a 16 asserções.
+3. **Dono nomeado**: transferida ao **014** (`atualização de dependências`) pela
+   seção *Transferido a itens posteriores* do contrato do 013. Pela ADR-020 §2,
+   RESEARCH da 014 que não cite e avalie esta entrada viola rastreabilidade (VIII).
+
+### 6. Achado colateral transferido junto
+
+O `lefthook.yml` roda `pip-audit` em `pre-commit`. Enquanto a vulnerabilidade
+existe, nenhum commit passa — inclusive o portão vermelho que a Regra 2 exige antes
+do verde (research Q9/E7). A única saída pelo hook seria commitar o verde primeiro,
+que é o que a Regra 2 proíbe. **Um gate de vulnerabilidade em `pre-commit` converte
+"corrigir a vulnerabilidade" em operação impossível.** Os commits pré-verde deste
+ciclo vão com `--no-verify`, com os demais portões executados à mão e o fato
+registrado em cada mensagem; nada vinculante é contornado, porque os 10 checks
+sem-bypass julgam o head final. O desenho do `lefthook.yml` — `pre-commit` ou
+`pre-push` para `pip-audit` — é decisão da **014**, que possui a política de
+dependências.
+
+### Consequências
+
+- O 013 passa a 17 asserções; `FR-015` acompanha (`12–16` → `12–17`) e o mapa de
+  identidade do contrato registra a extensão, como manda a Regra 8.
+- O commit vermelho leva `f0-013-release.sh` **e** a 13ª linha do `manifest.sha256`
+  no mesmo ato: `f0-009`/`010`/`011`/`012` verificam `sha256sum -c` sobre o manifest
+  inteiro, e separar os dois faria o próprio portão vermelho causar regressão em
+  item anterior (research Q8/E5).
+- A 014 herda duas obrigações nomeadas, não duas lembranças: remover o override
+  quando o upstream permitir, e decidir o lugar do `pip-audit` no `lefthook.yml`.
+
+---
+
+## ADR-035 — O merge pertence ao servidor, não ao agente
+
+**Data**: 2026-09-07 · **Item**: nenhum (checkpoint não-item, governança de
+integração) · **Estado**: aceita · **Origem**: pergunta do mantenedor após o
+bloqueio do merge do PR #16 (*"o ideal é que seja possível que agentes de IA façam
+o merge?"*) · **Evidência**: leitura da proteção de `main` e `develop` e dos
+settings do repositório em 2026-09-07, antes e depois · **Efeito**: autoriza os
+ajustes da §3 e **proíbe** os da §4. Nada além destas duas tabelas é tocado.
+
+### 1. O achado que muda a resposta
+
+A pergunta era sobre conveniência. A leitura da proteção revelou um defeito de
+determinismo que já existia, independente de agente:
+
+```
+required_status_checks.strict : false     ← "require branches to be up to date"
+```
+
+Com `strict: false`, os checks de um PR são medidos contra a base do momento em que
+rodaram. Se a linha de integração andar antes do merge, o GitHub mergeia assim
+mesmo — e **o estado resultante do merge é um estado que nenhum check executou**.
+É o conflito semântico clássico: dois PRs verdes isoladamente, vermelhos juntos.
+
+Hoje o risco é teórico, porque a Fase 0 roda um item por vez. Mas ligar auto-merge
+sobre `strict: false` **piora**: automatiza a produção de estado não testado. Seria
+automação sem determinismo, que é o oposto do princípio I.
+
+### 2. Decisão
+
+**O ato de mergear pertence ao servidor.** O agente — humano ou IA — propõe; quem
+decide é a proteção de linha, pelo código de saída dos 10 checks obrigatórios.
+
+É a regra 4 (*"conformidade é código de saída, não opinião"*) aplicada ao último
+passo que ainda era opinião. Com merge manual, mergear é julgamento de alguém: um
+humano olha o verde e clica. Com auto-merge sobre `strict: true`, mergear é
+**consequência**: ninguém decide que está bom, o exit code decide.
+
+Efeito colateral que resolve a pergunta original: com o servidor executando o
+merge, **não existe token de agente assinando o ato**. O registro de auditoria
+deixa de dizer que um humano mergeou algo que não leu.
+
+### 3. Ajustes autorizados (forma exata)
+
+| # | Alvo | De → Para | Fecha |
+|---|---|---|---|
+| 1 | `main` › `required_status_checks.strict` | `false` → **`true`** | O buraco da §1 |
+| 2 | `develop` › `required_status_checks.strict` | `false` → **`true`** | Espelho não pode ser mais frouxo que o espelhado |
+| 3 | repo › `allow_auto_merge` | `false` → **`true`** | O servidor passa a poder executar o merge |
+| 4 | repo › `allow_squash_merge` | `true` → **`false`** | 🔒 par vermelho→verde |
+| 5 | repo › `allow_rebase_merge` | `true` → **`false`** | 🔒 par vermelho→verde |
+| 6 | repo › `delete_branch_on_merge` | `false` → **`true`** | Poda automática (ADR-028) |
+| 7 | repo › `allow_update_branch` | `false` → **`true`** | Sem ele, `strict: true` não tem remédio na UI (B5) |
+
+**As linhas 4 e 5 são o ponto mais forte da lista.** Hoje *"não use squash, ele
+colapsaria o par vermelho→verde"* é regra que alguém precisa **lembrar** — e a
+regra 2 diz que essa prova **não é recuperável depois**. Um clique errado destrói
+permanentemente a única evidência auditável do TDD. Com squash e rebase desligados
+no servidor, o GitHub **recusa o clique**. A regra deixa de depender de memória e
+vira propriedade estrutural: a mesma conversão de opinião para código de saída que
+o motor já fez em toda parte.
+
+**Forma de aplicar (não é detalhe):** `PUT /branches/{b}/protection` **substitui o
+objeto inteiro**. Aplicar a linha 1 por esse endpoint apagaria os 10 checks e o
+`enforce_admins` em silêncio. Os ajustes 1 e 2 vão pelo sub-recurso
+`PATCH /branches/{b}/protection/required_status_checks`; os demais por `PATCH` do
+repositório, que é parcial.
+
+### 4. Não-mudanças deliberadas (armadilhas, não esquecimentos)
+
+Uma futura passada de *"vamos endurecer a segurança"* faria estes três ajustes
+achando que melhora. Cada um quebra algo. Ficam proibidos sem ADR que os
+reabra:
+
+| Alvo | Fica em | Por que mexer quebra |
+|---|---|---|
+| `required_linear_history` | **`false`** | `true` **proíbe merge commit** e força squash/rebase — destruiria exatamente o par vermelho→verde que a §3 acabou de blindar. É a armadilha mais perigosa das três, porque *"histórico linear"* soa como rigor |
+| `required_pull_request_reviews` | **`null`** | O GitHub proíbe aprovar o próprio PR. Exigir 1 aprovação num repositório de mantenedor único, com `enforce_admins: true`, é **impasse permanente** — e a única saída seria enfraquecer o `enforce_admins`, que é pior do que o problema |
+| `required_conversation_resolution` | **`false`** | `true` faz um comentário de bot não resolvido **travar o auto-merge** indefinidamente, sem sinal claro. Reabrir só quando houver política de revisão |
+
+### 5. Limites honestos (o que esta ADR não resolve)
+
+1. **Escopo de token.** O agente que aplica estes ajustes precisa de permissão de
+   administração — a mesma que permitiria **desligar a proteção**. Auto-merge move
+   o merge para o servidor, mas não impede um agente com token amplo de derrubar as
+   regras antes. A trava real é um PAT *fine-grained* com `Pull requests: write` e
+   **sem** `Administration`: pode propor e mergear, não pode mexer nas regras.
+   **O agente não pode aplicar isso a si mesmo** — é passo do mantenedor, e sem ele
+   o resto é higiene, não segurança.
+2. **`strict: true` pode travar em silêncio.** Se a base andar com o auto-merge
+   armado, o PR fica desatualizado e o merge simplesmente não acontece, sem alarme.
+   O ajuste 7 dá o botão de atualizar; ninguém o aperta sozinho. Custo aceito
+   enquanto a Fase 0 roda um item por vez.
+3. **A resposta industrial é merge queue**, que testa o *resultado* do merge antes
+   de mergear e resolve concorrência de verdade. É desproporcional para uma linha de
+   integração única com um item por vez — `strict: true` dá a mesma garantia aqui,
+   com muito menos peça. **Reabrir quando a Fase 1 trouxer PRs simultâneos**, que é
+   o momento em que `strict: true` deixa de bastar.
+
+### 6. Rejeitado com motivo (não re-litigar — molde ADR-020 §3)
+
+**GitHub App / Actions bot para dar identidade ao agente.** Rejeitado por
+desnecessário, não por difícil. Um Actions bot serve para o *CI* agir sobre o
+repositório, não para dar identidade a agente externo; um GitHub App resolveria
+identidade, ao custo de infraestrutura própria. Mas **com auto-merge o problema de
+identidade desaparece**: quem executa o merge é o GitHub, não um agente com token.
+Auto-merge não é alternativa ao bot — ele **torna o bot desnecessário**. Reabertura
+exige necessidade nova (múltiplos agentes com permissões distintas), não releitura.
+
+### Consequências
+
+- Qualquer agente, por MCP ou `gh`, pode **armar** o merge; nenhum pode
+  **executá-lo** sobre vermelho. O modelo de segurança sai de *"confie no agente"* e
+  vai para *"o servidor não mergeia vermelho"* — o único que escala para N agentes e
+  não depende de qual modelo está rodando.
+- O par vermelho→verde passa a ser garantido por configuração, não por convenção.
+- A §4 existe para que a próxima passada de endurecimento não desfaça a §3.
+- O passo 1 da §5 fica em aberto e **nomeado**: sem o escopo de token, isto é
+  organização, não controle.
