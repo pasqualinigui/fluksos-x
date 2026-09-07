@@ -2165,3 +2165,124 @@ dependências.
   item anterior (research Q8/E5).
 - A 014 herda duas obrigações nomeadas, não duas lembranças: remover o override
   quando o upstream permitir, e decidir o lugar do `pip-audit` no `lefthook.yml`.
+
+---
+
+## ADR-035 — O merge pertence ao servidor, não ao agente
+
+**Data**: 2026-09-07 · **Item**: nenhum (checkpoint não-item, governança de
+integração) · **Estado**: aceita · **Origem**: pergunta do mantenedor após o
+bloqueio do merge do PR #16 (*"o ideal é que seja possível que agentes de IA façam
+o merge?"*) · **Evidência**: leitura da proteção de `main` e `develop` e dos
+settings do repositório em 2026-09-07, antes e depois · **Efeito**: autoriza os
+ajustes da §3 e **proíbe** os da §4. Nada além destas duas tabelas é tocado.
+
+### 1. O achado que muda a resposta
+
+A pergunta era sobre conveniência. A leitura da proteção revelou um defeito de
+determinismo que já existia, independente de agente:
+
+```
+required_status_checks.strict : false     ← "require branches to be up to date"
+```
+
+Com `strict: false`, os checks de um PR são medidos contra a base do momento em que
+rodaram. Se a linha de integração andar antes do merge, o GitHub mergeia assim
+mesmo — e **o estado resultante do merge é um estado que nenhum check executou**.
+É o conflito semântico clássico: dois PRs verdes isoladamente, vermelhos juntos.
+
+Hoje o risco é teórico, porque a Fase 0 roda um item por vez. Mas ligar auto-merge
+sobre `strict: false` **piora**: automatiza a produção de estado não testado. Seria
+automação sem determinismo, que é o oposto do princípio I.
+
+### 2. Decisão
+
+**O ato de mergear pertence ao servidor.** O agente — humano ou IA — propõe; quem
+decide é a proteção de linha, pelo código de saída dos 10 checks obrigatórios.
+
+É a regra 4 (*"conformidade é código de saída, não opinião"*) aplicada ao último
+passo que ainda era opinião. Com merge manual, mergear é julgamento de alguém: um
+humano olha o verde e clica. Com auto-merge sobre `strict: true`, mergear é
+**consequência**: ninguém decide que está bom, o exit code decide.
+
+Efeito colateral que resolve a pergunta original: com o servidor executando o
+merge, **não existe token de agente assinando o ato**. O registro de auditoria
+deixa de dizer que um humano mergeou algo que não leu.
+
+### 3. Ajustes autorizados (forma exata)
+
+| # | Alvo | De → Para | Fecha |
+|---|---|---|---|
+| 1 | `main` › `required_status_checks.strict` | `false` → **`true`** | O buraco da §1 |
+| 2 | `develop` › `required_status_checks.strict` | `false` → **`true`** | Espelho não pode ser mais frouxo que o espelhado |
+| 3 | repo › `allow_auto_merge` | `false` → **`true`** | O servidor passa a poder executar o merge |
+| 4 | repo › `allow_squash_merge` | `true` → **`false`** | 🔒 par vermelho→verde |
+| 5 | repo › `allow_rebase_merge` | `true` → **`false`** | 🔒 par vermelho→verde |
+| 6 | repo › `delete_branch_on_merge` | `false` → **`true`** | Poda automática (ADR-028) |
+| 7 | repo › `allow_update_branch` | `false` → **`true`** | Sem ele, `strict: true` não tem remédio na UI (B5) |
+
+**As linhas 4 e 5 são o ponto mais forte da lista.** Hoje *"não use squash, ele
+colapsaria o par vermelho→verde"* é regra que alguém precisa **lembrar** — e a
+regra 2 diz que essa prova **não é recuperável depois**. Um clique errado destrói
+permanentemente a única evidência auditável do TDD. Com squash e rebase desligados
+no servidor, o GitHub **recusa o clique**. A regra deixa de depender de memória e
+vira propriedade estrutural: a mesma conversão de opinião para código de saída que
+o motor já fez em toda parte.
+
+**Forma de aplicar (não é detalhe):** `PUT /branches/{b}/protection` **substitui o
+objeto inteiro**. Aplicar a linha 1 por esse endpoint apagaria os 10 checks e o
+`enforce_admins` em silêncio. Os ajustes 1 e 2 vão pelo sub-recurso
+`PATCH /branches/{b}/protection/required_status_checks`; os demais por `PATCH` do
+repositório, que é parcial.
+
+### 4. Não-mudanças deliberadas (armadilhas, não esquecimentos)
+
+Uma futura passada de *"vamos endurecer a segurança"* faria estes três ajustes
+achando que melhora. Cada um quebra algo. Ficam proibidos sem ADR que os
+reabra:
+
+| Alvo | Fica em | Por que mexer quebra |
+|---|---|---|
+| `required_linear_history` | **`false`** | `true` **proíbe merge commit** e força squash/rebase — destruiria exatamente o par vermelho→verde que a §3 acabou de blindar. É a armadilha mais perigosa das três, porque *"histórico linear"* soa como rigor |
+| `required_pull_request_reviews` | **`null`** | O GitHub proíbe aprovar o próprio PR. Exigir 1 aprovação num repositório de mantenedor único, com `enforce_admins: true`, é **impasse permanente** — e a única saída seria enfraquecer o `enforce_admins`, que é pior do que o problema |
+| `required_conversation_resolution` | **`false`** | `true` faz um comentário de bot não resolvido **travar o auto-merge** indefinidamente, sem sinal claro. Reabrir só quando houver política de revisão |
+
+### 5. Limites honestos (o que esta ADR não resolve)
+
+1. **Escopo de token.** O agente que aplica estes ajustes precisa de permissão de
+   administração — a mesma que permitiria **desligar a proteção**. Auto-merge move
+   o merge para o servidor, mas não impede um agente com token amplo de derrubar as
+   regras antes. A trava real é um PAT *fine-grained* com `Pull requests: write` e
+   **sem** `Administration`: pode propor e mergear, não pode mexer nas regras.
+   **O agente não pode aplicar isso a si mesmo** — é passo do mantenedor, e sem ele
+   o resto é higiene, não segurança.
+2. **`strict: true` pode travar em silêncio.** Se a base andar com o auto-merge
+   armado, o PR fica desatualizado e o merge simplesmente não acontece, sem alarme.
+   O ajuste 7 dá o botão de atualizar; ninguém o aperta sozinho. Custo aceito
+   enquanto a Fase 0 roda um item por vez.
+3. **A resposta industrial é merge queue**, que testa o *resultado* do merge antes
+   de mergear e resolve concorrência de verdade. É desproporcional para uma linha de
+   integração única com um item por vez — `strict: true` dá a mesma garantia aqui,
+   com muito menos peça. **Reabrir quando a Fase 1 trouxer PRs simultâneos**, que é
+   o momento em que `strict: true` deixa de bastar.
+
+### 6. Rejeitado com motivo (não re-litigar — molde ADR-020 §3)
+
+**GitHub App / Actions bot para dar identidade ao agente.** Rejeitado por
+desnecessário, não por difícil. Um Actions bot serve para o *CI* agir sobre o
+repositório, não para dar identidade a agente externo; um GitHub App resolveria
+identidade, ao custo de infraestrutura própria. Mas **com auto-merge o problema de
+identidade desaparece**: quem executa o merge é o GitHub, não um agente com token.
+Auto-merge não é alternativa ao bot — ele **torna o bot desnecessário**. Reabertura
+exige necessidade nova (múltiplos agentes com permissões distintas), não releitura.
+
+### Consequências
+
+- Qualquer agente, por MCP ou `gh`, pode **armar** o merge; nenhum pode
+  **executá-lo** sobre vermelho. O modelo de segurança sai de *"confie no agente"* e
+  vai para *"o servidor não mergeia vermelho"* — o único que escala para N agentes e
+  não depende de qual modelo está rodando.
+- O par vermelho→verde passa a ser garantido por configuração, não por convenção.
+- A §4 existe para que a próxima passada de endurecimento não desfaça a §3.
+- O passo 1 da §5 fica em aberto e **nomeado**: sem o escopo de token, isto é
+  organização, não controle.

@@ -72,6 +72,7 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
 | Bootstrap zero-context (primeira mensagem) | `docs/guides/agent-bootstrap.md` |
+| Estado servidor de integração (merge, proteção) | `scripts/governance/apply-adr-035.sh --check` |
 
 ## Precedence
 
