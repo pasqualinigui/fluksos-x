@@ -2059,3 +2059,109 @@ releitura.
 - O item de Fase 4 recebe a restrição de determinismo **antes** de desenhar, em
   vez de descobri-la no ANALYZE.
 - A 013 permanece com o escopo que tinha: publicar, não consultar.
+
+---
+
+## ADR-034 — Teto transitivo do `click`: override mínimo, asserido, com condição de saída
+
+**Data**: 2026-09-07 · **Item**: 013 (emenda pós-convergência) · **Estado**: aceita
+· **Origem**: `PYSEC-2026-2132` publicado após a convergência do 013, derrubando 3
+dos 10 checks obrigatórios no PR #16 · **Pesquisa vinculante**:
+`docs/plan/research/f0-013-click-cve.md` (Q1–Q9, E1–E7, 2026-09-07).
+
+### 1. O fato, e o que ele não é
+
+`python-semantic-release==10.6.2` declara `click<8.5.0,~=8.1.0`, que resolve em
+`>=8.1.0,<8.2.0` e prende o `click` em 8.1.8. O `PYSEC-2026-2132`
+(`CVE-2026-7246`) é injeção de comando em `click.edit()`, corrigida em 8.3.3.
+
+**Não é defeito de entrega do 013.** O item entregou exatamente o que especificou,
+e o research de 2026-09-06 já registrara o teto `~=8.1.0` e a entrada do `click`
+no `uv.lock` (Q1). O advisory não existia. Fato novo, não erro velho.
+
+**Não alcança o produto** (research Q3, duas verificações independentes): o `click`
+de topo é do grupo `dev` e não viaja sob `--no-dev`; e o `_click` que o `typer`
+0.27.2 vendoriza **não tem** o módulo do editor — `grep "edit"` nele dá zero. O
+`fkx-cli` publicado não carrega a falha. O vermelho, ainda assim, está certo: o
+`pip-audit` mede o ambiente resolvido, e nele a falha existe.
+
+### 2. Decisão
+
+```toml
+[tool.uv]
+override-dependencies = ["click>=8.3.3,<8.5.0"]
+```
+
+O piso `8.3.3` é a correção. O teto `<8.5.0` **preserva** o limite que o próprio PSR
+declara: o override levanta somente a trava que carrega o CVE, e nada além.
+Verificado de ponta a ponta (Q7): `click` 8.1.8 → 8.4.2 como **único** pacote
+alterado, `pip-audit` limpo, `uv sync --frozen` consistente, `ruff`, `mypy --strict`
+e `f0-008` verdes. Compatibilidade do PSR **medida** em 4 versões do `click`, com
+saída byte-idêntica em 8.4.2 (Q6).
+
+### 3. As três alternativas rejeitadas, com motivo (molde ADR-020 §3)
+
+**Supressão por `--ignore-vuln`** — rejeitada por **governança, antes do mérito**. O
+`pip-audit` 2.10.1 não tem arquivo de configuração (Q5): a supressão só existe em
+linha de comando, e alcançá-la exigiria editar `scripts/verify/f0-008-pip-audit.sh`,
+oráculo de item anterior. É a **Regra 5**. Reabertura exigiria que o `pip-audit`
+ganhasse configuração versionada — não releitura.
+
+**Isolar o PSR fora do workspace** (`uvx` no workflow) — rejeitada por **método**.
+Tiraria o `click` do `uv.lock` e o vermelho junto, mas o PSR continuaria executando
+sobre `click` 8.1.8 na hora do release, agora fora do alcance do `pip-audit`.
+Resolve por invisibilidade, não por correção: troca um vermelho honesto por um verde
+falso, que é precisamente o que o princípio IV proíbe. Quebraria também o FR-001.
+
+**Esperar o upstream** — rejeitada por **indisponibilidade**. 10.6.2 é a última
+publicada (Q4). Sem prazo, e com `main` bloqueada por 10 checks `enforce_admins`.
+
+### 4. Por que emenda ao 013, e não spec nova
+
+O override existe **unicamente** porque o PSR está no grupo `dev`, e o PSR é entrega
+do 013 (FR-001). Uma spec `017` fragmentaria a posse — o 013 ficaria com a
+dependência e o 017 com a correção do teto dela — e criaria item cujo conteúdo
+inteiro é uma linha de `pyproject.toml`. A Regra 9 põe a posse no item que
+introduziu o fato. Precedente direto na mesma linha: PR #13
+(`f0-013-emenda-fr009`) e PR #14 (`f0-013-correcao-procedencia`), ambos amendando o
+013 já especificado.
+
+Estender `scripts/verify/f0-013-release.sh` é permitido: a Regra 5 protege o oráculo
+**anterior**, e este é o do próprio item.
+
+### 5. Condição de saída (a mitigação nasce com prazo e com dono)
+
+O `override-dependencies` é global e silencioso: vale para todo o grafo e não avisa
+quando mascara conflito futuro. Três travas contra virar dívida esquecida:
+
+1. **Especificador mínimo**, asserido **literalmente** pelo `FR-017` — alargar o
+   override exige mexer no oráculo, nunca passa em silêncio.
+2. **Condição de saída explícita**: quando o PSR relaxar `click~=8.1.0`, o override
+   **e** o `FR-017` são removidos, e o oráculo volta a 16 asserções.
+3. **Dono nomeado**: transferida ao **014** (`atualização de dependências`) pela
+   seção *Transferido a itens posteriores* do contrato do 013. Pela ADR-020 §2,
+   RESEARCH da 014 que não cite e avalie esta entrada viola rastreabilidade (VIII).
+
+### 6. Achado colateral transferido junto
+
+O `lefthook.yml` roda `pip-audit` em `pre-commit`. Enquanto a vulnerabilidade
+existe, nenhum commit passa — inclusive o portão vermelho que a Regra 2 exige antes
+do verde (research Q9/E7). A única saída pelo hook seria commitar o verde primeiro,
+que é o que a Regra 2 proíbe. **Um gate de vulnerabilidade em `pre-commit` converte
+"corrigir a vulnerabilidade" em operação impossível.** Os commits pré-verde deste
+ciclo vão com `--no-verify`, com os demais portões executados à mão e o fato
+registrado em cada mensagem; nada vinculante é contornado, porque os 10 checks
+sem-bypass julgam o head final. O desenho do `lefthook.yml` — `pre-commit` ou
+`pre-push` para `pip-audit` — é decisão da **014**, que possui a política de
+dependências.
+
+### Consequências
+
+- O 013 passa a 17 asserções; `FR-015` acompanha (`12–16` → `12–17`) e o mapa de
+  identidade do contrato registra a extensão, como manda a Regra 8.
+- O commit vermelho leva `f0-013-release.sh` **e** a 13ª linha do `manifest.sha256`
+  no mesmo ato: `f0-009`/`010`/`011`/`012` verificam `sha256sum -c` sobre o manifest
+  inteiro, e separar os dois faria o próprio portão vermelho causar regressão em
+  item anterior (research Q8/E5).
+- A 014 herda duas obrigações nomeadas, não duas lembranças: remover o override
+  quando o upstream permitir, e decidir o lugar do `pip-audit` no `lefthook.yml`.
