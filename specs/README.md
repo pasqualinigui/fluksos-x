@@ -22,7 +22,7 @@
 | `010` | **0.14** | F0 | CI completo (ci-completo) + branch protection | ✅ concluída (`b89f804`) |
 | `011` | **0.6** | F0 | `packages/core` (packages-core) | ✅ concluída (`770b136`) |
 | `012` | **0.7** | F0 | `packages/cli` (packages-cli) | ✅ concluída (`605a8de`) |
-| `013` | **0.15** | F0 | Automação de release | ✅ concluída (`pending`) |
+| `013` | **0.15** | F0 | Automação de release | ✅ concluída (`7e44001`) |
 | `014` | **0.16** | F0 | Atualização de dependências | ⏳ |
 | `015` | **0.8** | F0 | docker-compose | ⏳ |
 | `016` | **0.10** | F0 | `docs/tree.md` | ⏳ |
