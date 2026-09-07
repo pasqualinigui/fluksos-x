@@ -4,7 +4,7 @@
 
 ## Summary
 
-Configurar versionamento semântico via `python-semantic-release==10.6.2`, com `CHANGELOG.md`, carimbo em lockstep, construção por `uv build`, publicação por `pypa/gh-action-pypi-publish@v1.14.2` (OIDC), inventário CycloneDX 1.5 via `uv export`, e oráculo `f0-013-release.sh` com 16 asserções.
+Configurar versionamento semântico via `python-semantic-release==10.6.2`, com `CHANGELOG.md`, carimbo em lockstep, construção por `uv build`, publicação por `pypa/gh-action-pypi-publish@v1.14.2` (OIDC), inventário CycloneDX 1.5 via `uv export`, e oráculo `f0-013-release.sh` com 17 asserções (16 originais + `FR-017` pela emenda ADR-034).
 
 ## Constitution Check
 
@@ -15,7 +15,7 @@ Configurar versionamento semântico via `python-semantic-release==10.6.2`, com `
 | III Teste antes | ✅ PASS | oráculo vermelho→verde separado |
 | IV Dados antes | ✅ PASS | data-model + contratos |
 | V Lei Zero | ✅ PASS | OIDC, sem credencial em arquivo |
-| VI Oráculo | ✅ PASS | 16 asserções novas, 001-012 intocados |
+| VI Oráculo | ✅ PASS | 17 asserções novas (FR-017 pela emenda ADR-034), 001-012 intocados |
 | VII Auto-reparo | ✅ PASS | lições 009-012 consumidas |
 | VIII Elo verificado | ✅ PASS | PyPI + GitHub + executado Q1-Q10 |
 | IX Agnosticismo | ✅ PASS | versiona este motor |

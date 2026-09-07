@@ -49,3 +49,17 @@ description: "Task list for 013 — automação de release"
 - [x] T023 Re-executar harness 13/13
 - [x] T024 Confirmar tasks zero [ ] + AGENTS.md
 - [x] T025 Troubleshooting + commit docs(specs)
+
+---
+
+## Phase 8: Emenda ADR-034 — override de `click` (pós-convergência)
+
+> Gatilho: `PYSEC-2026-2132` publicado depois da convergência, derrubando `audit`,
+> `harness` e `verify` no PR #16. Pesquisa: `docs/plan/research/f0-013-click-cve.md`.
+
+- [ ] T026 RESEARCH — Q1–Q9 verificadas contra OSV/PyPI/disco/réplica; E1–E7
+- [ ] T027 DECIDE — ADR-034 com as 3 rejeições fundamentadas e a condição de saída
+- [ ] T028 SPECIFY — `FR-017`; `FR-015` de `12–16` para `12–17`; mapa de identidade
+- [ ] T029 **VERMELHO** — `FR-017` no oráculo **+ 13ª linha do manifest no mesmo commit** (E5: separar faria `f0-009/010/011/012` reprovarem junto), evidência em `evidence/red-fr017.txt`
+- [ ] T030 **VERDE** — `override-dependencies` no `pyproject.toml` + `uv lock`
+- [ ] T031 CONVERGE — harness 13/13, `specs/README.md`, `AGENTS.md`, zero `[ ]`

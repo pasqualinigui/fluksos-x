@@ -1,6 +1,6 @@
 # Contrato do oráculo: `f0-013-release.sh` — mapa FR↔asserção (ADR-015b)
 
-**Spec**: `specs/013-release-automation/spec.md` (16 FRs, 11 SCs, 4 US) · **Oráculo**: `scripts/verify/f0-013-release.sh`
+**Spec**: `specs/013-release-automation/spec.md` (17 FRs, 11 SCs, 4 US — FR-017 pela emenda ADR-034) · **Oráculo**: `scripts/verify/f0-013-release.sh`
 **Contrato de interface**: `specs/001-git-branching-strategy/contracts/oracle-cli.md`
 
 Identidade 1:1 — o oráculo emite os IDs **da spec**, sem remapeamento.
@@ -21,12 +21,13 @@ Identidade 1:1 — o oráculo emite os IDs **da spec**, sem remapeamento.
 | FR-012 | FR-012 | fluxo não grava em `main` sem PR; tag é gatilho |
 | FR-013 | FR-013 | `setup-uv` com `version:` pinado |
 | FR-014 | FR-014 | `checklists/server-side.md` presente |
-| FR-015 | FR-015 | contrato: `--list` 16 IDs, `--invalido` exit 2, 2× <5s, self-check série |
+| FR-015 | FR-015 | contrato: `--list` 17 IDs, `--invalido` exit 2, 2× <5s, self-check série |
 | FR-016 | FR-016 | `specs/README.md` `013 ✅` + hash; `tasks.md` zero `[ ]`; vermelho→verde |
+| FR-017 | FR-017 | `override-dependencies` = `click>=8.3.3,<8.5.0`; `uv.lock` resolve `click >= 8.3.3` |
 
 ### Entregue por este item
 
-- Oráculo `f0-013-release.sh` (16 asserções identidade) + 13ª linha do manifest.
+- Oráculo `f0-013-release.sh` (17 asserções identidade) + 13ª linha do manifest.
 - Checklist `checklists/server-side.md` (metade servidora 🧑).
 
 ### Recebido de itens anteriores
@@ -36,5 +37,7 @@ Identidade 1:1 — o oráculo emite os IDs **da spec**, sem remapeamento.
 ### Transferido a itens posteriores
 
 - Pipeline de release verde como validador (014).
+- **Condição de saída do override de `click`** (014): quando `python-semantic-release` relaxar `click~=8.1.0`, a **014** remove `override-dependencies` e o `FR-017`, devolvendo o oráculo a 16 asserções (ADR-034 §5). RESEARCH da 014 que não cite e avalie a ADR-034 viola rastreabilidade (VIII), pela ADR-020 §2.
+- **Lugar do `pip-audit` no `lefthook.yml`** (014): gate de vulnerabilidade em `pre-commit` bloqueia o próprio portão vermelho da correção (research emenda Q9/E7). A política é da 014.
 - Trava exportada como base de comparação (014).
 - Estrutura final incluindo fluxo de release (016).
