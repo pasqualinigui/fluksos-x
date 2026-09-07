@@ -2246,16 +2246,40 @@ reabra:
 | `required_linear_history` | **`false`** | `true` **proíbe merge commit** e força squash/rebase — destruiria exatamente o par vermelho→verde que a §3 acabou de blindar. É a armadilha mais perigosa das três, porque *"histórico linear"* soa como rigor |
 | `required_pull_request_reviews` | **`null`** | O GitHub proíbe aprovar o próprio PR. Exigir 1 aprovação num repositório de mantenedor único, com `enforce_admins: true`, é **impasse permanente** — e a única saída seria enfraquecer o `enforce_admins`, que é pior do que o problema |
 | `required_conversation_resolution` | **`false`** | `true` faz um comentário de bot não resolvido **travar o auto-merge** indefinidamente, sem sinal claro. Reabrir só quando houver política de revisão |
+| environment `release` › `prevent_self_review` | **`false`** | *(acrescentado 2026-09-07, ao aplicar o FR-014)* `true` impede o mantenedor único de aprovar o próprio deployment — impasse permanente cuja única saída seria remover o required reviewer, ou seja, ficar **sem** aprovação. Terceira ocorrência do mesmo padrão desta tabela: **regra de revisão que pressupõe dois atores, aplicada onde há um** |
 
 ### 5. Limites honestos (o que esta ADR não resolve)
 
-1. **Escopo de token.** O agente que aplica estes ajustes precisa de permissão de
-   administração — a mesma que permitiria **desligar a proteção**. Auto-merge move
-   o merge para o servidor, mas não impede um agente com token amplo de derrubar as
-   regras antes. A trava real é um PAT *fine-grained* com `Pull requests: write` e
-   **sem** `Administration`: pode propor e mergear, não pode mexer nas regras.
-   **O agente não pode aplicar isso a si mesmo** — é passo do mantenedor, e sem ele
-   o resto é higiene, não segurança.
+1. **Escopo de token — avaliado e deliberadamente adiado, com consumidor nomeado.**
+   O agente que aplica estes ajustes precisa de permissão de administração — a
+   mesma que permitiria **desligar a proteção**. A trava aparente seria um PAT
+   *fine-grained* com `Pull requests: write` e **sem** `Administration`.
+
+   **Não é adotada agora, e não por preguiça.** Três razões, em ordem:
+
+   (a) **Determinismo: impacto zero.** O escopo do token não altera build, trava,
+   harness nem oráculo. O princípio I não está em jogo — é questão de controle de
+   acesso, não de reprodutibilidade.
+
+   (b) **Hoje ela piora o que pretende melhorar.** O token teria de morar em algum
+   lugar: no keyring (e então o mantenedor perde admin no uso interativo, e este
+   próprio script para de funcionar), em `.claude/settings.json` (**credencial em
+   arquivo versionado — Lei Zero, descartado**) ou em `settings.local.json` (fora
+   do histórico, mas é uma **segunda credencial em texto plano** a rotacionar).
+   Com **um único ator**, troca-se "o agente poderia enfraquecer a proteção" por
+   "existe mais um segredo em disco". Troca ruim.
+
+   (c) **O controle coerente com este motor é detecção, não prevenção.** O
+   fluksos-x não impede commit ruim — detecta com o harness (regra 4). O análogo
+   existe e está pronto: `apply-adr-035.sh --check` mede a divergência e sai 1,
+   apontado no `AGENTS.md`. Enfraquecer a proteção passa a ser **visível**, que é
+   a forma que este projeto usa em toda parte.
+
+   **Consumidor nomeado (ADR-020 §2):** a hipótese que sustenta (b) é *um único
+   ator*. Ela cai quando houver vários — o que chega na **Fase 2 (Agentes Core)**.
+   RESEARCH do item que introduzir execução multiagente com credencial de servidor
+   MUST citar e reavaliar esta entrada; ANALYZE que a ignore é achado no mínimo
+   MEDIUM. Até lá, o limite fica **medido**, não esquecido.
 2. **`strict: true` pode travar em silêncio.** Se a base andar com o auto-merge
    armado, o PR fica desatualizado e o merge simplesmente não acontece, sem alarme.
    O ajuste 7 dá o botão de atualizar; ninguém o aperta sozinho. Custo aceito
