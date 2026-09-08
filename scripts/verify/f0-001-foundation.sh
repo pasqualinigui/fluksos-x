@@ -389,7 +389,11 @@ import re, sys
 RX = re.compile(r"^(feat|fix|docs|test|refactor|ci|chore|perf|build|style|revert)"
                 r"(\([a-z0-9][a-z0-9._-]*\))?(!)?: .+")
 # ADR-030: merges sinteticos do GitHub (PR) nao sao registros de autor
-MERGE = re.compile(r"^Merge [0-9a-f]{40} into \S+|^Merge pull request #[0-9]+ from \S+")
+# ADR-038: merges de sincronizacao do botao Update branch tambem nao sao:
+# a forma Merge branch A into B e registro automatizado sem autor, mesma
+# classe dos dois acima (a forma exata importa: sync-merges tem essa e so
+# essa forma; mensagem de autor que a imitasse seria detectavel no diff)
+MERGE = re.compile(r"^Merge [0-9a-f]{40} into \S+|^Merge pull request #[0-9]+ from \S+|^Merge branch '.+' into \S+$")
 bad = [l for l in sys.stdin.read().splitlines() if l.strip() and not RX.match(l) and not MERGE.match(l)]
 print("; ".join(sorted(bad)))
 ')"

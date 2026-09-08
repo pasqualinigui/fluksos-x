@@ -109,8 +109,8 @@ declare -A CANON=(
 
 CANON_ORDER="FR-001 FR-002 FR-003 FR-004 FR-005a FR-005b FR-006 FR-007 FR-008 FR-009 FR-010a FR-010b FR-011 FR-012 FR-013 FR-014 FR-015 FR-016a FR-016b FR-017a FR-017b FR-018 FR-019a FR-019b SC-008 FR-020a FR-020b FR-020c FR-021a FR-021b FR-022 FR-023 SC-006"
 
-# --- constantes fixadas (contrato §4, ADR-006; HASH_F0_001 acompanha ADR-029 e ADR-030) ---
-HASH_F0_001="b29e9942c2f5c94739c68323946b997bd0b4f9e767b0f47231d07d080640947b"
+# --- constantes fixadas (contrato §4, ADR-006; HASH_F0_001 acompanha ADR-029, ADR-030 e ADR-038) ---
+HASH_F0_001="f9be36910cad2f716cf76eac6795afa6cfec9ae0ac70ca8f624dcd64bd0d4b4a" # ADR-038: acompanha o 3o padrao de merge em f0-001 (consequencia mecanica, sem mudanca de semantica)
 BUDGET_AGENTS=150
 BUDGET_TOTAL=175
 DUP_MINLEN=40
