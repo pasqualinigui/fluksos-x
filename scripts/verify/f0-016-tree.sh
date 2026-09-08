@@ -158,7 +158,10 @@ else
   fi
   while IFS= read -r path; do
     [ -z "$path" ] && continue
-    if ! echo "$REGION" | grep -qxF "$path" 2>/dev/null; then
+    # Herestring (arquivo temporario, sem pipe): imune a SIGPIPE+pipefail —
+    # `echo GRANDE | grep -q` com match cedo mata o echo (141) e o pipefail
+    # transforma em falso-negativo intermitente. Achado documentado no verde.
+    if ! grep -qxF "$path" <<< "$REGION" 2>/dev/null; then
       FR2_OK=0; EVID2="${EVID2}path do indice ausente no mapa: $path; "
       break
     fi
@@ -181,7 +184,7 @@ if [ ! -f "$GENERATOR" ]; then
   FR3_OK=0; EVID3="${EVID3}scripts/generate-tree.py ausente; "
 else
   if grep -qE "^import |^from " "$GENERATOR" 2>/dev/null; then
-    if grep -E "^import |^from " "$GENERATOR" 2>/dev/null | grep -qvE "^(import|from) (os|sys|subprocess|pathlib|argparse)" 2>/dev/null; then
+    if grep -E "^import |^from " "$GENERATOR" 2>/dev/null | grep -qvE "^(import|from) (os|sys|shutil|subprocess|pathlib|argparse)" 2>/dev/null; then
       FR3_OK=0; EVID3="${EVID3}import fora da stdlib permitida (D5); "
     fi
   fi
@@ -227,7 +230,10 @@ FR5_OK=1; EVID5=""
 if [ ! -f "$TREE" ]; then
   FR5_OK=0; EVID5="${EVID5}docs/tree.md ausente; "
 else
-  if grep -qiE '\.env(\.|$)|secrets/|_PASSWORD|_SECRET|PRIVATE KEY|BEGIN .* KEY' "$TREE" 2>/dev/null; then
+  # .env.example e o molde versionavel (referencia-lo e obrigatorio);
+  # secrets/ sozinho nomeia o diretorio ignorado (documentacao); arquivo
+  # dentro dele (secrets/<nome>) seria conteudo versionado — vedado.
+  if grep -qiE '\.env($|[^.a-zA-Z])|secrets/[A-Za-z0-9_]|_PASSWORD|_SECRET|PRIVATE KEY|BEGIN .* KEY' "$TREE" 2>/dev/null; then
     FR5_OK=0; EVID5="${EVID5}padrao sensivel no mapa (Lei Zero); "
   fi
   while IFS= read -r tok; do

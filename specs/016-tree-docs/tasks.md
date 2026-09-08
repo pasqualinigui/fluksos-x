@@ -21,9 +21,9 @@ description: "Task list for 016 — docs/tree.md, mapa da árvore para IA"
 
 **Purpose**: base verde + branch + evidência
 
-- [ ] T001 [P] Confirmar harness 15/15 + manifest 15/15 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
-- [ ] T002 [P] Re-verificar fronteira no disco (`grep -rn "tree\.md|generate-tree|tree-docs" scripts/verify/ .github/ lefthook.yml pyproject.toml` → zero; confirma fronteira zero do plan)
-- [ ] T003 Criar branch `feature/f0-tree-docs` desde `main` + diretório `specs/016-tree-docs/evidence/`
+- [x] T001 [P] Confirmar harness 15/15 + manifest 15/15 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
+- [x] T002 [P] Re-verificar fronteira no disco (`grep -rn "tree\.md|generate-tree|tree-docs" scripts/verify/ .github/ lefthook.yml pyproject.toml` → zero; confirma fronteira zero do plan)
+- [x] T003 Criar branch `feature/f0-tree-docs` desde `main` + diretório `specs/016-tree-docs/evidence/`
 
 ---
 
@@ -33,9 +33,9 @@ description: "Task list for 016 — docs/tree.md, mapa da árvore para IA"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Criar `scripts/verify/f0-016-tree.sh` com esqueleto (cabeçalho Q1–Q5/D1–D5, CANON 9 IDs, contrato `contracts/oracle-cli.md`, self-check série ADR-031)
-- [ ] T005 Acrescer 16ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
-- [ ] T006 Implementar asserts auto-verificáveis em `scripts/verify/f0-016-tree.sh` (`--list` 9 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-015`)
+- [x] T004 Criar `scripts/verify/f0-016-tree.sh` com esqueleto (cabeçalho Q1–Q5/D1–D5, CANON 9 IDs, contrato `contracts/oracle-cli.md`, self-check série ADR-031)
+- [x] T005 Acrescer 16ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
+- [x] T006 Implementar asserts auto-verificáveis em `scripts/verify/f0-016-tree.sh` (`--list` 9 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-015`)
 
 **Checkpoint**: Foundation ready — oráculo existe e fala o contrato
 
@@ -51,11 +51,11 @@ description: "Task list for 016 — docs/tree.md, mapa da árvore para IA"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [US1] FR-001/FR-006 em `scripts/verify/f0-016-tree.sh` (H1+resumo+árvore+ponteiros; destinos herdados 013/014/015)
-- [ ] T008 [US2] FR-002/FR-003/FR-005 em `scripts/verify/f0-016-tree.sh` (esqueleto==gerador, 2× determinístico, zero segredo/fora-do-índice)
-- [ ] T009 [US3] FR-008 em `scripts/verify/f0-016-tree.sh` (auditoria `f0-audit-013-016.md` + cabeçalhos — vermelho esperado: relatório ainda não existe)
-- [ ] T010 FR-004/FR-007 em `scripts/verify/f0-016-tree.sh` (curadoria ≤120 linhas + total ≤25600 bytes; contrato auto-verificável)
-- [ ] T011 **VERMELHO** — executar `scripts/verify/f0-016-tree.sh`, preservar `specs/016-tree-docs/evidence/red.txt`, commit `test(harness)` separado (com a 16ª linha do manifest no mesmo ato; sem ADR — fronteira zero declarada no plan)
+- [x] T007 [US1] FR-001/FR-006 em `scripts/verify/f0-016-tree.sh` (H1+resumo+árvore+ponteiros; destinos herdados 013/014/015)
+- [x] T008 [US2] FR-002/FR-003/FR-005 em `scripts/verify/f0-016-tree.sh` (esqueleto==gerador, 2× determinístico, zero segredo/fora-do-índice)
+- [x] T009 [US3] FR-008 em `scripts/verify/f0-016-tree.sh` (auditoria `f0-audit-013-016.md` + cabeçalhos — vermelho esperado: relatório ainda não existe)
+- [x] T010 FR-004/FR-007 em `scripts/verify/f0-016-tree.sh` (curadoria ≤120 linhas + total ≤25600 bytes; contrato auto-verificável)
+- [x] T011 **VERMELHO** — executar `scripts/verify/f0-016-tree.sh`, preservar `specs/016-tree-docs/evidence/red.txt`, commit `test(harness)` separado (com a 16ª linha do manifest no mesmo ato; sem ADR — fronteira zero declarada no plan)
 
 **Checkpoint**: vermelho genuíno preservado; nada a autorizar (zero toques em oráculo anterior)
 
@@ -69,11 +69,11 @@ description: "Task list for 016 — docs/tree.md, mapa da árvore para IA"
 
 ### Implementation
 
-- [ ] T012 [US1] Criar `scripts/generate-tree.py` (stdlib, `git ls-files`, `LC_ALL=C`, ordenado, só-stdout, 2× byte-idêntico)
-- [ ] T013 [US1] Criar `docs/tree.md` com H1+resumo+esqueleto do gerador+tabela de ponteiros (depends on T012 — conteúdo deriva do gerador)
-- [ ] T014 [US2] Curar `docs/tree.md` (1 linha por diretório + ponteiros, teto ≤120 linhas na curadoria) (depends on T013 — mesmo arquivo, NUNCA paralelo)
-- [ ] T015 [P] [US3] Produzir `docs/plan/audit/f0-audit-013-016.md` como checkpoint não-item (formato ADR-014: `Veredito`, `Achados`, `Destino`; fora do mapa ADR-011)
-- [ ] T016 Executar cenários 1–4 de `specs/016-tree-docs/quickstart.md` (depends on T012–T014)
+- [x] T012 [US1] Criar `scripts/generate-tree.py` (stdlib, `git ls-files`, `LC_ALL=C`, ordenado, só-stdout, 2× byte-idêntico)
+- [x] T013 [US1] Criar `docs/tree.md` com H1+resumo+esqueleto do gerador+tabela de ponteiros (depends on T012 — conteúdo deriva do gerador)
+- [x] T014 [US2] Curar `docs/tree.md` (1 linha por diretório + ponteiros, teto ≤120 linhas na curadoria) (depends on T013 — mesmo arquivo, NUNCA paralelo)
+- [x] T015 [P] [US3] Produzir `docs/plan/audit/f0-audit-013-016.md` como checkpoint não-item (formato ADR-014: `Veredito`, `Achados`, `Destino`; fora do mapa ADR-011)
+- [x] T016 Executar cenários 1–4 de `specs/016-tree-docs/quickstart.md` (depends on T012–T014)
 
 **Checkpoint**: oráculo verde + quickstart verde
 
