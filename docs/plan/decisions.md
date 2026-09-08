@@ -2310,3 +2310,107 @@ exige necessidade nova (múltiplos agentes com permissões distintas), não rele
 - A §4 existe para que a próxima passada de endurecimento não desfaça a §3.
 - O passo 1 da §5 fica em aberto e **nomeado**: sem o escopo de token, isto é
   organização, não controle.
+
+---
+
+## ADR-036 — Pré-autorização de fronteira da 014: `pip-audit` no `pre-push` (ponto único em `f0-009` FR-003)
+
+**Data**: 2026-09-08 · **Item**: `014` (0.16), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 014 (`f0-014` FR-008 reprova sobre estado
+correto futuro + `lefthook.yml:20-21` com `pip-audit` no `pre-commit`) +
+`specs/014-dependency-updates/plan.md` (declaração de impacto) · **Efeito**:
+autoriza o ajuste abaixo **exclusivamente no commit verde da 014 (Fase C)**.
+
+### Contexto
+
+Um conflito genuíno, previsto na tabela Q9 do research
+(`docs/plan/research/f0-014-dependency-updates.md`, levantamento mecânico sobre
+os 13 oráculos). A 014 move `uv run pip-audit` para o `pre-push` por desenho
+(teorema ADR-034 §6: gate em `pre-commit` + Regra 2 = correção futura impossível;
+precedente convergido: `trivy` só em `pre-push`, FR-004 da 009). A asserção
+`f0-009` FR-003 exige `uv run pip-audit` presente **e** após `uv run pytest` por
+número de linha — sem ajuste, o harness reprovaria estado correto; com ajuste
+silencioso, repetiríamos o achado A1 (`f0-audit-005-008.md`).
+
+### Ajuste autorizado (forma exata, só na Fase C)
+
+Em `scripts/verify/f0-009-lefthook.sh` (FR-003): admitir `uv run pip-audit`
+ausente do bloco `pre-commit` **se** presente após o harness no bloco `pre-push`
+(jurisdição 014); ordem fail-fast do `pre-commit`
+(ruff < format < mypy < pytest) intacta; resto da FR intacto. Padrão ADR-018
+(legitimidade: `pip-audit==2.10.1` em `dev` + `uv.lock`,
+nunca nome estático). Manifest regenerado na Fase C citando esta ADR.
+Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix direto.
+
+### Consequências
+
+- Sétima execução do procedimento ADR-017 sobre oráculo alheio. A FR-008 da 014
+  (oráculo asserir PLAN + esta ADR) aprova no verde.
+- `[tool.pip-audit]` / `pip-audit.toml` / `--ignore-vuln` seguem **proibidos**
+  (`f0-008` FR-002, invariante): esta ADR move o gate, não cria supressão.
+- `.github/` segue sem o literal `lefthook` (FR-009 da 009): a config do bot e o
+  workflow de automerge não nomeiam a fronteira.
+
+---
+
+## ADR-037 — Bump verificado do `ruff` 0.16.5→0.16.6 no PR #23 (primeira execução do procedimento de bump)
+
+**Data**: 2026-09-08 · **Item**: nenhum (checkpoint não-item, pós-014; primeiro PR
+real do bot) · **Estado**: aceita · **Evidência**: run do PR #23
+(`f0-006` FR-001 vermelha com `dev=[... 'ruff==0.16.6']`, demais 13/14 verdes,
+`lint` com 0.16.6 verde) + delta abaixo · **Efeito**: autoriza os ajustes da §3,
+com re-verde no runner antes do merge. Nada além dela é tocado.
+
+### 1. O vermelho estava certo
+
+O portão reprovou `ruff==0.16.6` porque 0.16.6 nunca fora verificada — e
+verificação ausente reprovar é o comportamento correto, não defeito. É também a
+resposta à pergunta estrutural da 014: bump direto quebra o pin por desenho; o
+procedimento abaixo é como bumps voltam ao verde sem violar a Regra 5.
+
+### 2. Delta verificado (pesquisa mínima, mesma hierarquia ADR-025)
+
+| Fonte | Achado |
+|---|---|
+| P0 `pypi.org/pypi/ruff/json` (fetch 2026-09-08) | `0.16.6` latest, upload 2026-09-03, `requires_python >=3.7` (cobre `>=3.12,<3.14`) |
+| P1 `astral-sh/ruff` releases 0.16.6 (via corpo do PR #23) | preview-only + bugfixes + 1 display-fix; nenhuma diagnóstica estável nova nos conjuntos selecionados (`E,F,W,C90,I,UP,B,SIM,S,C4,A,RUF`), exceto remoção de hint `RUF102` (cosmética, sem nova classe de violação) |
+| P0 executado (run do PR #23, job `lint`) | `ruff 0.16.6 check` + `format --check` verdes sobre este repo e config; idempotência verde em `f0-006` FR-010 |
+
+**Veredito: LIMPO.** Nenhuma regra nova conflita com `mypy --strict`, `commitlint`
+ou o `pre-push`; nenhum ajuste de config exigido além do pin.
+
+### 3. Ajustes autorizados (forma exata)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `pyproject.toml` + `uv.lock` | `ruff==0.16.5` → `ruff==0.16.6` (já executado pelo bot no PR #23; aqui apenas verificado, não re-executado) |
+| 2 | `f0-006` FR-001 (+ CANON + evidência) | literal `0.16.5` → `0.16.6` + nota `D1'` de supersessão com ponteiro a esta ADR; D1/Q1 originais preservados como proveniência |
+| 3 | `AGENTS.md` (ponteiro vivo) | `ruff 0.16.5` → `ruff 0.16.6` |
+| 4 | `scripts/verify/manifest.sha256` | regenerado (linha `f0-006`) citando esta ADR na mensagem do commit |
+
+Congelado e NÃO tocado: `specs/006-*`, `docs/plan/research/f0-006-*`,
+`specs/README.md:18`, plano §4/§17 — registro histórico (precedente ADR-017 B1).
+
+### 4. Procedimento permanente (roteado, não improvisado)
+
+Todo PR futuro do bot que quebre pin de ferramenta verificada segue este molde:
+delta-research (tabela como a §2) → ADR de fronteira (forma exata) → verde →
+automerge. O bot **abre**, a verificação **julga**, o portão **mergeia**.
+
+### Consequências
+
+- Segunda execução do molde "exceção com prazo e ponteiro" sobre oráculo
+  convergido (primeira: ADR-029 sobre `f0-001`); a forma é a mesma das anteriores.
+- Bumps transitivos (só-lock, sem pin em manifesto) seguem sem procedimento:
+  nada quebram por desenho.
+- Auditoria pós-016 herda a contagem de bumps verificados por este molde como
+  dado de cadência do bot.
+
+### Nota de execução — transientes aninhados durante este ciclo (família A2)
+
+Três vítimas heterogêneas em loops locais sob carga 3.6–5.9, todas verdes
+isoladas em seguida: `f0-008` FR-011 (par divergiu), `f0-007` aninhada (via
+`f0-009` FR-014), `f0-003` aninhada (via `f0-012` FR-011). Assinatura exata da
+ADR-031; nenhum toque em oráculo convergido além do autorizado acima. O
+árbitro limpo é o runner do PR #23 — se verde lá, a teoria de contenção local
+confirma-se operacionalmente. Amostras somadas ao backlog da auditoria pós-016.

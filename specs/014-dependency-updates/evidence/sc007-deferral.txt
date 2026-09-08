@@ -1,0 +1,17 @@
+SC-007 (primeiro PR real do bot) — DIVERGENCIA DECLARADA (precedente 010/SC-005)
+
+Verificado via GitHub MCP em 2026-09-08, branch feature/f0-dependency-updates:
+  search PRs author:app/dependabot state:open → total_count: 0
+
+Esperado: o bot ativa no merge em main (dependabot.yml so e lido no default
+branch). Nada a validar antes do merge; validar ausencia seria provar negativo.
+
+Procedimento pos-merge (primeiro PR do bot, via GitHub MCP, saídas verbatim):
+  1. PR agrupado dev-minor-patch com manifesto + lock coerentes (SC-001)
+  2. prefixo build(deps) aprovado no job commitlint (SC-003; ressalva #9304)
+  3. forma SHA das actions preservada, ou fallback TRIPWIRE-014-actions (FR-011)
+  4. automerge executado pelo servidor só no verde (SC-002)
+  5. PR contra lock vulneravel reprova no audit (SC-004)
+
+Divergencia silenciosa (bot inativo sem registro apos 7 dias do merge) reabre
+este item; divergencia declarada aqui e saida aceitavel.

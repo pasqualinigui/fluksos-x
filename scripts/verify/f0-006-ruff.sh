@@ -27,6 +27,8 @@
 #
 # Decisoes pinadas verificadas 2026-08-31:
 #   D1 ruff==0.16.5 via [dependency-groups] dev (PEP 735), uv sync (Q1)
+#   D1' pin vigente ruff==0.16.6 via ADR-037 (delta 0.16.5->0.16.6 verificado
+#   contra PyPI/releases/CHANGELOG + CI executado; D1 acima registra a origem)
 #   D2 pyproject.toml [tool.ruff.*] fonte única, sem ruff.toml (Q2)
 #   D3 select E,F,W,C90 + extend-select I,UP,B,SIM,S,C4,A,RUF ignore E501,S101,S603 per-file-ignores tests/**/* S101,S603 (Q3)
 #   D4 line-length 88 target-version py312 exclude=[.git,...,.ruff_cache,.venv] + format double (Q4)
@@ -65,7 +67,7 @@ fail() { R_STATUS+=("bad");  R_ID+=("$1"); R_DESC+=("$2"); R_SEV+=("$3"); R_EVID
 skip() { R_STATUS+=("skip"); R_ID+=("$1"); R_DESC+=("$2"); R_SEV+=("-");  R_EVID+=("${3:-}"); }
 
 declare -A CANON=(
-  ["FR-001"]="ruff==0.16.5 em [dependency-groups] dev exato"
+  ["FR-001"]="ruff==0.16.6 em [dependency-groups] dev exato"
   ["FR-002"]="[tool.ruff] line-length 88 target-version py312 exclude"
   ["FR-003"]="[tool.ruff.lint] select E,F,W,C90 extend-select I,UP,B,SIM,S,C4,A,RUF ignore per-file-ignores"
   ["FR-004"]="[tool.ruff.format] quote-style double indent-style space line-ending auto"
@@ -106,7 +108,7 @@ if [ "$LIST" = "1" ]; then
 fi
 
 # =============================================================================
-# FR-001: ruff==0.16.5 em [dependency-groups] dev
+# FR-001: ruff==0.16.6 em [dependency-groups] dev
 # =============================================================================
 if [ ! -f "$PYPROJECT" ]; then
   fail "FR-001" "${CANON[FR-001]}" "alta" "pyproject.toml ausente (FR-001 D1)"
@@ -118,7 +120,7 @@ else
 import tomllib, sys
 d=tomllib.load(open(sys.argv[1],"rb"))
 dev=d.get("dependency-groups",{}).get("dev",[])
-assert "ruff==0.16.5" in dev, f"dev={dev!r}"
+assert "ruff==0.16.6" in dev, f"dev={dev!r}"
 # ensure not in project.dependencies
 deps=d.get("project",{}).get("dependencies",[])
 for dep in deps:
@@ -128,7 +130,7 @@ PY
       pass "FR-001" "${CANON[FR-001]}"
     else
       val=$(python3 -c 'import tomllib; d=tomllib.load(open("'"$PYPROJECT"'","rb")); print(d.get("dependency-groups",{}).get("dev"))' 2>/dev/null || echo "?")
-      fail "FR-001" "${CANON[FR-001]}" "alta" "dependency-groups.dev=${val} sem ruff==0.16.5 ou ruff em project.dependencies (D1)"
+      fail "FR-001" "${CANON[FR-001]}" "alta" "dependency-groups.dev=${val} sem ruff==0.16.6 ou ruff em project.dependencies (D1+D1')"
     fi
   fi
 fi

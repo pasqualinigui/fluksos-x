@@ -1,0 +1,62 @@
+# =============================================================================
+# Dependabot — atualizacao automatica de dependencias (014, item 0.16)
+#
+# O QUE ESTE ARQUIVO É
+#   A config do bot: ecossistemas uv + github-actions, grupos por nivel,
+#   prefixo de commit nao-liberavel. Todo merge de bot passa pelos 10 checks
+#   obrigatorios (strict) e pelo workflow de automerge em
+#   .github/workflows/dependabot-automerge.yml — este arquivo abre PRs,
+#   nunca mergeia.
+#
+# DESENHO (research f0-014 Q1–Q9, decisoes D1–D7):
+#   - uv semanal (versoes); security por evento de alerta (a via expressa é
+#     o proprio mecanismo de security updates: alertas disparam PRs sem
+#     esperar o schedule de versoes, e nunca se agrupam com versoes — P1).
+#   - dev-minor-patch: minor+patch com automerge no verde; major fora de
+#     grupo (PR proprio, sem automerge); runtime (typer/rich) fora do grupo
+#     dev (PR proprio).
+#   - prefixo build(deps): bumps nunca derivam versao no PSR (013) e passam
+#     no commitlint (preset local: sem regra de caixa no subject).
+#   - zero supressao: sem excecoes de auditoria em arquivo algum (invariante 008).
+#
+# TRIPWIRE-014-actions: se PR do bot reescrever pin SHA de action para forma
+# tag-only (quebrando f0-003/f0-010), o fallback pre-registrado e `ignore` em
+# github-actions + pin manual, sem nova deliberacao. Quem julga e o portao
+# no primeiro PR real, nao esta config.
+# =============================================================================
+version: 2
+updates:
+  # Python (uv): manifesto + lock juntos; pins == movem os dois (Q2)
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      dev-minor-patch:
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "typer"
+          - "rich"
+        update-types:
+          - "minor"
+          - "patch"
+      security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"
+  # Actions pinadas por SHA: grupo proprio (D7)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "build(deps)"

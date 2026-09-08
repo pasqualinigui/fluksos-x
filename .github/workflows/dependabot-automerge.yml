@@ -1,0 +1,43 @@
+# =============================================================================
+# Automerge de PRs do bot — fluksos-x
+#
+# O QUE ESTE ARQUIVO É
+#   O braco executor do portao para PRs do Dependabot. Arma o merge
+#   automatico SOMENTE quando: ator e dependabot[bot] + nivel patch/minor.
+#   Quem mergeia e o servidor, apos os 10 checks verdes sobre strict —
+#   merge aqui e consequencia do exit code, nunca decisao (ADR-035).
+#   Major, security fora do padrao e qualquer vermelho aguardam humano.
+#
+# FORMAS PROIBIDAS NESTE ARQUIVO (fronteiras asseridas por oraculo):
+#   squash/rebase (par vermelho-verde, ADR-035), vetores fora de
+#   pull_request/workflow_dispatch, runner movel, job sem teto de tempo,
+#   uses: sem SHA de 40 hex + comentario de versao.
+# =============================================================================
+name: dependabot-automerge
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  automerge:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'pasqualinigui/fluksos-x'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Armar auto-merge em patch/minor verdes
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch' || steps.metadata.outputs.update-type == 'version-update:semver-minor'
+        run: gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
