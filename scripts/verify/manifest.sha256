@@ -12,3 +12,4 @@ a5c59584badfd6ac47a18b0e7c874848d047ab16e18e545041c0a4fa57d4abb7  scripts/verify
 7344e660482dc53d68fc9c6cf5ba625163b17c0187b6631dd157d7c5bc302106  scripts/verify/f0-012-cli.sh
 5c1b10c64f52a9dccf04ef4e654d8bae3523e414ac7cf1020a29bef49cf34b7a  scripts/verify/f0-013-release.sh
 784618ef765b85974f2f16d6c34c5d909ff979c281294f3570f066c824d0c8a9  scripts/verify/f0-014-dependabot.sh
+a1650ae965f71077bc24f3e5eeb91ae65c3f33fe0a3529d8aeb89d77be871510  scripts/verify/f0-015-docker-compose.sh

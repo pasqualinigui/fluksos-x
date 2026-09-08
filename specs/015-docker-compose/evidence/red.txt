@@ -1,0 +1,30 @@
+🔴 FR-001   compose name fkx zero build imagens tag@digest
+           evidencia: docker-compose.yml ausente (D4); 
+🔴 FR-002   nucleo postgres+redis sem profile, obs+llm opt-in, gateway ausente
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-003   restart no explicito em todo servico
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-004   depends_on longo com condicao + healthcheck com start_period
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-005   zero segredo literal, env fora do indice, _FILE no banco
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-006   portas 127.0.0.1 no mapa fixo, backend internal
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-007   mem cpus pids_limit + logging com rotacao
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-008   read_only cap_drop ALL no-new-privileges, sem privileged/sock
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-009   profile llm 4.30.0 + CH25.12 + MinIO, TELEMETRY=false
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-010   profile observability 6 pins + provisioning
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-012   PG compartilhado fkx+langfuse sem SUPERUSER via init SQL
+           evidencia: docker/postgres/01-users-dbs.sql ausente (D3/Q7); 
+⏭️ FR-014   trivy image por pin zero HIGH CRITICAL ou skip sem daemon
+           evidencia: sem trivy e sem daemon Docker (precedente 008)
+🔴 FR-015   compose config byte-identico 2x
+           evidencia: docker-compose.yml ausente; 
+🔴 FR-016   README 015 hash + zero [ ] + vermelho-verde + self-check serie
+           evidencia: README sem "015.*docker.*✅.*hash"; tasks.md com 26 [ ] abertas (CONVERGE); par vermelho/verde 015 ausente no log (red= green=); 
+
+Resultado: 2/16 asserções aprovadas — 13 violação(ões) (critica: 0, alta: 13, media: 0) — 1 não aplicaveis — NAO CONFORME
