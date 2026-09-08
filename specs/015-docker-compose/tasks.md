@@ -88,11 +88,11 @@ description: "Task list for 015 — docker-compose sob demanda"
 
 **Purpose**: fechar a lista (Regra 10) e publicar o estado
 
-- [ ] T022 **VERDE** — oráculo CONFORME, preservar `specs/015-docker-compose/evidence/green.txt`, commit `feat(compose)` separado do vermelho (com o ponto ADR-017 aplicado AQUI)
-- [ ] T023 `specs/README.md` `015 ✅` + hash do commit de convergência
-- [ ] T024 Re-executar harness 15/15 + `sha256sum -c scripts/verify/manifest.sha256`
-- [ ] T025 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (015 concluída, próxima 016)
-- [ ] T026 SC-006 🧑 — ciclos live com daemon (núcleo + `llm` até trace visível + `observability` até Grafana com dados + `down` final sem resíduo; saídas verbatim; divergência declarada aceitável, silenciosa não)
+- [x] T022 **VERDE** — oráculo CONFORME, preservar `specs/015-docker-compose/evidence/green.txt`, commit `feat(compose)` separado do vermelho (com o ponto ADR-017 aplicado AQUI)
+- [x] T023 `specs/README.md` `015 ✅` + hash do commit de convergência
+- [x] T024 Re-executar harness 15/15 + `sha256sum -c scripts/verify/manifest.sha256`
+- [x] T025 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (015 concluída, próxima 016)
+- [x] T026 SC-006 🧑 — ciclos live com daemon (núcleo + `llm` até trace visível + `observability` até Grafana com dados + `down` final sem resíduo; saídas verbatim; divergência declarada aceitável, silenciosa não)
 
 ---
 
