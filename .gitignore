@@ -22,6 +22,8 @@
 .env.*
 !.env.example
 .envrc
+# 015: segredos file-based do compose (C1 do ANALYZE) — o diretorio existe, o conteudo nunca
+secrets/*
 
 # ------------------------------------------------------------------------------
 # EFEMEROS DO MOTOR (FR-012 / decisao D2)

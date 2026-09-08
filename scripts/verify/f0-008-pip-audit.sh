@@ -77,7 +77,7 @@ declare -A CANON=(
   ["FR-010"]="oraculo 12-16 assercoes CANON quiet list FKX EPOCHSECONDS"
   ["FR-011"]="CI glob inclui f0-008 sem editar ci.yml"
   ["FR-012"]="CONVERGE tasks.md zero [ ]"
-  ["FR-013"]="fronteira sem lefthook.yml/gitleaks/packages/docker-compose"
+  ["FR-013"]="fronteira sem lefthook/gitleaks/packages; compose sob jurisdicao 015"
   ["FR-014"]="specs/README.md 008 pip-audit concluida 007 mypy"
   ["FR-015"]="git ls-files specs/008-pip-audit-trivy/spec.md rastreado"
   ["FR-016"]="Trivy nao 0.69.4 e pip-audit nao <2.10.1"
@@ -506,7 +506,12 @@ if [ -f "$ROOT/.gitleaks.toml" ] || [ -f "$ROOT/gitleaks.toml" ]; then FR13_OK=0
 if [ -d "$ROOT/packages" ] && [ ! -f "$ROOT/packages/core/pyproject.toml" ]; then FR13_OK=0; EVID13="${EVID13}packages/ sem core/pyproject.toml de membro (ADR-023); "; fi
 if [ -d "$ROOT/packages/cli" ] && [ ! -f "$ROOT/packages/cli/pyproject.toml" ]; then FR13_OK=0; EVID13="${EVID13}packages/ com cli/ sem pyproject.toml de membro (ADR-026); "; fi
 if [ -n "$(ls "$ROOT/packages" 2>/dev/null | grep -v -x -e "core" -e "cli" | tr -d '[:space:]' || true)" ]; then FR13_OK=0; EVID13="${EVID13}packages/ com conteudo alem de core/+cli/ (ADR-023/026); "; fi
-if [ -f "$ROOT/docker-compose.yml" ]; then FR13_OK=0; EVID13="${EVID13}docker-compose.yml existe (deve ser 015); "; fi
+if [ -f "$ROOT/docker-compose.yml" ]; then
+  # 015 e o compose por desenho — admitido sob jurisdicao 015 (ADR-039):
+  # pins tag@digest, zero senha literal, zero latest/build/privileged/sock.
+  # O f0-015 assere cada propriedade; aqui so a presenca jurisdicionada.
+  if ! grep -q "015" "$ROOT/specs/015-docker-compose/contracts/oracle-cli.md" 2>/dev/null; then FR13_OK=0; EVID13="${EVID13}docker-compose.yml sem contrato 015 (fora de jurisdicao); "; fi
+fi
 if [ -f "$ROOT/requirements.txt" ] && grep -qi "pip-audit" "$ROOT/requirements.txt" 2>/dev/null; then FR13_OK=0; EVID13="${EVID13}requirements.txt com pip-audit; "; fi
 if [ -f "$ROOT/pylock.toml" ]; then FR13_OK=0; EVID13="${EVID13}pylock.toml existe (só em 013); "; fi
 if [ -f "$ROOT/pip-audit.toml" ] || [ -f "$ROOT/.pip-audit.toml" ]; then FR13_OK=0; EVID13="${EVID13}pip-audit.toml existe; "; fi

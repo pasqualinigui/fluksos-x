@@ -36,7 +36,7 @@ Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (pi
 - Q2 LiteLLM agora ou na Fase 2? → A: **B — adia à Fase 2** (princípio IV: gateway sem provedor para rotear é especulação). Pin `v1.100.0` + digest a congelar ficam registrados no research Q8 para reuso sem re-pesquisa; profile `gateway` **fora** desta spec.
 - Q3 Postgres do Langfuse — compartilhado ou dedicado? → A: **A — compartilhado com fallback pré-autorizado** (1 PG, bancos separados; se TESTS reprovar migração no PG18, PG17 dedicado no profile sem nova deliberação).
 - Q4 (clarify 2026-09-09) Portas das UIs — Grafana e Langfuse disputam a 3000? → A: **A — Grafana `127.0.0.1:3000`, Langfuse `127.0.0.1:3001`** (segue o §5 do plano, que já resolveu a colisão na intenção; demais serviços só-rede-interna).
-- Q5 (clarify 2026-09-09, delegada) Superusuário único ou usuários por banco? → A: **A — bootstrap superuser + usuários dedicados por banco sem SUPERUSER**, criados por init SQL versionado em `docker/postgres/` (menor privilégio; Langfuse só alcança o próprio banco).
+- Q5 (clarify 2026-09-09, delegada) Superusuário único ou usuários por banco? → A: **A — bootstrap superuser + usuários dedicados por banco sem SUPERUSER**, criados por init versionado `docker/postgres/01-users-dbs.sh` (.sh executavel — entrypoint nao substitui env em .sql) (menor privilégio; Langfuse só alcança o próprio banco).
 - Q6 (clarify 2026-09-09, delegada) Redis com persistência ou efêmero? → A: **A — `--appendonly yes` + `--maxmemory-policy noeviction` + volume de dados** (a fila BullMQ do Langfuse não admite eviction nem perda silenciosa; cache do motor herda a mesma durabilidade).
 - Q7 (clarify 2026-09-09, delegada) Nomes dos bancos no PG compartilhado? → A: **`fkx` (motor) + `langfuse` (studio)**, usuários homônimos sem SUPERUSER, schema `public` do Langfuse isolado no próprio banco.
 
@@ -147,7 +147,7 @@ O profile `gateway` **não existe nesta spec** (decisão 2026-09-09, princípio 
 - **FR-009**: O profile `llm` MUST trazer Langfuse OSS `4.30.0` (`web`+`worker`) + ClickHouse `25.12` + MinIO + uso do Redis do núcleo, com `TELEMETRY_ENABLED=false`, segredos via `.env`+`_FILE`, e migrações aplicando limpas sobre o Postgres do núcleo (ou fallback PG17 dedicado, ver Edge Cases).
 - **FR-010**: O profile `observability` MUST pinar Grafana `13.2.1` + Alloy `v1.19.2` + Loki `v3.7.7` + Tempo `v3.0.3` + Prometheus `v3.14.0` + Pyroscope `v2.3.0` com datasources provisionados entre si (decisão 2026-09-09: observabilidade máxima; profiling serve ao desenvolvimento Fase 1/2, custo ~zero com profile parado por padrão).
 - **FR-011**: O sistema MUST NOT criar profile `gateway`/LiteLLM nesta spec (adiado à Fase 2, decisão 2026-09-09); o pin candidato `ghcr.io/berriai/litellm:v1.100.0` MUST estar registrado no research Q8 e no contrato Transferido para reuso sem re-pesquisa; nenhuma chave de provedor MUST estar versionada.
-- **FR-012**: O Postgres do núcleo MUST ser compartilhado pelo profile `llm` em bancos separados — `fkx` (motor) + `langfuse` (studio, schema `public` isolado no próprio banco) — com usuários homônimos sem SUPERUSER criados por init SQL versionado em `docker/postgres/` (superuser só no bootstrap); se TESTS reprovar migração no PG18, o fallback é Postgres `17` dedicado no profile, sem nova deliberação (decisão 2026-09-09).
+- **FR-012**: O Postgres do núcleo MUST ser compartilhado pelo profile `llm` em bancos separados — `fkx` (motor) + `langfuse` (studio, schema `public` isolado no próprio banco) — com usuários homônimos sem SUPERUSER criados por init versionado `docker/postgres/01-users-dbs.sh` (.sh executavel — entrypoint nao substitui env em .sql) (superuser só no bootstrap); se TESTS reprovar migração no PG18, o fallback é Postgres `17` dedicado no profile, sem nova deliberação (decisão 2026-09-09).
 - **FR-013**: O sistema MUST prover oráculo `scripts/verify/f0-015-*.sh` sob o contrato `oracle-cli.md` (identidade FR↔asserção documentada, determinismo, somente leitura, self-check `f0-001…f0-014` **em série** conforme ADR-031, 15ª linha do manifest).
 - **FR-014**: `trivy image` por pin MUST sair 0 com zero `HIGH,CRITICAL`, ou linha ⏭️ skip nomeado sem daemon (precedente 008 FR-009) — quita a dívida B2 da ADR-017.
 - **FR-015**: `docker compose config` MUST renderizar byte-idêntico em 2 execuções (determinismo I executável, sem daemon).
@@ -189,7 +189,7 @@ O profile `gateway` **não existe nesta spec** (decisão 2026-09-09, princípio 
 ### Entregue por este item
 
 - `docker-compose.yml` (núcleo + profiles `observability`/`llm`/`gateway`) com pins `tag@digest`, hardening por serviço, redes/volumes nomeados.
-- `docker/` com configs versionadas montadas `:ro` (init SQL, `prometheus.yml`, `config.alloy`, provisioning do Grafana).
+- `docker/` com configs versionadas montadas `:ro` (init, `prometheus.yml`, `config.alloy`, provisioning do Grafana).
 - `.env.example` estendido como molde de todas as chaves (placeholders, zero segredo).
 - Oráculo `f0-015` + 15ª linha do manifest + `specs/README.md` `015 ✅`.
 - Quitação da dívida B2 da ADR-017 (`trivy image` pleno sobre os pins).

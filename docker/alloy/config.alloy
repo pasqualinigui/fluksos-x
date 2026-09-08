@@ -1,0 +1,20 @@
+// Alloy do motor (015, profile observability): recebe logs via API e
+// entrega no Loki local. Sem exportador externo (nada sai da maquina).
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+loki.source.api "default" {
+  http {
+    listen_addr = "127.0.0.1"
+    listen_port = 3500
+  }
+  forward_to = [loki.write.local.receiver]
+}
+
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}

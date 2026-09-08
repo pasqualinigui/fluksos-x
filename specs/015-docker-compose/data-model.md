@@ -25,7 +25,7 @@ Persistência nomeada. Valores: `pgdata` (`/var/lib/postgresql`), `redisdata` (`
 
 ## Network
 
-`backend` (`internal: true`, todo serviço) + `edge` (só quem publica UI: grafana:3000, langfuse:3001). Nenhum serviço toca as duas, exceto os que publicam porta.
+`backend` única (`internal: true`) para todos os serviços — portas publicadas funcionam por NAT do daemon mesmo em rede interna, e nada precisa de egresso em dev (telemetria desligada). UIs locais via portas do mapa fixo.
 
 ## Mapa de portas (fixo, FR-006)
 

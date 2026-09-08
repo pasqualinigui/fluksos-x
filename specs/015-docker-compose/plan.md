@@ -6,7 +6,7 @@
 
 ## Summary
 
-Declarar `docker-compose.yml` (`name: fkx`, zero `build:`, tudo `tag@digest` congelado) com núcleo `postgres:18.6-trixie` + `redis:8.8.2-trixie` e profiles opt-in (`observability` LGTM+Pyroscope, `llm` Langfuse v4.30.0 + ClickHouse 25.12 + MinIO), tudo `restart: "no"` explícito e desligado por padrão; `docker/` com init SQL e configs `:ro`; `.env.example` estendido; oráculo `f0-015` com 12–16 asserções em identidade + self-check serial + 15ª linha do manifest; fronteira de 1 ponto (`f0-008` FR-013) paga por ADR prévia na Fase C.
+Declarar `docker-compose.yml` (`name: fkx`, zero `build:`, tudo `tag@digest` congelado) com núcleo `postgres:18.6-trixie` + `redis:8.8.2-trixie` e profiles opt-in (`observability` LGTM+Pyroscope, `llm` Langfuse v4.30.0 + ClickHouse 25.12 + MinIO), tudo `restart: "no"` explícito e desligado por padrão; `docker/` com init `01-users-dbs.sh` e configs `:ro`; `.env.example` estendido; oráculo `f0-015` com 12–16 asserções em identidade + self-check serial + 15ª linha do manifest; fronteira de 1 ponto (`f0-008` FR-013) paga por ADR prévia na Fase C.
 
 ## Technical Context
 
@@ -81,7 +81,7 @@ specs/015-docker-compose/
 docker-compose.yml                # NOVO: name fkx, núcleo + profiles, tudo tag@digest + restart no
 docker/
 ├── postgres/
-│   └── 01-users-dbs.sql          # NOVO: usuários fkx/langfuse sem SUPERUSER + bancos (:ro)
+│   └── 01-users-dbs.sh          # NOVO: usuários fkx/langfuse sem SUPERUSER + bancos (:ro)
 ├── prometheus/
 │   └── prometheus.yml            # NOVO: scrape do núcleo + alloy (:ro)
 ├── alloy/

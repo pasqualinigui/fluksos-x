@@ -21,9 +21,9 @@ description: "Task list for 015 — docker-compose sob demanda"
 
 **Purpose**: base verde + branch + evidência
 
-- [ ] T001 [P] Confirmar harness 14/14 + manifest 14/14 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
-- [ ] T002 [P] Re-verificar fronteira Q10 no disco (`grep -n -i "docker-compose|docker/|compose" scripts/verify/f0-*.sh` → só `f0-008:80,509`; literais `Dockerfile`, `privileged`, `docker.sock` → zero)
-- [ ] T003 Criar branch `feature/f0-docker-compose` desde `main` + diretório `specs/015-docker-compose/evidence/`
+- [x] T001 [P] Confirmar harness 14/14 + manifest 14/14 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
+- [x] T002 [P] Re-verificar fronteira Q10 no disco (`grep -n -i "docker-compose|docker/|compose" scripts/verify/f0-*.sh` → só `f0-008:80,509`; literais `Dockerfile`, `privileged`, `docker.sock` → zero)
+- [x] T003 Criar branch `feature/f0-docker-compose` desde `main` + diretório `specs/015-docker-compose/evidence/`
 
 ---
 
@@ -33,9 +33,9 @@ description: "Task list for 015 — docker-compose sob demanda"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Criar `scripts/verify/f0-015-docker-compose.sh` com esqueleto (cabeçalho Q1–Q10/D1–D7, CANON 16 IDs, contrato `contracts/oracle-cli.md`, self-check série ADR-031)
-- [ ] T005 Acrescer 15ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
-- [ ] T006 Implementar asserts auto-verificáveis em `scripts/verify/f0-015-docker-compose.sh` (`--list` 16 IDs, `--invalido` exit 2, 2× byte-idêntico <5s modo estático, self-check `f0-001…f0-014`)
+- [x] T004 Criar `scripts/verify/f0-015-docker-compose.sh` com esqueleto (cabeçalho Q1–Q10/D1–D7, CANON 16 IDs, contrato `contracts/oracle-cli.md`, self-check série ADR-031)
+- [x] T005 Acrescer 15ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
+- [x] T006 Implementar asserts auto-verificáveis em `scripts/verify/f0-015-docker-compose.sh` (`--list` 16 IDs, `--invalido` exit 2, 2× byte-idêntico <5s modo estático, self-check `f0-001…f0-014`)
 
 **Checkpoint**: Foundation ready — oráculo existe e fala o contrato
 
@@ -51,14 +51,14 @@ description: "Task list for 015 — docker-compose sob demanda"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [US1] FR-001/FR-002-núcleo/FR-003/FR-004 em `scripts/verify/f0-015-docker-compose.sh` (pins `tag@digest`, profiles, `restart: "no"`, `depends_on`+healthcheck)
-- [ ] T008 [US2] FR-005/FR-006/FR-007/FR-008 em `scripts/verify/f0-015-docker-compose.sh` (zero segredo, portas `127.0.0.1` no mapa fixo, limites+logs, hardening)
-- [ ] T009 [US3] FR-009/FR-012 em `scripts/verify/f0-015-docker-compose.sh` (profile `llm` pinado, `TELEMETRY_ENABLED=false`, bancos `fkx`+`langfuse` sem SUPERUSER)
-- [ ] T010 [US4] FR-010 em `scripts/verify/f0-015-docker-compose.sh` (6 pins observability + provisioning)
-- [ ] T011 [US5] FR-011/FR-002-gateway em `scripts/verify/f0-015-docker-compose.sh` (ausência de `gateway`/`litellm` — vermelho se existir)
-- [ ] T012 FR-014/FR-015 em `scripts/verify/f0-015-docker-compose.sh` (`trivy image` por pin com ⏭️ sem daemon, `compose config` 2× byte-idêntico)
-- [ ] T013 **VERMELHO** — executar `scripts/verify/f0-015-docker-compose.sh`, preservar `specs/015-docker-compose/evidence/red.txt`, commit `test(harness)` separado (com a 15ª linha do manifest no mesmo ato)
-- [ ] T014 Redigir ADR de fronteira em `docs/plan/decisions.md` (1 ponto `f0-008` FR-003→FR-013, forma exata do plan) — PRÉVIA ao verde, nunca depois
+- [x] T007 [US1] FR-001/FR-002-núcleo/FR-003/FR-004 em `scripts/verify/f0-015-docker-compose.sh` (pins `tag@digest`, profiles, `restart: "no"`, `depends_on`+healthcheck)
+- [x] T008 [US2] FR-005/FR-006/FR-007/FR-008 em `scripts/verify/f0-015-docker-compose.sh` (zero segredo, portas `127.0.0.1` no mapa fixo, limites+logs, hardening)
+- [x] T009 [US3] FR-009/FR-012 em `scripts/verify/f0-015-docker-compose.sh` (profile `llm` pinado, `TELEMETRY_ENABLED=false`, bancos `fkx`+`langfuse` sem SUPERUSER)
+- [x] T010 [US4] FR-010 em `scripts/verify/f0-015-docker-compose.sh` (6 pins observability + provisioning)
+- [x] T011 [US5] FR-011/FR-002-gateway em `scripts/verify/f0-015-docker-compose.sh` (ausência de `gateway`/`litellm` — vermelho se existir)
+- [x] T012 FR-014/FR-015 em `scripts/verify/f0-015-docker-compose.sh` (`trivy image` por pin com ⏭️ sem daemon, `compose config` 2× byte-idêntico)
+- [x] T013 **VERMELHO** — executar `scripts/verify/f0-015-docker-compose.sh`, preservar `specs/015-docker-compose/evidence/red.txt`, commit `test(harness)` separado (com a 15ª linha do manifest no mesmo ato)
+- [x] T014 Redigir ADR de fronteira em `docs/plan/decisions.md` (1 ponto `f0-008` FR-003→FR-013, forma exata do plan) — PRÉVIA ao verde, nunca depois
 
 **Checkpoint**: vermelho genuíno preservado + ADR autoriza o único toque em oráculo anterior
 
@@ -72,13 +72,13 @@ description: "Task list for 015 — docker-compose sob demanda"
 
 ### Implementation
 
-- [ ] T015 [US1] Criar `docker-compose.yml` com núcleo (`postgres`+`redis` pinados, `restart: "no"`, healthchecks, rede `backend`+`edge`, volumes, limites, logging) — implementa também as propriedades de US2 (F1: label único por formato; US2 sem arquivo próprio)
-- [ ] T016 [P] [US1] Criar `docker/postgres/01-users-dbs.sql` (bancos `fkx`+`langfuse`, usuários sem SUPERUSER) + estender `.env.example` (todas as chaves, placeholders) + verificar/adicionar `secrets/` ao `.gitignore` (C1: `.env` já ignorado; `secrets/` sem entrada é Lei Zero por omissão)
-- [ ] T017 [US3] Adicionar profile `llm` em `docker-compose.yml` (web+worker `4.30.0`, ClickHouse `25.12`, MinIO, `TELEMETRY_ENABLED=false`) (depends on T015 — mesmo arquivo)
-- [ ] T018 [US4] Adicionar profile `observability` em `docker-compose.yml` (6 pins + provisioning) (depends on T015 — mesmo arquivo)
-- [ ] T019 [P] [US4] Criar `docker/prometheus/prometheus.yml` + `docker/alloy/config.alloy` + `docker/grafana/provisioning/` (montes `:ro`, arquivos distintos)
-- [ ] T020 Executar cenários 1–2 de `specs/015-docker-compose/quickstart.md` (depends on T015–T016; com daemon: up→prova→down sem resíduo; sem daemon: registra ⏭️ e segue — E2, precedente 008 FR-009)
-- [ ] T021 [P] Re-verificar digests contra registry API (tabela de pins do `research.md`; divergência = bump pelo molde ADR-037, nunca `latest`)
+- [x] T015 [US1] Criar `docker-compose.yml` com núcleo (`postgres`+`redis` pinados, `restart: "no"`, healthchecks, rede `backend`+`edge`, volumes, limites, logging) — implementa também as propriedades de US2 (F1: label único por formato; US2 sem arquivo próprio)
+- [x] T016 [P] [US1] Criar `docker/postgres/01-users-dbs.sh` (bancos `fkx`+`langfuse`, usuários sem SUPERUSER) + estender `.env.example` (todas as chaves, placeholders) + verificar/adicionar `secrets/` ao `.gitignore` (C1: `.env` já ignorado; `secrets/` sem entrada é Lei Zero por omissão)
+- [x] T017 [US3] Adicionar profile `llm` em `docker-compose.yml` (web+worker `4.30.0`, ClickHouse `25.12`, MinIO, `TELEMETRY_ENABLED=false`) (depends on T015 — mesmo arquivo)
+- [x] T018 [US4] Adicionar profile `observability` em `docker-compose.yml` (6 pins + provisioning) (depends on T015 — mesmo arquivo)
+- [x] T019 [P] [US4] Criar `docker/prometheus/prometheus.yml` + `docker/alloy/config.alloy` + `docker/grafana/provisioning/` (montes `:ro`, arquivos distintos)
+- [x] T020 Executar cenários 1–2 de `specs/015-docker-compose/quickstart.md` (depends on T015–T016; com daemon: up→prova→down sem resíduo; sem daemon: registra ⏭️ e segue — E2, precedente 008 FR-009)
+- [x] T021 [P] Re-verificar digests contra registry API (tabela de pins do `research.md`; divergência = bump pelo molde ADR-037, nunca `latest`)
 
 **Checkpoint**: oráculo verde (estáticas) + quickstart local verde
 

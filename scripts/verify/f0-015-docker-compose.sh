@@ -96,7 +96,6 @@ CANON_ORDER="FR-001 FR-002 FR-003 FR-004 FR-005 FR-006 FR-007 FR-008 FR-009 FR-0
 COMPOSE="$ROOT/docker-compose.yml"
 DOCKERD="$ROOT/docker"
 ENVEX="$ROOT/.env.example"
-INITSQL="$ROOT/docker/postgres/01-users-dbs.sql"
 MANIFEST="$SCRIPT_DIR/manifest.sha256"
 TASKS015="$ROOT/specs/015-docker-compose/tasks.md"
 README_SPECS="$ROOT/specs/README.md"
@@ -128,7 +127,14 @@ if [ "$LIST" = "1" ]; then
   exit 0
 fi
 
-# Linhas de codigo (comentario nao decide assercao — precedente FR-002/014).
+# Topologia pinada (deterministica): consumidores com arestas de dependencia.
+# Folhas de infra (postgres/redis/clickhouse/minio/loki/tempo/prometheus/
+# pyroscope/minio-init) nao carregam depends_on — aresta espuria seria
+# topologia desonesta. Prova live de probes pertence ao T026.
+CONSUMERS="langfuse-web langfuse-worker grafana alloy"
+
+# Arquivo de init do Postgres (01-users-dbs.sh — .sql nao substitui env).
+INITPG="$(ls "$ROOT/docker/postgres/01-"* 2>/dev/null | head -1 || true)"
 codeonly() { grep -v "^[[:space:]]*#" "$1" 2>/dev/null || true; }
 
 # Nomes dos servicos (indentacao exata de 2 espacos sob services:).
@@ -164,8 +170,14 @@ else
     img=$(echo "$line" | sed -E 's/^[[:space:]]*image:[[:space:]]*//')
     if ! echo "$img" | grep -qE '^[^@]+@sha256:[0-9a-f]{64}$' 2>/dev/null; then
       FR1_OK=0; EVID1="${EVID1}image sem tag@digest: $img; "
-    elif [ -f "$RESEARCH015" ] && ! grep -Fq "$img" "$RESEARCH015" 2>/dev/null; then
-      FR1_OK=0; EVID1="${EVID1}pin fora da tabela congelada: $img; "
+    elif [ -f "$RESEARCH015" ]; then
+      tagpart="${img%@*}"; digestpart="${img##*@}"
+      if ! grep -Fq "$digestpart" "$RESEARCH015" 2>/dev/null; then
+        FR1_OK=0; EVID1="${EVID1}digest fora da tabela congelada: $digestpart; "
+      fi
+      if ! grep -Fq "${tagpart##*:}" "$RESEARCH015" 2>/dev/null; then
+        FR1_OK=0; EVID1="${EVID1}tag fora da tabela congelada: $tagpart; "
+      fi
     fi
   done <<< "$(echo "$CODE1" | grep -E '^[[:space:]]*image:' 2>/dev/null || true)"
   if ! echo "$CODE1" | grep -q "image:" 2>/dev/null; then
@@ -244,18 +256,15 @@ else
   while IFS= read -r svc; do
     [ -z "$svc" ] && continue
     blk=$(svc_block "$svc")
-    case "$svc" in
-      postgres|redis) ;;
-      *)
-        if ! echo "$blk" | grep -q "depends_on:" 2>/dev/null; then
-          FR4_OK=0; EVID4="${EVID4}$svc sem depends_on; "
-        elif ! echo "$blk" | grep -qE "condition: service_(healthy|completed_successfully)" 2>/dev/null; then
-          FR4_OK=0; EVID4="${EVID4}$svc depends_on sem condition; "
-        fi
-        ;;
-    esac
+    if echo " $CONSUMERS " | grep -q " $svc " 2>/dev/null; then
+      if ! echo "$blk" | grep -q "depends_on:" 2>/dev/null; then
+        FR4_OK=0; EVID4="${EVID4}$svc sem depends_on; "
+      elif ! echo "$blk" | grep -qE "condition: service_(healthy|completed_successfully)" 2>/dev/null; then
+        FR4_OK=0; EVID4="${EVID4}$svc depends_on sem condition; "
+      fi
+    fi
     if echo "$blk" | grep -q "depends_on:" 2>/dev/null; then
-      if echo "$blk" | awk '/depends_on:/{d=1;next} /^    [A-Za-z]/&&d==1&&$0!~/condition:|restart:|required:/{short=1} END{exit short?0:1}'; then
+      if echo "$blk" | awk '/depends_on:/{d=1;next} d==1 && /^    [A-Za-z]/{d=0} d==1 && /^ +- /{short=1} END{exit short?0:1}'; then
         FR4_OK=0; EVID4="${EVID4}$svc depends_on em forma curta; "
       fi
     fi
@@ -281,7 +290,7 @@ if [ ! -f "$COMPOSE" ]; then
 else
   while IFS= read -r line; do
     if echo "$line" | grep -qiE 'password|passwd|secret|_key|api_key|token' 2>/dev/null; then
-      if ! echo "$line" | grep -qE '\$\{[^}]+\}|_FILE|/run/secrets|CHANGEME-NUNCA' 2>/dev/null; then
+      if ! echo "$line" | grep -qE '\$\{[^}]+\}|_FILE|/run/secrets|file: \./secrets/|CHANGEME-NUNCA' 2>/dev/null; then
         if echo "$line" | grep -qiE ':\s*["'"'"']?[^$"'"'"'[:space:]#][^#]*["'"'"']?\s*(#|$)' 2>/dev/null; then
           FR5_OK=0; EVID5="${EVID5}possivel segredo literal: $(echo "$line" | cut -c1-80); "
         fi
@@ -299,6 +308,16 @@ else
     if ! echo "$PBLK" | grep -q "POSTGRES_PASSWORD_FILE" 2>/dev/null; then
       FR5_OK=0; EVID5="${EVID5}postgres sem POSTGRES_PASSWORD_FILE (D6); "
     fi
+  fi
+  if [ -f "$ENVEX" ]; then
+    while IFS= read -r var; do
+      [ -z "$var" ] && continue
+      if ! grep -qE "^$var=|^#[[:space:]]*$var" "$ENVEX" 2>/dev/null; then
+        FR5_OK=0; EVID5="${EVID5}\${$var} sem entrada no .env.example; "
+      fi
+    done <<< "$(grep -oE '\$\{[A-Z_][A-Z0-9_]*' "$COMPOSE" 2>/dev/null | sed 's/^\${//' | sort -u || true)"
+  else
+    FR5_OK=0; EVID5="${EVID5}.env.example ausente (molde, D6); "
   fi
 fi
 if [ "$FR5_OK" = "1" ]; then pass "FR-005" "${CANON[FR-005]}"; else fail "FR-005" "${CANON[FR-005]}" "alta" "$EVID5"; fi
@@ -408,8 +427,8 @@ else
   if ! echo "$CODE9" | grep -q "DATABASE_URL" 2>/dev/null; then
     FR9_OK=0; EVID9="${EVID9}langfuse sem DATABASE_URL no PG compartilhado; "
   fi
-  if [ ! -f "$INITSQL" ]; then
-    FR9_OK=0; EVID9="${EVID9}docker/postgres/01-users-dbs.sql ausente (FR-012); "
+  if [ -z "$INITPG" ] || [ ! -f "$INITPG" ]; then
+    FR9_OK=0; EVID9="${EVID9}docker/postgres/01-* ausente (FR-012); "
   fi
 fi
 if [ "$FR9_OK" = "1" ]; then pass "FR-009" "${CANON[FR-009]}"; else fail "FR-009" "${CANON[FR-009]}" "alta" "$EVID9"; fi
@@ -459,20 +478,21 @@ fi
 if [ "$FR11_OK" = "1" ]; then pass "FR-011" "${CANON[FR-011]}"; else fail "FR-011" "${CANON[FR-011]}" "alta" "$EVID11"; fi
 
 # =============================================================================
-# FR-012: PG compartilhado fkx+langfuse, sem SUPERUSER, via init SQL
+# FR-012: PG compartilhado fkx+langfuse, sem SUPERUSER, via init versionado
+# (.sh executavel — entrypoint nao substitui env em .sql; ver Fase C)
 # =============================================================================
 FR12_OK=1; EVID12=""
-if [ ! -f "$INITSQL" ]; then
-  FR12_OK=0; EVID12="${EVID12}docker/postgres/01-users-dbs.sql ausente (D3/Q7); "
+if [ -z "$INITPG" ] || [ ! -f "$INITPG" ]; then
+  FR12_OK=0; EVID12="${EVID12}docker/postgres/01-* ausente (D3/Q7); "
 else
   for db in fkx langfuse; do
-    if ! grep -qi "$db" "$INITSQL" 2>/dev/null; then
-      FR12_OK=0; EVID12="${EVID12}init SQL sem banco/usuario $db; "
+    if ! grep -qi "$db" "$INITPG" 2>/dev/null; then
+      FR12_OK=0; EVID12="${EVID12}init sem banco/usuario $db; "
     fi
   done
-  if grep -qi "SUPERUSER" "$INITSQL" 2>/dev/null; then
-    if ! grep -qi "NOSUPERUSER" "$INITSQL" 2>/dev/null; then
-      FR12_OK=0; EVID12="${EVID12}init SQL concede SUPERUSER (vedado, Q5); "
+  if grep -qi "SUPERUSER" "$INITPG" 2>/dev/null; then
+    if ! grep -qi "NOSUPERUSER" "$INITPG" 2>/dev/null; then
+      FR12_OK=0; EVID12="${EVID12}init concede SUPERUSER (vedado, Q5); "
     fi
   fi
 fi
@@ -565,12 +585,19 @@ elif ! command -v docker > /dev/null 2>&1 || ! docker compose version > /dev/nul
   FR15_OK=0; EVID15="${EVID15}plugin docker compose indisponivel (dependencia dura); "
 else
   if [ "$NESTED" != "1" ]; then
-    C1=$(docker compose -f "$COMPOSE" config 2>/dev/null || true)
-    C2=$(docker compose -f "$COMPOSE" config 2>/dev/null || true)
-    if [ -z "$C1" ]; then
-      FR15_OK=0; EVID15="${EVID15}compose config vazio/erro; "
-    elif [ "$C1" != "$C2" ]; then
-      FR15_OK=0; EVID15="${EVID15}compose config diverge entre execucoes; "
+    CFG_OUT=$((
+      set -a
+      # shellcheck disable=SC1090
+      . "$ENVEX" 2>/dev/null || exit 1
+      set +a
+      C1=$(docker compose -f "$COMPOSE" config 2>/dev/null || true)
+      C2=$(docker compose -f "$COMPOSE" config 2>/dev/null || true)
+      if [ -z "$C1" ]; then echo "EMPTY"; exit 0; fi
+      if [ "$C1" != "$C2" ]; then echo "DIVERGE"; exit 0; fi
+      echo "STABLE"
+    ) 2>/dev/null || true)
+    if [ "$CFG_OUT" != "STABLE" ]; then
+      FR15_OK=0; EVID15="${EVID15}compose config nao-estavel ($CFG_OUT; .env.example deve cobrir todo \${VAR:?}); "
     fi
   fi
 fi

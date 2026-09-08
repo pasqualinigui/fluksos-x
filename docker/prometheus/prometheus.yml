@@ -1,0 +1,10 @@
+# Prometheus do motor (015, profile observability): scrape local.
+# Retencao curta (7d, dev); sem remote_write (nada sai da maquina).
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
