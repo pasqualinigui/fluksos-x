@@ -2350,3 +2350,67 @@ Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix direto.
   (`f0-008` FR-002, invariante): esta ADR move o gate, não cria supressão.
 - `.github/` segue sem o literal `lefthook` (FR-009 da 009): a config do bot e o
   workflow de automerge não nomeiam a fronteira.
+
+---
+
+## ADR-037 — Bump verificado do `ruff` 0.16.5→0.16.6 no PR #23 (primeira execução do procedimento de bump)
+
+**Data**: 2026-09-08 · **Item**: nenhum (checkpoint não-item, pós-014; primeiro PR
+real do bot) · **Estado**: aceita · **Evidência**: run do PR #23
+(`f0-006` FR-001 vermelha com `dev=[... 'ruff==0.16.6']`, demais 13/14 verdes,
+`lint` com 0.16.6 verde) + delta abaixo · **Efeito**: autoriza os ajustes da §3,
+com re-verde no runner antes do merge. Nada além dela é tocado.
+
+### 1. O vermelho estava certo
+
+O portão reprovou `ruff==0.16.6` porque 0.16.6 nunca fora verificada — e
+verificação ausente reprovar é o comportamento correto, não defeito. É também a
+resposta à pergunta estrutural da 014: bump direto quebra o pin por desenho; o
+procedimento abaixo é como bumps voltam ao verde sem violar a Regra 5.
+
+### 2. Delta verificado (pesquisa mínima, mesma hierarquia ADR-025)
+
+| Fonte | Achado |
+|---|---|
+| P0 `pypi.org/pypi/ruff/json` (fetch 2026-09-08) | `0.16.6` latest, upload 2026-09-03, `requires_python >=3.7` (cobre `>=3.12,<3.14`) |
+| P1 `astral-sh/ruff` releases 0.16.6 (via corpo do PR #23) | preview-only + bugfixes + 1 display-fix; nenhuma diagnóstica estável nova nos conjuntos selecionados (`E,F,W,C90,I,UP,B,SIM,S,C4,A,RUF`), exceto remoção de hint `RUF102` (cosmética, sem nova classe de violação) |
+| P0 executado (run do PR #23, job `lint`) | `ruff 0.16.6 check` + `format --check` verdes sobre este repo e config; idempotência verde em `f0-006` FR-010 |
+
+**Veredito: LIMPO.** Nenhuma regra nova conflita com `mypy --strict`, `commitlint`
+ou o `pre-push`; nenhum ajuste de config exigido além do pin.
+
+### 3. Ajustes autorizados (forma exata)
+
+| # | Alvo | Ajuste |
+|---|---|---|
+| 1 | `pyproject.toml` + `uv.lock` | `ruff==0.16.5` → `ruff==0.16.6` (já executado pelo bot no PR #23; aqui apenas verificado, não re-executado) |
+| 2 | `f0-006` FR-001 (+ CANON + evidência) | literal `0.16.5` → `0.16.6` + nota `D1'` de supersessão com ponteiro a esta ADR; D1/Q1 originais preservados como proveniência |
+| 3 | `AGENTS.md` (ponteiro vivo) | `ruff 0.16.5` → `ruff 0.16.6` |
+| 4 | `scripts/verify/manifest.sha256` | regenerado (linha `f0-006`) citando esta ADR na mensagem do commit |
+
+Congelado e NÃO tocado: `specs/006-*`, `docs/plan/research/f0-006-*`,
+`specs/README.md:18`, plano §4/§17 — registro histórico (precedente ADR-017 B1).
+
+### 4. Procedimento permanente (roteado, não improvisado)
+
+Todo PR futuro do bot que quebre pin de ferramenta verificada segue este molde:
+delta-research (tabela como a §2) → ADR de fronteira (forma exata) → verde →
+automerge. O bot **abre**, a verificação **julga**, o portão **mergeia**.
+
+### Consequências
+
+- Segunda execução do molde "exceção com prazo e ponteiro" sobre oráculo
+  convergido (primeira: ADR-029 sobre `f0-001`); a forma é a mesma das anteriores.
+- Bumps transitivos (só-lock, sem pin em manifesto) seguem sem procedimento:
+  nada quebram por desenho.
+- Auditoria pós-016 herda a contagem de bumps verificados por este molde como
+  dado de cadência do bot.
+
+### Nota de execução — transientes aninhados durante este ciclo (família A2)
+
+Três vítimas heterogêneas em loops locais sob carga 3.6–5.9, todas verdes
+isoladas em seguida: `f0-008` FR-011 (par divergiu), `f0-007` aninhada (via
+`f0-009` FR-014), `f0-003` aninhada (via `f0-012` FR-011). Assinatura exata da
+ADR-031; nenhum toque em oráculo convergido além do autorizado acima. O
+árbitro limpo é o runner do PR #23 — se verde lá, a teoria de contenção local
+confirma-se operacionalmente. Amostras somadas ao backlog da auditoria pós-016.

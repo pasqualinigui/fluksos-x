@@ -6,7 +6,7 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 0 (bootstrap), item 014 de 016 concluído (harness 14/14 verde). Servidor: `pasqualinigui/fluksos-x` (público) com proteção em `main`+`develop` (10 checks obrigatórios, sem-bypass) — `feature/*`+PR em `main`, linha de integração única, `develop` é espelho (ADR-032). Self-check dos oráculos é serial (ADR-031). Ferramentas ativas: ruff 0.16.5 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12 + CI completo + `packages/core` + `packages/cli` (`fkx --help/--version`); automação de release (PSR 10.6.2 + OIDC PyPI, `click` por override mínimo — ADR-034); atualização de dependências (Dependabot uv+actions, automerge pelo portão, `pip-audit` no `pre-push` — ADR-036); `docker-compose` (015) é o próximo.
+**Estado**: Fase 0 (bootstrap), item 014 de 016 concluído (harness 14/14 verde). Servidor: `pasqualinigui/fluksos-x` (público) com proteção em `main`+`develop` (10 checks obrigatórios, sem-bypass) — `feature/*`+PR em `main`, linha de integração única, `develop` é espelho (ADR-032). Self-check dos oráculos é serial (ADR-031). Ferramentas ativas: ruff 0.16.6 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12 + CI completo + `packages/core` + `packages/cli` (`fkx --help/--version`); automação de release (PSR 10.6.2 + OIDC PyPI, `click` por override mínimo — ADR-034); atualização de dependências (Dependabot uv+actions, automerge pelo portão, `pip-audit` no `pre-push` — ADR-036); `docker-compose` (015) é o próximo.
 
 ## How to operate
 
