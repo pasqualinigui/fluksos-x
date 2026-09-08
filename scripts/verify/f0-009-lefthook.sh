@@ -174,6 +174,8 @@ if [ "$FR2_OK" = "1" ]; then pass "FR-002" "${CANON[FR-002]}"; else fail "FR-002
 
 # =============================================================================
 # FR-003: pre-commit fail-fast via uv run, ordem, sem cor forcada
+# Forma ADR-036 (014): pip-audit vive no pre-push (teorema ADR-034 §6); aqui
+# se exige ausencia no pre-commit + presenca apos o harness no pre-push.
 # =============================================================================
 FR3_OK=1; EVID3=""
 if [ ! -f "$HOOKYML" ]; then
@@ -184,10 +186,19 @@ else
   L_MYPY=$(grep -n "uv run mypy --strict" "$HOOKYML" 2>/dev/null | head -1 | cut -d: -f1 || true)
   L_PY=$(grep -n "uv run pytest" "$HOOKYML" 2>/dev/null | head -1 | cut -d: -f1 || true)
   L_PA=$(grep -n "uv run pip-audit" "$HOOKYML" 2>/dev/null | head -1 | cut -d: -f1 || true)
-  if [ -z "$L_RUFF" ] || [ -z "$L_FMT" ] || [ -z "$L_MYPY" ] || [ -z "$L_PY" ] || [ -z "$L_PA" ]; then
-    FR3_OK=0; EVID3="${EVID3}jobs ausentes (ruff=$L_RUFF fmt=$L_FMT mypy=$L_MYPY pytest=$L_PY pip-audit=$L_PA); "
-  elif [ ! "$L_RUFF" -lt "$L_FMT" ] 2>/dev/null || [ ! "$L_FMT" -lt "$L_MYPY" ] 2>/dev/null || [ ! "$L_MYPY" -lt "$L_PY" ] 2>/dev/null || [ ! "$L_PY" -lt "$L_PA" ] 2>/dev/null; then
-    FR3_OK=0; EVID3="${EVID3}ordem fail-fast quebrada ($L_RUFF<$L_FMT<$L_MYPY<$L_PY<$L_PA); "
+  L_HARNESS=$(grep -n "for f in scripts/verify/f0-" "$HOOKYML" 2>/dev/null | head -1 | cut -d: -f1 || true)
+  PRECOMMIT_SECT=$(awk '/^[ ]*pre-commit:/,/^[ ]*pre-push:/' "$HOOKYML" 2>/dev/null || true)
+  if [ -z "$L_RUFF" ] || [ -z "$L_FMT" ] || [ -z "$L_MYPY" ] || [ -z "$L_PY" ]; then
+    FR3_OK=0; EVID3="${EVID3}jobs fail-fast ausentes (ruff=$L_RUFF fmt=$L_FMT mypy=$L_MYPY pytest=$L_PY); "
+  elif [ ! "$L_RUFF" -lt "$L_FMT" ] 2>/dev/null || [ ! "$L_FMT" -lt "$L_MYPY" ] 2>/dev/null || [ ! "$L_MYPY" -lt "$L_PY" ] 2>/dev/null; then
+    FR3_OK=0; EVID3="${EVID3}ordem fail-fast quebrada ($L_RUFF<$L_FMT<$L_MYPY<$L_PY); "
+  fi
+  if [ -z "$L_PA" ]; then
+    FR3_OK=0; EVID3="${EVID3}pip-audit ausente do hook (deve estar no pre-push, ADR-036); "
+  elif echo "$PRECOMMIT_SECT" | grep -q "uv run pip-audit" 2>/dev/null; then
+    FR3_OK=0; EVID3="${EVID3}pip-audit no pre-commit (teorema ADR-034 §6); "
+  elif [ -n "$L_HARNESS" ] && [ ! "$L_PA" -gt "$L_HARNESS" ] 2>/dev/null; then
+    FR3_OK=0; EVID3="${EVID3}pip-audit antes do harness no pre-push (ordem); "
   fi
   if grep -Eq 'CLICOLOR_FORCE|NO_COLOR=0|--color=always|--colors[ ]+on' "$HOOKYML" 2>/dev/null; then
     FR3_OK=0; EVID3="${EVID3}cor forcada no config (determinismo); "

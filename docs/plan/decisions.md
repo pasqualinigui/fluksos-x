@@ -2310,3 +2310,43 @@ exige necessidade nova (múltiplos agentes com permissões distintas), não rele
 - A §4 existe para que a próxima passada de endurecimento não desfaça a §3.
 - O passo 1 da §5 fica em aberto e **nomeado**: sem o escopo de token, isto é
   organização, não controle.
+
+---
+
+## ADR-036 — Pré-autorização de fronteira da 014: `pip-audit` no `pre-push` (ponto único em `f0-009` FR-003)
+
+**Data**: 2026-09-08 · **Item**: `014` (0.16), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 014 (`f0-014` FR-008 reprova sobre estado
+correto futuro + `lefthook.yml:20-21` com `pip-audit` no `pre-commit`) +
+`specs/014-dependency-updates/plan.md` (declaração de impacto) · **Efeito**:
+autoriza o ajuste abaixo **exclusivamente no commit verde da 014 (Fase C)**.
+
+### Contexto
+
+Um conflito genuíno, previsto na tabela Q9 do research
+(`docs/plan/research/f0-014-dependency-updates.md`, levantamento mecânico sobre
+os 13 oráculos). A 014 move `uv run pip-audit` para o `pre-push` por desenho
+(teorema ADR-034 §6: gate em `pre-commit` + Regra 2 = correção futura impossível;
+precedente convergido: `trivy` só em `pre-push`, FR-004 da 009). A asserção
+`f0-009` FR-003 exige `uv run pip-audit` presente **e** após `uv run pytest` por
+número de linha — sem ajuste, o harness reprovaria estado correto; com ajuste
+silencioso, repetiríamos o achado A1 (`f0-audit-005-008.md`).
+
+### Ajuste autorizado (forma exata, só na Fase C)
+
+Em `scripts/verify/f0-009-lefthook.sh` (FR-003): admitir `uv run pip-audit`
+ausente do bloco `pre-commit` **se** presente após o harness no bloco `pre-push`
+(jurisdição 014); ordem fail-fast do `pre-commit`
+(ruff < format < mypy < pytest) intacta; resto da FR intacto. Padrão ADR-018
+(legitimidade: `pip-audit==2.10.1` em `dev` + `uv.lock`,
+nunca nome estático). Manifest regenerado na Fase C citando esta ADR.
+Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix direto.
+
+### Consequências
+
+- Sétima execução do procedimento ADR-017 sobre oráculo alheio. A FR-008 da 014
+  (oráculo asserir PLAN + esta ADR) aprova no verde.
+- `[tool.pip-audit]` / `pip-audit.toml` / `--ignore-vuln` seguem **proibidos**
+  (`f0-008` FR-002, invariante): esta ADR move o gate, não cria supressão.
+- `.github/` segue sem o literal `lefthook` (FR-009 da 009): a config do bot e o
+  workflow de automerge não nomeiam a fronteira.
