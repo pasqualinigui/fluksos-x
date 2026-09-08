@@ -2461,3 +2461,43 @@ Manifest regenerado citando esta ADR. Nenhum outro oráculo é tocado.
 > legítimo — a integridade funcionando como desenhada. Fica autorizada,
 > **exclusivamente**, essa atualização + a regeneração do manifest. Nenhuma
 > asserção muda de sentido: só o número fixado acompanha o estado autorizado.
+
+## ADR-039 — Pré-autorização de fronteira da 015: `docker-compose.yml` + `docker/` admitidos (ponto único em `f0-008` FR-013)
+
+**Data**: 2026-09-09 · **Item**: `015` (0.8), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 015 (`f0-015` 2/16: FR-001..010/012/015/016
+reprovam sobre estado sem compose, guardas FR-011/FR-013 verdes, FR-014 ⏭️ sem
+daemon; commit `62f9a2d`) + `specs/015-docker-compose/plan.md` (declaração de
+impacto) · **Efeito**: autoriza o ajuste abaixo **exclusivamente no commit verde
+da 015 (Fase C)**.
+
+### Contexto
+
+Um conflito genuíno, previsto na tabela Q10 do research
+(`docs/plan/research/f0-015-docker-compose.md`, levantamento mecânico sobre os 14
+oráculos: `grep -n -i "docker-compose|docker/|compose"` → só `f0-008:80,509`;
+literais `Dockerfile`, `privileged`, `docker.sock` → zero). A 015 **é** o
+`docker-compose` por desenho (item 0.8 do plano); a asserção `f0-008` FR-013
+exige `docker-compose.yml` ausente ("deve ser 015"). Sem ajuste, o harness
+reprovaria estado correto; com ajuste silencioso, repetiríamos o achado A1
+(`f0-audit-005-008.md`).
+
+### Ajuste autorizado (forma exata, só na Fase C)
+
+Em `scripts/verify/f0-008-pip-audit.sh` (FR-013, linhas 80 e 509): admitir
+`docker-compose.yml` + diretório `docker/` **se** sob jurisdição 015 (imagens
+`tag@digest` sem `latest`, zero senha literal, zero `build:`, zero
+`privileged`/`docker.sock` — o próprio `f0-015` assere cada propriedade);
+descrição CANON atualizada para "fronteira sem lefthook.yml/gitleaks/packages,
+com compose sob jurisdição 015"; resto da FR intacto (`lefthook.yml`,
+gitleaks/`pip-audit.toml`, `packages/` com `pyproject.toml` seguem proibidos).
+Padrão ADR-018 (legitimidade: pins conferem com a tabela congelada do research,
+nunca nome estático). Manifest regenerado na Fase C citando esta ADR.
+Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix direto.
+
+### Consequências
+
+- Nona execução do procedimento ADR-017 sobre oráculo alheio. A FR-016 da 015
+  (oráculo asserir PLAN + esta ADR) aprova no verde.
+- `.env`/`.env.*` seguem ignorados (Lei Zero); `secrets/` entra no `.gitignore`
+  nesta spec (C1 do ANALYZE) sem tocar nenhum oráculo (nenhum o menciona).

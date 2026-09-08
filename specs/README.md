@@ -24,7 +24,7 @@
 | `012` | **0.7** | F0 | `packages/cli` (packages-cli) | ✅ concluída (`605a8de`) |
 | `013` | **0.15** | F0 | Automação de release | ✅ concluída (`7e44001`) · emenda ADR-034 (`e73d9a7`) |
 | `014` | **0.16** | F0 | Atualização de dependências | ✅ concluída (`9082301`) |
-| `015` | **0.8** | F0 | docker-compose | ⏳ |
+| `015` | **0.8** | F0 | docker-compose | ✅ concluída (`f380116`) |
 | `016` | **0.10** | F0 | `docs/tree.md` | ⏳ |
 
 *Mapa histórico original (12 itens) em `ADR-001` permanece como registro; `ADR-011` o supersede para 16.*
