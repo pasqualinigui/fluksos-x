@@ -2414,3 +2414,50 @@ isoladas em seguida: `f0-008` FR-011 (par divergiu), `f0-007` aninhada (via
 ADR-031; nenhum toque em oráculo convergido além do autorizado acima. O
 árbitro limpo é o runner do PR #23 — se verde lá, a teoria de contenção local
 confirma-se operacionalmente. Amostras somadas ao backlog da auditoria pós-016.
+
+---
+
+## ADR-038 — SC-002 isenta o terceiro padrão de merge: sync de "Update branch"
+
+**Data**: 2026-09-08 · **Item**: nenhum (checkpoint não-item, pós-#23) ·
+**Estado**: aceita · **Evidência**: run do PR #22 pós-sync
+(`f0-001` SC-002 vermelha com `Merge branch 'main' into
+dependabot/github_actions/actions-1d38ee6ce1`, 29/30) · **Efeito**: autoriza o
+ajuste abaixo **neste fluxo**, com re-verde no runner antes do merge. Nada além
+dele é tocado.
+
+### Contexto
+
+O botão "Update branch" (e qualquer sync por merge) grava na branch um commit
+`Merge branch '<nome>' into <linha>` — registro automatizado sem autor, da
+mesma classe dos dois padrões que a ADR-030 já isenta (merges sintéticos de
+checkout e merges reais de PR). A asserção media a forma de *toda* mensagem e
+não conhecia a terceira forma — mesma divergência "enunciado diz registro de
+autor, implementação mede tudo" que a ADR-029 corrigiu em FR-001.
+
+### Ajuste autorizado (forma exata)
+
+Em `scripts/verify/f0-001-foundation.sh`, bloco SC-002: terceira alternativa no
+`MERGE` (`^Merge branch '.+' into \S+$`) + comentário citando esta ADR. A forma
+é exata por construção: sync-merges do GitHub têm esta e só esta forma.
+Manifest regenerado citando esta ADR. Nenhum outro oráculo é tocado.
+
+### Consequências
+
+- Oitava execução do procedimento ADR-017 (terceira sobre o item 001 —
+  intocável desde a convergência; a forma é a mesma das anteriores).
+- Custo do atalho documentado no achado: sync por merge em branch de bot, além
+  de quebrar SC-002, transfere a posse da branch para humano (bot recusa
+  `rebase`, só oferece `recreate` — verificado no PR #22). Procedimento: em PR
+  de bot, nunca sync por merge; `recreate`, ou nada.
+- Residual honesto: mensagem de autor que imitasse a forma passaria — detectável
+  no diff, não no harness. Troca aceita: o harness julga forma de registro
+  automatizado, não intenção de autor (que nenhum grep mede).
+
+> **Adendo (consequência mecânica, precedente ADR-029):** a correção acima move
+> o resumo de `f0-001`, e `f0-002` FR-021a fixa o valor antigo por número
+> (mecanismo ADR-006). Sem acompanhar a constante `HASH_F0_001` em `f0-002`
+> para o novo resumo (+ comentário citando esta ADR), a cadeia reprova push
+> legítimo — a integridade funcionando como desenhada. Fica autorizada,
+> **exclusivamente**, essa atualização + a regeneração do manifest. Nenhuma
+> asserção muda de sentido: só o número fixado acompanha o estado autorizado.
