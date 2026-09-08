@@ -83,11 +83,11 @@ description: "Task list for 016 — docs/tree.md, mapa da árvore para IA"
 
 **Purpose**: fechar a lista (Regra 10) e publicar o estado
 
-- [ ] T017 **VERDE** — oráculo CONFORME (re-verificar contagens da pesquisa contra o índice atual antes — E1), preservar `specs/016-tree-docs/evidence/green.txt`, commit `feat(treedocs)` separado do vermelho
-- [ ] T018 `specs/README.md` `016 ✅` + hash do commit de convergência
-- [ ] T019 Re-executar harness 16/16 + `sha256sum -c scripts/verify/manifest.sha256`
-- [ ] T020 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (016 concluída, Fase 0 16/16)
-- [ ] T021 SC-007 🧑 — janela nova com só `AGENTS.md` + `tree.md`, localizar 3 artefatos de itens distintos (saídas verbatim; divergência declarada aceitável, silenciosa não)
+- [x] T017 **VERDE** — oráculo CONFORME (re-verificar contagens da pesquisa contra o índice atual antes — E1), preservar `specs/016-tree-docs/evidence/green.txt`, commit `feat(treedocs)` separado do vermelho
+- [x] T018 `specs/README.md` `016 ✅` + hash do commit de convergência
+- [x] T019 Re-executar harness 16/16 + `sha256sum -c scripts/verify/manifest.sha256`
+- [x] T020 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (016 concluída, Fase 0 16/16)
+- [x] T021 SC-007 🧑 — janela nova com só `AGENTS.md` + `tree.md`, localizar 3 artefatos de itens distintos (saídas verbatim; divergência declarada aceitável, silenciosa não)
 
 ---
 
