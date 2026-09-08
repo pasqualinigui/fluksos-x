@@ -1,0 +1,4 @@
+🔴 FR-009   README 016 hash + zero [ ] + vermelho-verde + manifest
+           evidencia: README sem "016.*tree.*✅.*hash"; tasks.md com 5 [ ] abertas (CONVERGE); par vermelho/verde 016 ausente no log (red=1 green=); 
+
+Resultado: 8/9 asserções aprovadas — 1 violação(ões) (critica: 0, alta: 1, media: 0) — NAO CONFORME
