@@ -21,9 +21,9 @@ description: "Task list for 014 — atualização automática de dependências"
 
 **Purpose**: base verde + branch + evidência
 
-- [ ] T001 [P] Confirmar harness 13/13 + manifest 13/13 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
-- [ ] T002 [P] Re-verificar fronteira Q9 no disco (`grep -rn "dependabot|renovate" scripts/verify/` → zero; conferir literais `lefthook`, `pip-audit`, `[tool.pip-audit]`)
-- [ ] T003 Criar branch `feature/f0-dependency-updates` desde `main` + diretório `specs/014-dependency-updates/evidence/`
+- [x] T001 [P] Confirmar harness 13/13 + manifest 13/13 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done`)
+- [x] T002 [P] Re-verificar fronteira Q9 no disco (`grep -rn "dependabot|renovate" scripts/verify/` → zero; conferir literais `lefthook`, `pip-audit`, `[tool.pip-audit]`)
+- [x] T003 Criar branch `feature/f0-dependency-updates` desde `main` + diretório `specs/014-dependency-updates/evidence/`
 
 ---
 
@@ -33,9 +33,9 @@ description: "Task list for 014 — atualização automática de dependências"
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Criar `scripts/verify/f0-014-dependabot.sh` com esqueleto (cabeçalho Q1–Q9/D1–D7, CANON 11 IDs, contrato `oracle-cli.md`, self-check série ADR-031)
-- [ ] T005 Acrescer 14ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
-- [ ] T006 Implementar asserts auto-verificáveis FR-009 em `scripts/verify/f0-014-dependabot.sh` (`--list` 11 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-013`)
+- [x] T004 Criar `scripts/verify/f0-014-dependabot.sh` com esqueleto (cabeçalho Q1–Q9/D1–D7, CANON 11 IDs, contrato `oracle-cli.md`, self-check série ADR-031)
+- [x] T005 Acrescer 14ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
+- [x] T006 Implementar asserts auto-verificáveis FR-009 em `scripts/verify/f0-014-dependabot.sh` (`--list` 11 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-013`)
 
 **Checkpoint**: Foundation ready — oráculo existe e fala o contrato
 
@@ -51,14 +51,14 @@ description: "Task list for 014 — atualização automática de dependências"
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [US1] FR-001/FR-002-version em `scripts/verify/f0-014-dependabot.sh` (uv + grupos `dev-minor-patch`/`security`)
-- [ ] T008 [US2] FR-002-major/FR-003 em `scripts/verify/f0-014-dependabot.sh` (major isolado + `github-actions` SHA)
-- [ ] T009 [US3] FR-004/FR-006 em `scripts/verify/f0-014-dependabot.sh` (prefixo `build(deps)` + zero supressão)
-- [ ] T010 [US1] FR-005/FR-011 em `scripts/verify/f0-014-dependabot.sh` (gate de ator + tripwire actions)
-- [ ] T011 [US4] FR-008 em `scripts/verify/f0-014-dependabot.sh` (`pip-audit` no `pre-push` — vermelho esperado: ainda está no `pre-commit`)
-- [ ] T012 FR-007 em `scripts/verify/f0-014-dependabot.sh` (override `click` + lock — guarda, verde-desde-nascimento esperado)
-- [ ] T013 **VERMELHO** — executar `scripts/verify/f0-014-dependabot.sh`, preservar `specs/014-dependency-updates/evidence/red.txt`, commit `test(harness)` separado (com a 14ª linha do manifest no mesmo ato)
-- [ ] T014 Redigir ADR de fronteira em `docs/plan/decisions.md` (1 ponto `f0-009` FR-003, forma exata do plan) — PRÉVIA ao verde, nunca depois
+- [x] T007 [US1] FR-001/FR-002-version em `scripts/verify/f0-014-dependabot.sh` (uv + grupos `dev-minor-patch`/`security`)
+- [x] T008 [US2] FR-002-major/FR-003 em `scripts/verify/f0-014-dependabot.sh` (major isolado + `github-actions` SHA)
+- [x] T009 [US3] FR-004/FR-006 em `scripts/verify/f0-014-dependabot.sh` (prefixo `build(deps)` + zero supressão)
+- [x] T010 [US1] FR-005/FR-011 em `scripts/verify/f0-014-dependabot.sh` (gate de ator + tripwire actions)
+- [x] T011 [US4] FR-008 em `scripts/verify/f0-014-dependabot.sh` (`pip-audit` no `pre-push` — vermelho esperado: ainda está no `pre-commit`)
+- [x] T012 FR-007 em `scripts/verify/f0-014-dependabot.sh` (override `click` + lock — guarda, verde-desde-nascimento esperado)
+- [x] T013 **VERMELHO** — executar `scripts/verify/f0-014-dependabot.sh`, preservar `specs/014-dependency-updates/evidence/red.txt`, commit `test(harness)` separado (com a 14ª linha do manifest no mesmo ato)
+- [x] T014 Redigir ADR de fronteira em `docs/plan/decisions.md` (1 ponto `f0-009` FR-003, forma exata do plan) — PRÉVIA ao verde, nunca depois
 
 **Checkpoint**: vermelho genuíno preservado + ADR autoriza o único toque em oráculo anterior
 
@@ -72,12 +72,12 @@ description: "Task list for 014 — atualização automática de dependências"
 
 ### Implementation
 
-- [ ] T015 [US1] Criar `.github/dependabot.yml` (ecossistema `uv`, grupos, schedule, prefixo — sem literal `lefthook`)
-- [ ] T016 [US2] Completar `.github/dependabot.yml` (`github-actions` separado, majors isolados, bloco de comentário `TRIPWIRE-014-actions` com o fallback) (depends on T015 — mesmo arquivo)
-- [ ] T017 [P] [US1] Criar `.github/workflows/dependabot-automerge.yml` (gate `dependabot[bot]` + `fetch-metadata@<40hex>` + `merge --auto --merge`; sem squash/rebase/vetores)
-- [ ] T018 [US4] Mover `uv run pip-audit` para `pre-push` em `lefthook.yml` (ordem fail-fast do `pre-commit` intacta — SÓ na Fase C, ponto ADR-017)
-- [ ] T019 [P] Re-verificar Q6 (`pypi.org/pypi/python-semantic-release/json` + `uv.lock` click) e registrar veredito no commit (mantém override ou remove pelo gatilho)
-- [ ] T020 Executar cenários 1–3 de `specs/014-dependency-updates/quickstart.md` (depends on T015–T018)
+- [x] T015 [US1] Criar `.github/dependabot.yml` (ecossistema `uv`, grupos, schedule, prefixo — sem literal `lefthook`)
+- [x] T016 [US2] Completar `.github/dependabot.yml` (`github-actions` separado, majors isolados, bloco de comentário `TRIPWIRE-014-actions` com o fallback) (depends on T015 — mesmo arquivo)
+- [x] T017 [P] [US1] Criar `.github/workflows/dependabot-automerge.yml` (gate `dependabot[bot]` + `fetch-metadata@<40hex>` + `merge --auto --merge`; sem squash/rebase/vetores)
+- [x] T018 [US4] Mover `uv run pip-audit` para `pre-push` em `lefthook.yml` (ordem fail-fast do `pre-commit` intacta — SÓ na Fase C, ponto ADR-017)
+- [x] T019 [P] Re-verificar Q6 (`pypi.org/pypi/python-semantic-release/json` + `uv.lock` click) e registrar veredito no commit (mantém override ou remove pelo gatilho)
+- [x] T020 Executar cenários 1–3 de `specs/014-dependency-updates/quickstart.md` (depends on T015–T018)
 
 **Checkpoint**: oráculo 11/11 + quickstart local verde
 
@@ -87,11 +87,11 @@ description: "Task list for 014 — atualização automática de dependências"
 
 **Purpose**: fechar a lista (Regra 10) e publicar o estado
 
-- [ ] T021 **VERDE** — oráculo 11/11, preservar `specs/014-dependency-updates/evidence/green.txt`, commit `feat(deps)` separado do vermelho
-- [ ] T022 `specs/README.md` `014 ✅` + hash do commit de convergência
-- [ ] T023 Re-executar harness 14/14 + `sha256sum -c scripts/verify/manifest.sha256`
-- [ ] T024 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (014 concluída, próxima 015)
-- [ ] T025 SC-007 🧑 — primeiro PR real do bot validado via GitHub MCP (saídas verbatim; divergência declarada aceitável, silenciosa não)
+- [x] T021 **VERDE** — oráculo 11/11, preservar `specs/014-dependency-updates/evidence/green.txt`, commit `feat(deps)` separado do vermelho
+- [x] T022 `specs/README.md` `014 ✅` + hash do commit de convergência
+- [x] T023 Re-executar harness 14/14 + `sha256sum -c scripts/verify/manifest.sha256`
+- [x] T024 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (014 concluída, próxima 015)
+- [x] T025 SC-007 🧑 — primeiro PR real do bot validado via GitHub MCP (saídas verbatim; divergência declarada aceitável, silenciosa não)
 
 ---
 
