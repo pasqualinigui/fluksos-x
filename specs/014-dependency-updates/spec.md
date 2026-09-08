@@ -31,6 +31,7 @@ Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (bo
 - Q: Ecossistema `github-actions` entra nesta spec ou actions seguem pinadas à mão? → A: **entra, em grupo separado, com tripwire** (research Q3+Q9). A forma SHA+comentário é julgada pelos 10 checks no primeiro PR real do bot; fallback pré-registrado (`ignore` em actions, pin manual) sem nova deliberação.
 - Q (clarify): Quais níveis de semver o automerge pode fundir sem ato humano? → A: **minor+patch com automerge, major isolado** — confirma FR-002/US-1: o portão verde decide; commits não-liberáveis; sem revisão prévia por julgamento.
 - Q (clarify): Updates de segurança no mesmo fluxo semanal ou em via expressa? → A: **via expressa separada** — grupo `security` próprio, cadência mais rápida, mesmo portão verde e mesmo automerge; CVE parado já bloqueou a `main` uma vez (013) e não espera o grupo semanal.
+- Achado de implementação (2026-09-08, P1 GitHub docs): security updates são **event-driven** (alerta dispara PR; `schedule.interval` rege só versions; security nunca se agrupa com versions) — a segunda entrada `daily` seria redundante na melhor hipótese e config inválida na pior, ambas improváveis de provar localmente. Desenho corrigido para entrada única + grupo `security` (`applies-to`): o intento do clarify (nunca esperar o grupo semanal) cumprido por mecanismo de plataforma, não por poll. FR-002 ajustada; histórico acima preservado.
 
 ---
 
@@ -49,7 +50,7 @@ Toda semana o bot abre PRs agrupados de `minor`/`patch` das dependências de des
 1. **Given** bumps `minor`/`patch` disponíveis nas dependências de desenvolvimento, **When** o bot executa no schedule, **Then** um único PR agrupado é aberto com manifesto + lock coerentes.
 2. **Given** um PR de bot com os 10 checks verdes, **When** o automerge avalia, **Then** o merge acontece sem ato humano.
 3. **Given** um PR de bot com qualquer check vermelho, **When** o automerge avalia, **Then** nada mergeia e o vermelho nomeia a causa.
-4. **Given** uma correção de segurança disponível, **When** o bot executa, **Then** ela trafega no grupo `security` em cadência diária (não espera o grupo semanal) e mergeia sob o mesmo portão verde.
+4. **Given** uma correção de segurança disponível, **When** o bot executa, **Then** ela trafega no grupo `security` disparado por evento (não espera o grupo semanal) e mergeia sob o mesmo portão verde.
 
 ---
 
@@ -112,7 +113,7 @@ Com o `pip-audit` no `pre-push`, corrigir uma vulnerabilidade futura volta a ser
 ### Functional Requirements
 
 - **FR-001**: O sistema MUST declarar o bot em configuração versionada para o ecossistema `uv` (diretório raiz, schedule semanal), cobrindo manifesto + lock a cada bump.
-- **FR-002**: O sistema MUST agrupar updates `minor`/`patch` das dependências de desenvolvimento em grupo único e MUST excluir `major` do agrupamento e do automerge (PR próprio, revisão humana). Updates de segurança MUST trafegar em grupo próprio com cadência diária (`daily`), sob o mesmo portão verde e o mesmo automerge — nunca presos ao grupo semanal.
+- **FR-002**: O sistema MUST agrupar updates `minor`/`patch` das dependências de desenvolvimento em grupo único e MUST excluir `major` do agrupamento e do automerge (PR próprio, revisão humana). Updates de segurança MUST trafegar em grupo próprio disparado por evento de alerta (sem schedule próprio — o mecanismo de security updates não espera o schedule de versões, P1), sob o mesmo portão verde e o mesmo automerge — nunca presos ao grupo semanal.
 - **FR-003**: O sistema MUST declarar o ecossistema `github-actions` em separado, preservando a forma de pin por resumo criptográfico + comentário de versão em todo bump.
 - **FR-004**: O sistema MUST prefixar toda mensagem de commit do bot com tipo não-liberável (`build(deps)`), de modo que bumps MUST NOT derivar incremento de versão no PSR e MUST passar no `commitlint`.
 - **FR-005**: O sistema MUST prover automerge exclusivamente como consequência do portão: apenas PRs de bot, apenas via merge simples, apenas com os checks obrigatórios verdes — e MUST NOT mergear vermelho por nenhuma via.

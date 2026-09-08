@@ -9,7 +9,7 @@
 | `version` | `2` (literal) | fixo do formato |
 | `updates[]` | lista de 2 entradas: `uv` + `github-actions` | uma por ecossistema, nunca misturados |
 | `updates[].directory` | `"/"` | raiz (manifesto + lock co-localizados) |
-| `updates[].schedule.interval` | `weekly` (uv/version); `daily` (security) | D2 + clarify Q2 + remediação F1 |
+| `updates[].schedule.interval` | `weekly` (versões; security é event-driven, sem schedule próprio) | D2 + clarify Q2 + achado de implementação |
 | `updates[].groups` | `dev-minor-patch` (patterns dev, `update-types: [minor, patch]`); `security` (`applies-to: security-updates`); `major` excluído de grupo com automerge | FR-002 |
 | `updates[].commit-message.prefix` | `build(deps)` (não-liberável) | FR-004; ressalva #9304 no TESTS |
 | `updates[].open-pull-requests-limit` | `5` (default do formato; teto de ruído) | nunca 0 para `uv` (mataria o item) |

@@ -8,7 +8,7 @@ Identidade 1:1 — o oráculo emite os IDs **da spec**, sem remapeamento.
 | Asserção | FR | Verifica |
 |---|---|---|
 | FR-001 | FR-001 | `.github/dependabot.yml` com ecossistema `uv`, diretório raiz, schedule semanal |
-| FR-002 | FR-002 | grupos `dev-minor-patch` + `security` próprio; `major` fora de grupo com automerge |
+| FR-002 | FR-002 | grupos `dev-minor-patch` + `security` por evento (`applies-to`); `major` fora de grupo com automerge |
 | FR-003 | FR-003 | ecossistema `github-actions` separado; pins `uses:` SHA 40hex + comentário |
 | FR-004 | FR-004 | `commit-message.prefix` não-liberável (`build(deps)`) |
 | FR-005 | FR-005 | automerge só bot, só `--merge`, só no verde (gate de ator; sem squash/rebase) |

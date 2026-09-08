@@ -71,7 +71,7 @@ skip() { R_STATUS+=("skip"); R_ID+=("$1"); R_DESC+=("$2"); R_SEV+=("-");  R_EVID
 
 declare -A CANON=(
   ["FR-001"]="dependabot.yml uv raiz schedule semanal"
-  ["FR-002"]="grupos dev-minor-patch + security daily, major isolado"
+  ["FR-002"]="grupos dev-minor-patch + security por evento, major isolado"
   ["FR-003"]="github-actions separado, pins SHA + comentario"
   ["FR-004"]="prefixo build(deps) nao-liberavel"
   ["FR-005"]="automerge so bot so --merge so no verde"
@@ -139,22 +139,22 @@ fi
 if [ "$FR1_OK" = "1" ]; then pass "FR-001" "${CANON[FR-001]}"; else fail "FR-001" "${CANON[FR-001]}" "alta" "$EVID1"; fi
 
 # =============================================================================
-# FR-002: grupos dev-minor-patch + security daily, major isolado sem automerge
+# FR-002: grupos dev-minor-patch + security por evento, major isolado sem automerge
+# Security e event-driven (alerta dispara PR, sem schedule proprio — P1 docs);
+# checagens sobre linhas nao-comentadas: comentario nao decide assercao.
 # =============================================================================
 FR2_OK=1; EVID2=""
 if [ ! -f "$DEPENDBOT" ]; then
   FR2_OK=0; EVID2="${EVID2}.github/dependabot.yml ausente; "
 else
-  if ! grep -q "dev-minor-patch" "$DEPENDBOT" 2>/dev/null; then
+  CODEONLY=$(grep -v "^[[:space:]]*#" "$DEPENDBOT" 2>/dev/null || true)
+  if ! echo "$CODEONLY" | grep -q "dev-minor-patch" 2>/dev/null; then
     FR2_OK=0; EVID2="${EVID2}sem grupo dev-minor-patch; "
   fi
-  if ! grep -q "security" "$DEPENDBOT" 2>/dev/null; then
-    FR2_OK=0; EVID2="${EVID2}sem grupo security; "
+  if ! echo "$CODEONLY" | grep -q "applies-to: \"security-updates\"" 2>/dev/null; then
+    FR2_OK=0; EVID2="${EVID2}sem grupo security por evento (applies-to); "
   fi
-  if ! grep -q 'interval: "daily"' "$DEPENDBOT" 2>/dev/null; then
-    FR2_OK=0; EVID2="${EVID2}security sem cadencia diaria (F1); "
-  fi
-  if grep -q "automerge.*major\|major.*automerge" "$DEPENDBOT" 2>/dev/null; then
+  if echo "$CODEONLY" | grep -q "automerge.*major\|major.*automerge" 2>/dev/null; then
     FR2_OK=0; EVID2="${EVID2}major com automerge (vedado, D2); "
   fi
 fi
