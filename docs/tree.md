@@ -326,6 +326,7 @@ specs/017-harness/plan.md
 specs/017-harness/quickstart.md
 specs/017-harness/research.md
 specs/017-harness/spec.md
+specs/017-harness/tasks.md
 specs/README.md
 tests/__init__.py
 tests/conftest.py
