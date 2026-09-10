@@ -33,7 +33,7 @@
 
 | Spec | Item plano | Fase | Título | Status |
 |---|---|---|---|---|
-| `017` | **1.1** | F1 | `core/harness.py` — feedforward + feedback controls | ✅ concluída (`6e4f404`) |
+| `017` | **1.1** | F1 | `core/harness.py` — feedforward + feedback controls | ✅ concluída (`2dce893`) |
 | `018` | **1.2** | F1 | `core/constitution.py` — parser AGENTS.md | ⏳ próxima |
 | `019` | **1.3** | F1 | `core/spec_kit_bridge.py` — bridge Spec-Kit CLI | ⏳ |
 | `020` | **1.4** | F1 | `indexer/treesitter.py` — AST multi-linguagem (+ FR de cadência: auditoria `017–020`) | ⏳ |

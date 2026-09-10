@@ -15,4 +15,3 @@ f49b60b114fca643d1cbf13b2f232b7873709af20d7d9775fcc6aa14f7e319e0  scripts/verify
 0bf917b4263dd239aafe6aa5cb11e3bab4a875f06077f4003a998a483dcc7bb7  scripts/verify/f0-015-docker-compose.sh
 cbd33648c4e2e255e78a1fcdee967c682416b64a3c6c0b596e71f1cb3169549b  scripts/verify/f0-016-tree.sh
 cd63b01177e2464aa9ee68ed7e78f393f7bd9576e6d471abbd626cb2fdbed7af  scripts/verify/f1-017-harness.sh
-cd63b01177e2464aa9ee68ed7e78f393f7bd9576e6d471abbd626cb2fdbed7af  scripts/verify/f1-017-harness.sh
