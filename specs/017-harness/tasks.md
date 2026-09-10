@@ -86,12 +86,12 @@
 
 **Purpose**: fechar a lista (Regra 10) e publicar o estado
 
-- [ ] T018 **VERDE** — oráculo CONFORME + pytest verde, preservar `specs/017-harness/evidence/green.txt`, commit `feat(harness)` separado do vermelho
-- [ ] T019 `specs/README.md` `017 ✅` + hash do commit de convergência
-- [ ] T020 Re-executar harness 17/17 + `sha256sum -c scripts/verify/manifest.sha256`
-- [ ] T021 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (Fase 1 1/8; precedente 016/T020 — ANALYZE F2, manter)
-- [ ] T022 SC-006 🧑 — roteiro de `specs/017-harness/quickstart.md` com saídas verbatim (divergência declarada aceitável, silenciosa não)
-- [ ] T023 PR + auto-merge servidor (merge no verde; sem squash/rebase por construção — ADR-035)
+- [x] T018 **VERDE** — oráculo CONFORME + pytest verde, preservar `specs/017-harness/evidence/green.txt`, commit `feat(harness)` separado do vermelho
+- [x] T019 `specs/README.md` `017 ✅` + hash do commit de convergência
+- [x] T020 Re-executar harness 17/17 + `sha256sum -c scripts/verify/manifest.sha256`
+- [x] T021 Confirmar `tasks.md` zero `[ ]` + atualizar `AGENTS.md` (Fase 1 1/8; precedente 016/T020 — ANALYZE F2, manter)
+- [x] T022 SC-006 🧑 — roteiro de `specs/017-harness/quickstart.md` com saídas verbatim (divergência declarada aceitável, silenciosa não)
+- [x] T023 PR + auto-merge servidor (merge no verde; sem squash/rebase por construção — ADR-035)
 
 ---
 
