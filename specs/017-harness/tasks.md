@@ -20,9 +20,9 @@
 
 **Purpose**: base verde + branch + evidência
 
-- [ ] T001 [P] Confirmar harness 16/16 + manifest 16/16 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done; sha256sum -c scripts/verify/manifest.sha256`)
-- [ ] T002 [P] Re-verificar fronteira no disco (`grep -rn 'alem dos 4|EXTRA=' scripts/verify/f0-*.sh` → só `f0-011` sobre `core/`; confirma o ponto único do plan)
-- [ ] T003 Verificar branch `feature/f1-harness-engine` desde `main` + diretório `specs/017-harness/evidence/`
+- [x] T001 [P] Confirmar harness 16/16 + manifest 16/16 (`for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done; sha256sum -c scripts/verify/manifest.sha256`)
+- [x] T002 [P] Re-verificar fronteira no disco (`grep -rn -E 'alem dos 4|EXTRA=' scripts/verify/f0-*.sh` → só `f0-011` sobre `core/` + `f0-012` sobre `cli/`; confirma o ponto único do plan)
+- [x] T003 Verificar branch `feature/f1-harness-engine` desde `main` + diretório `specs/017-harness/evidence/`
 
 ---
 
@@ -32,9 +32,9 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 Criar `scripts/verify/f1-017-harness.sh` com esqueleto (cabeçalho Q1–Q8/D1–D7, CANON 12 IDs, contrato `specs/017-harness/contracts/oracle-cli.md`, self-check `f0-001…f0-016` em série ADR-031 — prefixo `f1-`, primeiro da Fase 1)
-- [ ] T005 Acrescer 17ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
-- [ ] T006 Implementar asserts auto-verificáveis em `scripts/verify/f1-017-harness.sh` (`--list` 12 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-016`)
+- [x] T004 Criar `scripts/verify/f1-017-harness.sh` com esqueleto (cabeçalho Q1–Q8/D1–D7, CANON 12 IDs, contrato `specs/017-harness/contracts/oracle-cli.md`, self-check `f0-001…f0-016` em série ADR-031 — prefixo `f1-`, primeiro da Fase 1)
+- [x] T005 Acrescer 17ª linha a `scripts/verify/manifest.sha256` (junto do esqueleto — precedente E5: separar faria `f0-009/010/011/012` reprovarem junto)
+- [x] T006 Implementar asserts auto-verificáveis em `scripts/verify/f1-017-harness.sh` (`--list` 12 IDs, `--invalido` exit 2, 2× byte-idêntico <5s, self-check `f0-001…f0-016`)
 
 **Checkpoint**: Foundation ready — oráculo existe e fala o contrato
 
@@ -50,11 +50,11 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T007 [US1] FR-002/FR-003/FR-005/FR-006 em `scripts/verify/f1-017-harness.sh` (feedback com returncode preservado; literais `0/1/2`; veredito nomeia requisito+evidência; `HarnessError`)
-- [ ] T008 [US2] FR-001/FR-012 em `scripts/verify/f1-017-harness.sh` (feedforward recusa sem processo; portão não-POSIX fail-closed)
-- [ ] T009 [US3] FR-003/FR-007 em `scripts/verify/f1-017-harness.sh` (equivalência Python↔shell; nenhum exit fora de `{0,1,2}`)
-- [ ] T010 FR-004/FR-008/FR-011 em `scripts/verify/f1-017-harness.sh` (zero retry tentativa-única; contrato auto-verificável; só-stdlib) + `tests/test_fkx_core_harness.py` com os casos US1–US3 (molde `tests/test_fkx_core_*.py`, importa de `fkx_core`)
-- [ ] T011 **VERMELHO** — executar `scripts/verify/f1-017-harness.sh` + `pytest tests/test_fkx_core_harness.py`, preservar `specs/017-harness/evidence/red.txt`, commit `test(harness)` separado (com a 17ª linha do manifest no mesmo ato; fronteira AINDA intocada) + **PUSH do vermelho** (disciplina §6 do checkpoint: durabilidade da prova)
+- [x] T007 [US1] FR-002/FR-003/FR-005/FR-006 em `scripts/verify/f1-017-harness.sh` (feedback com returncode preservado; literais `0/1/2`; veredito nomeia requisito+evidência; `HarnessError`)
+- [x] T008 [US2] FR-001/FR-012 em `scripts/verify/f1-017-harness.sh` (feedforward recusa sem processo; portão não-POSIX fail-closed)
+- [x] T009 [US3] FR-003/FR-007 em `scripts/verify/f1-017-harness.sh` (equivalência Python↔shell; nenhum exit fora de `{0,1,2}`)
+- [x] T010 FR-004/FR-008/FR-011 em `scripts/verify/f1-017-harness.sh` (zero retry tentativa-única; contrato auto-verificável; só-stdlib) + `tests/test_fkx_core_harness.py` com os casos US1–US3 (molde `tests/test_fkx_core_*.py`, importa de `fkx_core`)
+- [x] T011 **VERMELHO** — executar `scripts/verify/f1-017-harness.sh` + `pytest tests/test_fkx_core_harness.py`, preservar `specs/017-harness/evidence/red.txt`, commit `test(harness)` separado (com a 17ª linha do manifest no mesmo ato; fronteira AINDA intocada) + **PUSH do vermelho** (disciplina §6 do checkpoint: durabilidade da prova)
 
 **Checkpoint**: vermelho genuíno preservado e empurrado; fronteira declarada, nada autorizado ainda
 

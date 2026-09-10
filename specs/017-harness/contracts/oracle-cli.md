@@ -4,14 +4,14 @@ Identidade 1:1 (12 FRs → 12 asserções). Self-check `f0-001…f0-016` em sér
 
 > A03 (mapeamento positivo `0/1/2`) vs A07 (proibição negativa fora de `{0,1,2}`): distinção intencional (ANALYZE A1, manter) — uma prova o alfabeto, a outra proíbe o fora-do-alfabeto.
 
-## Superfície (ANALYZE F1 — fixada aqui, não no TESTS)
+## Superfície (ANALYZE F1 + adendo pré-vermelho — fixada aqui, não no TESTS)
 
 ```python
-veredito = harness.run(cmd, *, timeout=None) -> Veredito
-Veredito(requisito: str, evidencia: str, exit: Literal[0, 1, 2])
+veredito = harness.run(cmd, *, timeout=None, requisito="HARNESS") -> Veredito
+Veredito(requisito: str, evidencia: str, exit: Literal[0, 1, 2], returncode: int)
 ```
 
-`requisito` é o ID `FR-XXX` (da spec consumidora ou deste item); `evidencia` é a saída observada (nunca traceback, segredo mascarado); `exit` é o literal. O vermelho (T007/T010) chama exatamente esta forma; o verde a implementa sem desviar.
+`requisito` é o ID `FR-XXX` informado pelo chamador (o módulo é genérico: quem chama nomeia o requisito — sem ele, FR-005 seria inexigível); `evidencia` é a saída observada (nunca traceback, segredo mascarado); `exit` é o literal; `returncode` é o código preservado (negativo por sinal: `-9` medido). O vermelho (T007/T010) chama exatamente esta forma; o verde a implementa sem desviar.
 
 | FR | Asserção |
 |---|---|

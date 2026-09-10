@@ -113,6 +113,7 @@ scripts/verify/f0-013-release.sh
 scripts/verify/f0-014-dependabot.sh
 scripts/verify/f0-015-docker-compose.sh
 scripts/verify/f0-016-tree.sh
+scripts/verify/f1-017-harness.sh
 scripts/verify/manifest.sha256
 specs/001-git-branching-strategy/checklists/requirements.md
 specs/001-git-branching-strategy/contracts/oracle-cli.md
@@ -322,6 +323,7 @@ specs/016-tree-docs/tasks.md
 specs/017-harness/checklists/requirements.md
 specs/017-harness/contracts/oracle-cli.md
 specs/017-harness/data-model.md
+specs/017-harness/evidence/red.txt
 specs/017-harness/plan.md
 specs/017-harness/quickstart.md
 specs/017-harness/research.md
@@ -335,6 +337,7 @@ tests/test_fkx_cli_help.py
 tests/test_fkx_cli_version.py
 tests/test_fkx_core_config.py
 tests/test_fkx_core_errors.py
+tests/test_fkx_core_harness.py
 tests/test_fkx_core_models.py
 tests/test_fkx_core_state.py
 tests/test_harness_debts.py
