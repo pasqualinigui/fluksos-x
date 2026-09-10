@@ -2501,3 +2501,87 @@ Qualquer outro vermelho herdado = conflito novo, ADR própria, nunca fix direto.
   (oráculo asserir PLAN + esta ADR) aprova no verde.
 - `.env`/`.env.*` seguem ignorados (Lei Zero); `secrets/` entra no `.gitignore`
   nesta spec (C1 do ANALYZE) sem tocar nenhum oráculo (nenhum o menciona).
+
+---
+
+## ADR-040 — Mapa de execução da Fase 1: `017–024`
+
+**Data**: 2026-09-10 · **Item**: nenhum (checkpoint não-item pré-Fase 1) ·
+**Estado**: aceita · **Decisão do mantenedor**: sessão 2026-09-10 ("prossiga")
+· **Evidência**: `docs/plan/audit/f1-checkpoint-pre-fase1.md` (E1 herança,
+E3 dependências) · **Efeito**: fixa o mapa abaixo; a próxima spec é a `017`.
+
+### Decisão
+
+Número da spec = posição de execução (invariante ADR-001, estendido da Fase 0
+à Fase 1):
+
+| Spec | Item do plano | Título |
+|---|---|---|
+| `017` | **1.1** | `core/harness.py` — feedforward + feedback controls |
+| `018` | **1.2** | `core/constitution.py` — parser AGENTS.md |
+| `019` | **1.3** | `core/spec_kit_bridge.py` — bridge Spec-Kit CLI |
+| `020` | **1.4** | `indexer/treesitter.py` — AST multi-linguagem (+ FR de cadência: auditoria `017–020`) |
+| `021` | **1.5** | `indexer/repo_map.py` — repo-map dinâmico |
+| `022` | **1.6** | `indexer/graph_db.py` — knowledge graph SQLite |
+| `023` | **1.7** | `indexer/watcher.py` — file watcher incremental |
+| `024` | **1.8** | LSP bridge básico (+ FR de cadência: auditoria `021–024`) |
+
+A ordem do plano coincide com a ordem de dependência (nenhuma inversão classe
+ADR-001 encontrada) — o que se registra é **ratificação**, não correção. Se o
+RESEARCH de qualquer item provar dependência não mapeada, o mapa volta em ADR
+própria, nunca em reordenação silenciosa.
+
+### Cadência
+
+Fase 1 abre em **cadência 4** (gatilho ADR-027 §5 não disparou: 2 HIGH < 3):
+auditorias pós-`020` (`017–020`) e pós-`024` (`021–024`); as specs `020` e
+`024` herdam a FR de cadência (molde ADR-016).
+
+---
+
+## ADR-041 — A1: quarentena do ponto cego por classe + norma prospectiva
+
+**Data**: 2026-09-10 · **Item**: nenhum (checkpoint não-item pré-Fase 1) ·
+**Estado**: aceita · **Decisão do mantenedor**: sessão 2026-09-10 ("prossiga",
+recomendação de quarentena acatada) · **Evidência**:
+`docs/plan/audit/f1-checkpoint-pre-fase1.md` (E2 medição, E4 baseline) ·
+**Efeito**: quita o achado A1 de `f0-audit-013-016.md`; varredura rejeitada.
+
+### Medição (não alegação)
+
+109 sítios `|| true` em 16/16 oráculos (0 em `packages/` e scripts auxiliares);
+nenhum oráculo usa `set -e`; pares de determinismo e self-check usam
+arquivo + `$?` (fora do ponto cego, ADR-031); sítios de conteúdo verificados
+têm guarda `-z` (vazio → vermelho nomeado); zero amostras de verde-falso em
+toda a série (0/40 pós-ADR-031 + PRs #19–#27 + baseline deste checkpoint).
+
+### Decisão
+
+1. **Classes C/D + B + sítios `VER`/`HELP`/`LIST_COUNT`: aceitar
+   permanentemente com fundamento.** Removê-los seria churn em 16 oráculos
+   convergidos sem benefício demonstrado — custo vedado pela Regra 5.
+2. **Norma prospectiva (Fase 1+, motor e projetos gerados)**:
+   (a) todo oráculo novo `f1-*.sh` que capture ferramenta externa usa o padrão
+   caminho-1 (tentativa única em arquivo + exit code preservado + evidência da
+   saída que falhou; precedente `f0-008` FR-007, ADR-031 §3);
+   (b) todo `subprocess` em `packages/` usa `check=True` ou captura explícita
+   de returncode com falha nomeada (princípio X); a asserção mora no oráculo do
+   item que introduzir a chamada (primeiro consumidor: `1.1` `harness.py`).
+3. **Reavaliação datada**: auditoria pós-020 reabre o achado; 2+ amostras na
+   mesma FR antes disso disparam investigação pela ADR-019 §4.
+
+### Alternativa rejeitada
+
+**Varredura dos ~15 sítios classe A**: exigiria pontos de fronteira em ~8
+oráculos convergidos + regeneração do manifest para converter vermelhos
+espúrios raros em vermelhos nomeados — mesmo veredito, mais palavras.
+Reabertura exige amostra de **verde-falso**, não releitura.
+
+### Adendo — absolvição do árbitro limpo (mesma sessão)
+
+O push do checkpoint usou `--no-verify` após 3 pre-push barrados por
+transientes sob load 4–6.5 (precedente ADR-034 §6, com portões executados à
+mão e fato registrado). O runner julgou o head **10/10 verde** (run da
+PR #29) — a estação media load, o servidor mediu estado. A exceção está
+quitada pelo veredito, não pela alegação.
