@@ -57,6 +57,7 @@ docs/plan/audit/f0-audit-001-004.md
 docs/plan/audit/f0-audit-005-008.md
 docs/plan/audit/f0-audit-009-012.md
 docs/plan/audit/f0-audit-013-016.md
+docs/plan/audit/f1-checkpoint-pre-fase1.md
 docs/plan/decisions.md
 docs/plan/implementation_plan.md
 docs/plan/research/f0-001-git-branching.md
