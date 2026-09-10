@@ -137,6 +137,26 @@ E o limite de fundo é o da ADR-009: `--no-verify` é flag do cliente git, não 
 proíbe de dentro do repositório. O que se remove é a **necessidade**; o que
 neutraliza vive no servidor.
 
+### Prova de discriminação da FR-008 reescrita
+
+Uma asserção que não reprova o estado errado é tautologia — o modo exato de
+derrotar um oráculo sem tocar no seu resumo. Sonda executada nesta sessão, com
+restauração garantida:
+
+```
+isca (pytest de volta ao pre-commit):
+  🔴 FR-008  pytest e pip-audit no pre-push, fora do pre-commit
+  Resultado: 10/11 — NAO CONFORME
+
+estado correto (restaurado):
+  ✅ FR-008  pytest e pip-audit no pre-push, fora do pre-commit
+  Resultado: 11/11 — CONFORME
+```
+
+A FR discrimina nas duas direções. `f0-009` FR-003 permanece verde em ambos os
+estados, como previsto: ela assere ordem por número de linha e presença no
+arquivo, jamais a seção — verificado por leitura do código, não por suposição.
+
 ---
 
 ## 4. Achado 3 — normas sem oráculo

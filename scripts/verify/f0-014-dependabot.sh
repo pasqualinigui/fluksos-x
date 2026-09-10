@@ -77,7 +77,7 @@ declare -A CANON=(
   ["FR-005"]="automerge so bot so --merge so no verde"
   ["FR-006"]="zero supressao em arquivo versionado"
   ["FR-007"]="override click>=8.3.3,<8.5.0 + lock resolve >=8.3.3"
-  ["FR-008"]="pip-audit no pre-push, fora do pre-commit"
+  ["FR-008"]="pytest e pip-audit no pre-push, fora do pre-commit"
   ["FR-009"]="contrato: list 11 exit2 2x <5s self-check serie"
   ["FR-010"]="README 014 hash + zero [ ] + vermelho-verde"
   ["FR-011"]="tripwire TRIPWIRE-014-actions no dependabot.yml"
@@ -261,7 +261,12 @@ fi
 if [ "$FR7_OK" = "1" ]; then pass "FR-007" "${CANON[FR-007]}"; else fail "FR-007" "${CANON[FR-007]}" "alta" "$EVID7"; fi
 
 # =============================================================================
-# FR-008: pip-audit no pre-push, fora do pre-commit (ponto ADR-017 sobre FR-003/009)
+# FR-008: pytest e pip-audit no pre-push, fora do pre-commit
+# ADR-044 (11a execucao do procedimento ADR-017): o teorema da ADR-034 §6 nao e
+# sobre vulnerabilidade, e sobre a natureza do verificador — RESULTADO no
+# pre-commit mata o portao vermelho da Regra 2, FORMA nao. pytest e verificador
+# de resultado, logo acompanha o pip-audit para o pre-push. O pre-commit guarda
+# o trio estatico. Ponto ADR-017 sobre FR-003/009.
 # =============================================================================
 FR8_OK=1; EVID8=""
 if [ ! -f "$HOOKYML" ]; then
@@ -274,9 +279,15 @@ else
   if ! grep -q "pip-audit" "$HOOKYML" 2>/dev/null; then
     FR8_OK=0; EVID8="${EVID8}pip-audit ausente do hook (deve estar no pre-push); "
   fi
-  for job in "uv run ruff check" "uv run ruff format --check" "uv run mypy --strict" "uv run pytest"; do
+  if echo "$PRECOMMIT_SECT" | grep -q "uv run pytest" 2>/dev/null; then
+    FR8_OK=0; EVID8="${EVID8}pytest no pre-commit (teorema ADR-034 §6 generalizado, ADR-044); "
+  fi
+  if ! grep -q "uv run pytest" "$HOOKYML" 2>/dev/null; then
+    FR8_OK=0; EVID8="${EVID8}pytest ausente do hook (deve estar no pre-push); "
+  fi
+  for job in "uv run ruff check" "uv run ruff format --check" "uv run mypy --strict"; do
     if ! echo "$PRECOMMIT_SECT" | grep -Fq "$job" 2>/dev/null; then
-      FR8_OK=0; EVID8="${EVID8}fail-fast desfalcado no pre-commit ($job); "
+      FR8_OK=0; EVID8="${EVID8}trio estatico desfalcado no pre-commit ($job); "
     fi
   done
 fi
