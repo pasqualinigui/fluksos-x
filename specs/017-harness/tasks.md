@@ -68,15 +68,15 @@
 
 ### Prerequisite (bloqueia a Fase C)
 
-- [ ] T012 Redigir ADR-042 prévia de fronteira em `docs/plan/decisions.md` (10ª execução do molde ADR-017, forma exata do plan: `f0-011` FR-002 admite `harness.py` sob jurisdição 017; nada além)
+- [x] T012 Redigir ADR-042 prévia de fronteira em `docs/plan/decisions.md` (10ª execução do molde ADR-017, forma exata do plan: `f0-011` FR-002 admite `harness.py` sob jurisdição 017; nada além)
 
 ### Implementation
 
-- [ ] T013 [US1] `HarnessError(FkxError)` em `packages/core/src/fkx_core/exceptions.py` + exports em `packages/core/src/fkx_core/__init__.py`
-- [ ] T014 [US1] Feedback em `packages/core/src/fkx_core/harness.py` (`check=False` + captura + returncode preservado + veredito; depends on T013 — concepção deriva do erro)
-- [ ] T015 [US2] Feedforward + portão POSIX em `packages/core/src/fkx_core/harness.py` (depends on T014 — mesmo arquivo, NUNCA paralelo)
-- [ ] T016 Aplicar ajuste autorizado em `scripts/verify/f0-011-core.sh` FR-002 (whitelist `harness.py` sob jurisdição 017, citando ADR-042) + regenerar `scripts/verify/manifest.sha256` citando ADR-042 (**exclusivamente na Fase C**; nenhum outro oráculo tocado)
-- [ ] T017 Executar cenários 1–4 de `specs/017-harness/quickstart.md` (depends on T013–T015)
+- [x] T013 [US1] `HarnessError(FkxError)` em `packages/core/src/fkx_core/exceptions.py` + exports em `packages/core/src/fkx_core/__init__.py`
+- [x] T014 [US1] Feedback em `packages/core/src/fkx_core/harness.py` (`check=False` + captura + returncode preservado + veredito; depends on T013 — concepção deriva do erro)
+- [x] T015 [US2] Feedforward + portão POSIX em `packages/core/src/fkx_core/harness.py` (depends on T014 — mesmo arquivo, NUNCA paralelo)
+- [x] T016 Aplicar ajuste autorizado em `scripts/verify/f0-011-core.sh` FR-002 (whitelist `harness.py` sob jurisdição 017, citando ADR-042) + regenerar `scripts/verify/manifest.sha256` citando ADR-042 (**exclusivamente na Fase C**; nenhum outro oráculo tocado)
+- [x] T017 Executar cenários 1–4 de `specs/017-harness/quickstart.md` (depends on T013–T015)
 
 **Checkpoint**: oráculo verde + pytest verde + quickstart verde
 

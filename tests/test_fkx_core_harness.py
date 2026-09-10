@@ -33,8 +33,9 @@ def test_us1_timeout_expiracao_nomeada_fail_closed():
 def test_us2_recusa_nao_gera_processo(tmp_path, monkeypatch):
     marker = tmp_path / "marker-017"
     monkeypatch.setenv("FKX_HARNESS_FORCE_PLATFORM", "nonposix")
-    with pytest.raises(HarnessError):
-        harness.run(["touch", str(marker)], requisito="FR-001")
+    v = harness.run(["touch", str(marker)], requisito="FR-001")
+    assert v.exit == 2
+    assert "HarnessError" in v.evidencia
     assert not marker.exists()
 
 
@@ -43,10 +44,11 @@ def test_us2_binario_ausente_erro_de_uso():
     assert v.exit == 2
 
 
-def test_us2_plataforma_forcada_falha_fechada(monkeypatch):
+def test_us2_plataforma_forcada_falha_fechada_nomeada(monkeypatch):
     monkeypatch.setenv("FKX_HARNESS_FORCE_PLATFORM", "nonposix")
-    with pytest.raises(HarnessError):
-        harness.run(["true"], requisito="FR-012")
+    v = harness.run(["true"], requisito="FR-012")
+    assert v.exit == 2
+    assert "HarnessError" in v.evidencia
 
 
 def test_us3_exits_no_alfabeto():
@@ -61,3 +63,10 @@ def test_harness_error_hierarquia():
     assert issubclass(HarnessError, FkxError)
     with pytest.raises(FkxError):
         raise HarnessError("portao", "recusa nomeada")
+
+
+def test_mau_uso_da_api_levanta():
+    with pytest.raises(HarnessError):
+        harness.run([], requisito="FR-001")
+    with pytest.raises(HarnessError):
+        harness.run(["true"], requisito="FR-001", timeout=0)

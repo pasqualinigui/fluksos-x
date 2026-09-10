@@ -202,7 +202,7 @@ else
   if [ "$P1_RC" != "0" ]; then
     FR1_OK=0; EVID1="${EVID1}sonda P1 indisponivel (rc=$P1_RC); "
   else
-    if ! grep -q "^SC=binabsent exit=2 req=FR-001 " "$TMPD/p1.out" 2>/dev/null; then
+    if ! grep -q "^SC=binabsent exit=2 rc=0 req=FR-001 " "$TMPD/p1.out" 2>/dev/null; then
       FR1_OK=0; EVID1="${EVID1}binario ausente sem exit 2 nomeado FR-001; "
     fi
   fi

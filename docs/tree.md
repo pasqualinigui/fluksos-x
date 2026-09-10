@@ -90,6 +90,7 @@ packages/core/pyproject.toml
 packages/core/src/fkx_core/__init__.py
 packages/core/src/fkx_core/config.py
 packages/core/src/fkx_core/exceptions.py
+packages/core/src/fkx_core/harness.py
 packages/core/src/fkx_core/models.py
 packages/core/src/fkx_core/py.typed
 packages/core/src/fkx_core/state.py
@@ -323,6 +324,7 @@ specs/016-tree-docs/tasks.md
 specs/017-harness/checklists/requirements.md
 specs/017-harness/contracts/oracle-cli.md
 specs/017-harness/data-model.md
+specs/017-harness/evidence/green.txt
 specs/017-harness/evidence/red.txt
 specs/017-harness/plan.md
 specs/017-harness/quickstart.md

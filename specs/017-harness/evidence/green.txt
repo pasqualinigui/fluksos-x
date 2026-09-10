@@ -1,0 +1,15 @@
+✅ FR-001   feedforward recusa sem processo + marcador ausente
+✅ FR-002   feedback preserva rc; sinal nunca verde; vazio com guarda
+✅ FR-003   exits literais 0 1 2 nos tres cenarios
+✅ FR-004   zero retry: tentativa unica, sem sleep retry backoff
+✅ FR-005   veredito nomeia requisito+evidencia; sem traceback; sem segredo
+✅ FR-006   HarnessError(FkxError) exportado; sem except nu
+✅ FR-007   nenhum exit fora de 0 1 2
+✅ FR-008   contrato: list 12 exit2 2x <5s manifest17 self-check serie
+🔴 FR-009   README 017 hash + zero [ ] + vermelho-verde
+           evidencia: README sem "017.*harness.*✅.*hash"; tasks.md com 6 [ ] abertas (CONVERGE); par vermelho/verde 017 ausente no log (red=1 green=); 
+✅ FR-010   PLAN+ADR previa; f0-011 admite harness.py e nada alem
+✅ FR-011   so stdlib; uv.lock sem pacote novo
+✅ FR-012   POSIX declarado; nonposix fail-closed nomeado
+
+Resultado: 11/12 asserções aprovadas — 1 violação(ões) (critica: 0, alta: 1, media: 0) — NAO CONFORME
