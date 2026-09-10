@@ -319,6 +319,8 @@ specs/016-tree-docs/quickstart.md
 specs/016-tree-docs/research.md
 specs/016-tree-docs/spec.md
 specs/016-tree-docs/tasks.md
+specs/017-harness/checklists/requirements.md
+specs/017-harness/spec.md
 specs/README.md
 tests/__init__.py
 tests/conftest.py
