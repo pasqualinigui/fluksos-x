@@ -79,6 +79,7 @@ docs/plan/research/f0-014-dependency-updates.md
 docs/plan/research/f0-015-docker-compose.md
 docs/plan/research/f0-016-tree.md
 docs/plan/research/f0-skills-mcp-2026-09.md
+docs/plan/research/f1-017-harness.md
 docs/tree.md
 lefthook.yml
 packages/cli/pyproject.toml
