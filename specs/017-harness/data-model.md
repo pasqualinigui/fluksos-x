@@ -10,7 +10,7 @@ Resultado de `subprocess.run(check=False, capture_output=True, timeout=…)`: `r
 
 ## Veredito
 
-`requisito` (FR-XXX da spec consumidora ou do item) + `evidência` observada (saída que falhou, nunca traceback) + `exit` literal (`0` conforme · `1` não conforme · `2` erro de uso). Validação: todo veredito carrega os três campos; segredo mascarado (`SecretStr` nunca em claro — Lei Zero).
+`requisito: str` (ID `FR-XXX` da spec consumidora ou deste item) + `evidencia: str` (saída observada, nunca traceback, segredo mascarado) + `exit: Literal[0, 1, 2]`. Superfície construtora em `contracts/oracle-cli.md` › Superfície (ANALYZE F1). Validação: todo veredito carrega os três campos; segredo mascarado (`SecretStr` nunca em claro — Lei Zero).
 
 ## Erro do módulo
 

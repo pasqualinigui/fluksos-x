@@ -19,4 +19,4 @@ uv run --frozen --all-packages python -c "from fkx_core import harness; v = harn
 scripts/verify/f1-017-harness.sh
 ```
 
-Esperado: 1 importa `HarnessError`; 2 imprime `0`, `1`, `2` nomeados; 3 imprime falha com `-9` (nunca `0`); 4 CONFORME 12/12. Nomes exatos de funções/assinaturas são desenho do TESTS/IMPLEMENT (este roteiro usa a forma candidata `harness.run` → veredito; se o PLAN fixar outra, este arquivo acompanha antes do verde). Detalhes em `data-model.md`; mapa FR↔asserção em `contracts/oracle-cli.md`.
+Esperado: 1 importa `HarnessError`; 2 imprime `0`, `1`, `2` nomeados; 3 imprime falha com `-9` (nunca `0`); 4 CONFORME 12/12. Forma `harness.run` → veredito fixada em `contracts/oracle-cli.md` › Superfície (ANALYZE F1). Detalhes em `data-model.md`; mapa FR↔asserção em `contracts/oracle-cli.md`.

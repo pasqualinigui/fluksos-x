@@ -122,12 +122,14 @@ Como QA do motor, uso os exit codes do `harness.py` dentro e fora dos oráculos 
 - **SC-006**: 🧑 Cenário humano — operador executa o roteiro de demonstração (comando OK, comando com defeito, binário ausente) e obtém `0`, `1`, `2` nomeados; divergência declarada é saída aceitável, silenciosa não é.
 - **SC-007**: Fronteira paga pelo procedimento: `f0-011` FR-002 ajustada exclusivamente na Fase C verde via ADR prévia, manifest citando a ADR; nenhum outro oráculo anterior tocado.
 
+> SC-004/SC-007 restatem FR-009/FR-010 por desenho (vereditos legíveis das FRs meta; padrão desde a 003 — ANALYZE A2, manter).
+
 ## Assumptions
 
 - Tipos-base 011 (`FkxError`, `Settings`, superfície via `__init__.py`) estáveis e importáveis (E1 do checkpoint).
 - `DATABASE_URL`/`REDIS_URL` são elos verificados sem código cliente nesta spec (015, princípio IV).
 - Runner `ubuntu-24.04` + Python 3.12/3.13 (CI) e máquina do mantenedor (Linux, Python 3.12.3) — POSIX nos dois (research Q5, com prova executada).
-- Nomes exatos de funções/assinaturas e mensagens de evidência são desenho do PLAN, não desta especificação.
+- Superfície da API fixada em `contracts/oracle-cli.md` › Superfície (ANALYZE F1: `harness.run(cmd, *, timeout=None) -> Veredito`); mensagens de evidência seguem o formato do veredito (`data-model.md`).
 - **Termo canônico**: `harness` (o módulo e o item); `feedforward`/`feedback` como formas adjetivas dos controles; `veredito` para a saída julgada.
 
 ## Contratos
