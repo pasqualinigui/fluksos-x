@@ -28,9 +28,9 @@ ADR-041 aceitas, §4). Nenhuma dívida bloqueante além delas:
    como mapa (número da spec = posição de execução, invariante ADR-001/011):
    minuta ADR-040 propõe `017↔1.1 … 024↔1.8` (identidade).
 
-**Baseline**: manifest 16/16 SUCESSO · loop com **6 amostras de
-tendência em 5 FRs** (pares 2×, 1 conteúdo estático, 1 truncamento de
-`--help` e 1 self-check aninhado, sob load externa 4–6.5 com dono
+**Baseline**: manifest 16/16 SUCESSO · loop com **8 amostras de
+tendência em 6 FRs** (pares 2×, 1 conteúdo estático, 1 truncamento de
+`--help` e 2 self-checks aninhados, sob load externa 3.8–6.5 com dono
 identificado em `ps`; 100% verde isolado em seguida — doutrina ADR-019 §4: amostras heterogêneas são
 tendência; dado roteado à auditoria pós-020, §2 E4, incluindo a reabertura
 dos tetos <5s). `f0-016` verde (FR-002 mordeu 1× por motivo legítimo —
@@ -150,6 +150,20 @@ ADR-016: sem relatório, sem converge).
   é a primeira medida do instrumento contra a carga real. Destino: auditoria
   pós-020 avalia endurecer (margem por carga) ou aceitar (teto mede runner
   limpo, não estação) — com este parágrafo como evidência.
+- **Adendo 2026-09-10 (sessão 017-RESEARCH): gatilho disparado e investigação
+  concluída.** Duas amostras fora da contagem acima: `f0-011` FR-011
+  (self-check aninhado; 3/3 verde isolado; registrada no comentário da
+  PR #29) e a **3ª amostra em `f0-015` FR-013** (3/3 verde isolado em
+  seguida, load 3.81). Total: **8 amostras em 6 FRs**, 100% verdes isoladas.
+  Pelo procedimento ADR-019 §4, a 3ª amostra na mesma FR promove o caso de
+  "ambiental por padrão" a **defeito investigado** — e a investigação está
+  feita aqui: mecanismo conhecido (teto 2× <5s com `EPOCHSECONDS` de 1s sob
+  load 3.8–6.5; amostra nº 2 capturou `4631ms/5250ms`), nenhuma amostra de
+  verde-falso, nenhuma regressão de item (a 017 tem só research/docs).
+  **Conclusão**: defeito CARACTERIZADO como teto-vs-load; a correção
+  (margem por carga vs. teto-para-runner) **permanece roteada à pós-020**
+  (parágrafo anterior) — sem ação imediata além deste registro. Reabrir
+  antes da pós-020 exige amostra de verde-falso ou amostra sob load <2.
 - `f0-016` verde isolado; `f0-016` FR-002 mordeu 1× por motivo legítimo
   (arquivo novo deste checkpoint fora do `tree.md` — o desenho funcionando:
   regeneração da região GENERATED, +1 linha, 9/9 em seguida).
@@ -162,7 +176,7 @@ ADR-016: sem relatório, sem converge).
 |---|---|---|
 | E2 (A1 medido) | **ADR-041 aceita** 2026-09-10: quarentena por classe + norma prospectiva + reavaliação na pós-020 | — (carimbada) |
 | E3 (mapa F1) | **ADR-040 aceita** 2026-09-10: `017↔1.1 … 024↔1.8` + cadência 4 | — (carimbada) |
-| E4 (6 amostras em 5 FRs, causa externa com prova, 1 mecanismo capturado) | Backlog da auditoria pós-020 (esta seção como evidência; gatilho: 2+ amostras na **mesma** FR) | reavaliar na pós-020 |
+| E4 (8 amostras em 6 FRs + investigação do gatilho FR-013, causa externa com prova, 1 mecanismo capturado) | Backlog da auditoria pós-020 (esta seção como evidência; gatilho ADR-019 §4 DISPAROU em `f0-015` FR-013 e foi investigado aqui — correção na pós-020) | reavaliar na pós-020 |
 | E1 (herança) | RESEARCH de cada item consumidor MUST citar a linha correspondente (regra ADR-020 §2); ANALYZE que ignorar é achado ≥MEDIUM | Fase 1 |
 
 ---
@@ -231,3 +245,26 @@ Push com `--no-verify` é admitido **exclusivamente** quando, nesta ordem:
 
 Uso fora desta forma é achado em auditoria. Revisão datada: pós-020, junto
 dos tetos <5s (E4).
+
+---
+
+## 6. Disciplina de push por item (2 pontos fixos)
+
+> Origem: pergunta do mantenedor em 2026-09-10 ("push a cada documento é o
+> padrão?"). Resposta normativa — nem push-por-documento, nem "spec inteira
+> antes do push": o determinismo exige **durabilidade do vermelho antes do
+> verde existir**, e só isso exige rede.
+
+**Regra**: cada item empurra (`push`) a branch em exatamente 2 pontos do ciclo:
+
+1. **TESTS 🔴** — o commit vermelho, imediatamente após criado. Fundamento:
+   a prova vermelho→verde (Regra 2) é irrecuperável; se a estação morre entre
+   🔴 e 🟢 com o vermelho só local, a prova morre junto. Push no 🔴 torna o
+   ordenamento independente da máquina — e dá veredito servidor sobre o
+   vermelho (um vermelho que passa em tudo não é vermelho).
+2. **CONVERGE** — push + PR; o servidor mergeia sobre os 10 checks (ADR-035).
+
+Todas as demais etapas (RESEARCH, SPECIFY, CLARIFY, PLAN, TASKS) vivem em
+commits locais, empurrados juntos no ponto 1. Exceção: sinal antecipado do CI
+pedido pelo mantenedor. Cada push fora destes pontos sem esse pedido é achado
+em auditoria. Revisão datada: pós-020, junto das §§4–5.

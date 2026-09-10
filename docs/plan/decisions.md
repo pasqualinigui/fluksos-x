@@ -2585,3 +2585,41 @@ transientes sob load 4–6.5 (precedente ADR-034 §6, com portões executados à
 mão e fato registrado). O runner julgou o head **10/10 verde** (run da
 PR #29) — a estação media load, o servidor mediu estado. A exceção está
 quitada pelo veredito, não pela alegação.
+
+---
+
+## ADR-042 — Pré-autorização de fronteira da 017: `harness.py` admitido (ponto único em `f0-011` FR-002)
+
+**Data**: 2026-09-10 · **Item**: `017` (1.1), fase TESTS 🔴→GREEN · **Estado**:
+aceita · **Evidência**: run vermelho da 017 (`f1-017` 1/12 + pytest collection
+ERROR sobre estado sem `harness.py`; FR-008 guarda verde) +
+`specs/017-harness/plan.md` (declaração de impacto) · **Efeito**: autoriza o
+ajuste abaixo **exclusivamente no commit verde da 017 (Fase C)**.
+
+### Contexto
+
+Um conflito genuíno, previsto na tabela Q7 do research
+(`docs/plan/research/f1-017-harness.md`, levantamento mecânico sobre os 16
+oráculos: `grep -rn -E 'alem dos 4|EXTRA='` → só `f0-011` sobre `core/` +
+`f0-012` sobre `cli/`). A 017 **é** `packages/core/src/fkx_core/harness.py`
+por desenho (item 1.1 do plano); a asserção `f0-011` FR-002 exige exatamente
+os 4 módulos ("deve ser 011"). Sem ajuste, o harness reprovaria estado
+correto; com ajuste silencioso, repetiríamos o achado A1
+(`f0-audit-005-008.md`).
+
+### Ajuste autorizado (forma exata, só na Fase C)
+
+Em `scripts/verify/f0-011-core.sh` (FR-002, linha 144): admitir `harness.py`
+na whitelist (`grep -v -x -e ... -e "harness.py"`) **se** sob jurisdição 017
+(`specs/017-harness/` existe com o módulo; o próprio `f1-017` assere cada
+propriedade); descrição CANON atualizada para "membro UV + 4 módulos + harness
+(017) + init nada além"; resto da FR intacto. Padrão ADR-018 (legitimidade:
+membro `packages/core`, nunca nome estático). Manifest regenerado na Fase C
+citando esta ADR. Qualquer outro vermelho herdado = conflito novo, ADR
+própria, nunca fix direto.
+
+### Consequências
+
+- Décima execução do procedimento ADR-017 sobre oráculo alheio. A FR-010 da
+  017 (oráculo asserir PLAN + esta ADR) aprova no verde.
+- `f0-012` FR-002 (`cli/`) intocada: a 017 não cria nada em `packages/cli/`.

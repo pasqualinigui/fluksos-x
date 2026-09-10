@@ -68,7 +68,7 @@ skip() { R_STATUS+=("skip"); R_ID+=("$1"); R_DESC+=("$2"); R_SEV+=("-");  R_EVID
 
 declare -A CANON=(
   ["FR-001"]="pydantic+settings runtime packages/core + hash lock"
-  ["FR-002"]="membro UV + 4 modulos + init nada alem"
+  ["FR-002"]="membro UV + 4 modulos + harness(017) + init nada alem"
   ["FR-003"]="settings FKX_ + SecretStr + ConfigError"
   ["FR-004"]="TypedDict canais/reducers sem Pydantic state"
   ["FR-005"]="modelos Pydantic sem logica"
@@ -141,8 +141,9 @@ else
   for m in __init__.py config.py state.py models.py exceptions.py; do
     if [ ! -f "$SRCDIR/$m" ]; then FR2_OK=0; EVID2="${EVID2}src/fkx_core/$m ausente; "; fi
   done
-  EXTRA=$(ls "$SRCDIR" 2>/dev/null | grep -v -x -e "__init__.py" -e "config.py" -e "state.py" -e "models.py" -e "exceptions.py" -e "py.typed" -e "__pycache__" | tr '\n' ' ' || true)
-  if [ -n "$EXTRA" ]; then FR2_OK=0; EVID2="${EVID2}modulos alem dos 4: $EXTRA (Q8); "; fi
+  EXTRA=$(ls "$SRCDIR" 2>/dev/null | grep -v -x -e "__init__.py" -e "config.py" -e "state.py" -e "models.py" -e "exceptions.py" -e "harness.py" -e "py.typed" -e "__pycache__" | tr '\n' ' ' || true)
+  if [ -n "$EXTRA" ]; then FR2_OK=0; EVID2="${EVID2}modulos alem dos 4+harness: $EXTRA (Q8); "; fi
+  # ADR-042: harness.py admitido sob jurisdicao 017 (10a execucao do molde ADR-017); resto proibido
   # ADR-026: packages/cli/ membro admitido (jurisdicao 012); guarda cumprida
   if [ -d "$ROOT/packages/cli" ] && [ ! -f "$ROOT/packages/cli/pyproject.toml" ]; then FR2_OK=0; EVID2="${EVID2}packages/cli sem pyproject.toml de membro (ADR-026); "; fi
 fi

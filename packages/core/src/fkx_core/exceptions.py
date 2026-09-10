@@ -26,3 +26,7 @@ class StateError(FkxError):
 
 class ModelError(FkxError):
     """Payload inválido além da validação Pydantic (US1/US2)."""
+
+
+class HarnessError(FkxError):
+    """Recusa ou mau uso do harness de execução (017)."""

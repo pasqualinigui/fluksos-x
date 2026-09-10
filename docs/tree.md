@@ -79,6 +79,7 @@ docs/plan/research/f0-014-dependency-updates.md
 docs/plan/research/f0-015-docker-compose.md
 docs/plan/research/f0-016-tree.md
 docs/plan/research/f0-skills-mcp-2026-09.md
+docs/plan/research/f1-017-harness.md
 docs/tree.md
 lefthook.yml
 packages/cli/pyproject.toml
@@ -89,6 +90,7 @@ packages/core/pyproject.toml
 packages/core/src/fkx_core/__init__.py
 packages/core/src/fkx_core/config.py
 packages/core/src/fkx_core/exceptions.py
+packages/core/src/fkx_core/harness.py
 packages/core/src/fkx_core/models.py
 packages/core/src/fkx_core/py.typed
 packages/core/src/fkx_core/state.py
@@ -112,6 +114,7 @@ scripts/verify/f0-013-release.sh
 scripts/verify/f0-014-dependabot.sh
 scripts/verify/f0-015-docker-compose.sh
 scripts/verify/f0-016-tree.sh
+scripts/verify/f1-017-harness.sh
 scripts/verify/manifest.sha256
 specs/001-git-branching-strategy/checklists/requirements.md
 specs/001-git-branching-strategy/contracts/oracle-cli.md
@@ -318,6 +321,16 @@ specs/016-tree-docs/quickstart.md
 specs/016-tree-docs/research.md
 specs/016-tree-docs/spec.md
 specs/016-tree-docs/tasks.md
+specs/017-harness/checklists/requirements.md
+specs/017-harness/contracts/oracle-cli.md
+specs/017-harness/data-model.md
+specs/017-harness/evidence/green.txt
+specs/017-harness/evidence/red.txt
+specs/017-harness/plan.md
+specs/017-harness/quickstart.md
+specs/017-harness/research.md
+specs/017-harness/spec.md
+specs/017-harness/tasks.md
 specs/README.md
 tests/__init__.py
 tests/conftest.py
@@ -326,6 +339,7 @@ tests/test_fkx_cli_help.py
 tests/test_fkx_cli_version.py
 tests/test_fkx_core_config.py
 tests/test_fkx_core_errors.py
+tests/test_fkx_core_harness.py
 tests/test_fkx_core_models.py
 tests/test_fkx_core_state.py
 tests/test_harness_debts.py

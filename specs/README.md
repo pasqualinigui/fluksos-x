@@ -29,6 +29,21 @@
 
 *Mapa histórico original (12 itens) em `ADR-001` permanece como registro; `ADR-011` o supersede para 16.*
 
+## Mapa vigente — Fase 1 (8 posições, ADR-040)
+
+| Spec | Item plano | Fase | Título | Status |
+|---|---|---|---|---|
+| `017` | **1.1** | F1 | `core/harness.py` — feedforward + feedback controls | ✅ concluída (`2dce893`) |
+| `018` | **1.2** | F1 | `core/constitution.py` — parser AGENTS.md | ⏳ próxima |
+| `019` | **1.3** | F1 | `core/spec_kit_bridge.py` — bridge Spec-Kit CLI | ⏳ |
+| `020` | **1.4** | F1 | `indexer/treesitter.py` — AST multi-linguagem (+ FR de cadência: auditoria `017–020`) | ⏳ |
+| `021` | **1.5** | F1 | `indexer/repo_map.py` — repo-map dinâmico | ⏳ |
+| `022` | **1.6** | F1 | `indexer/graph_db.py` — knowledge graph SQLite | ⏳ |
+| `023` | **1.7** | F1 | `indexer/watcher.py` — file watcher incremental | ⏳ |
+| `024` | **1.8** | F1 | LSP bridge básico (+ FR de cadência: auditoria `021–024`) | ⏳ |
+
+*Após `024`, a numeração segue `025...` flat, sem reiniciar por fase (F2: 10 itens 2.1–2.10; F3: 9 itens 3.1–3.9; F4: 11 itens 4.1–4.11).*
+
 ## Como ler uma spec
 
 ```
