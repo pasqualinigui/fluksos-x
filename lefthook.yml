@@ -4,6 +4,13 @@
 #   Bypass documentado: LEFTHOOK=0 git commit / LEFTHOOK=0 git push
 #   Portão real: harness scripts/verify/f0-*.sh + CI required checks (010).
 # Somente-leitura: nenhum job escreve (sem --fix, sem stage_fixed — FR-006).
+#
+# Divisao forma/resultado (ADR-044, generalizando o teorema ADR-034 §6):
+#   pre-commit julga FORMA  (ruff, ruff format, mypy) — nunca contradiz um 🔴
+#   pre-push   julga RESULTADO (harness, pytest, trivy, pip-audit)
+# Verificador de resultado no pre-commit torna impossivel o commit vermelho que
+# a Regra 2 exige, e converte --no-verify em obrigacao. pip-audit saiu na
+# ADR-036; pytest sai aqui. Custo aceito: teste quebrado reprova no push.
 min_version: 2.1.12
 
 pre-commit:
@@ -15,14 +22,18 @@ pre-commit:
       run: uv run ruff format --check .
     mypy:
       run: uv run mypy --strict .
-    pytest:
-      run: uv run pytest -q
 
 pre-push:
   parallel: false
   commands:
     harness:
       run: 'for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done'
+    harness-fases:
+      # Cobertura das fases seguintes (ADR-043). O laço acima é literal
+      # congelado por f0-003 FR-010; este alcança f1..f9, que ele não alcança.
+      run: 'for f in scripts/verify/f[1-9]-*.sh; do "$f" --quiet || exit 1; done'
+    pytest:
+      run: uv run pytest -q
     trivy:
       run: 'sh -c "if command -v trivy >/dev/null 2>&1; then trivy fs --severity HIGH,CRITICAL .; elif command -v docker >/dev/null 2>&1 && docker image inspect aquasec/trivy:0.74.0 >/dev/null 2>&1; then docker run --rm -v $PWD:/w -w /w aquasec/trivy:0.74.0 fs --severity HIGH,CRITICAL .; else echo trivy-skip-sem-Docker-009-FR-004; exit 0; fi"'
     pip-audit:

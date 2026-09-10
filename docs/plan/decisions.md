@@ -2623,3 +2623,225 @@ própria, nunca fix direto.
 - Décima execução do procedimento ADR-017 sobre oráculo alheio. A FR-010 da
   017 (oráculo asserir PLAN + esta ADR) aprova no verde.
 - `f0-012` FR-002 (`cli/`) intocada: a 017 não cria nada em `packages/cli/`.
+
+---
+
+## ADR-043 — Cegueira de fase do portão automático: o glob `f0-*` não alcança a Fase 1
+
+**Data**: 2026-09-10 · **Item**: nenhum (checkpoint não-item pré-`018`) ·
+**Estado**: aceita · **Decisão do mantenedor**: sessão 2026-09-10 ("prossiga")
+· **Evidência**: `docs/plan/audit/f1-checkpoint-pre-018.md` §2 (varredura
+`grep -rn "f1-" .github/ lefthook.yml tests/ scripts/` → zero ocorrências fora
+do próprio oráculo e do manifest) · **Efeito**: autoriza o Bloco A abaixo.
+
+### O achado
+
+`scripts/verify/f1-017-harness.sh` convergiu e foi integrado em `main` sem que
+**nenhum portão automático o executasse**. Os quatro pontos que rodam o harness
+enumeram por `f0-*`:
+
+| Ponto | Forma vigente | Alcança `f1-017`? |
+|---|---|---|
+| `.github/workflows/ci.yml` jobs `verify` e `harness` | `for f in scripts/verify/f0-*.sh` | não |
+| `lefthook.yml` `pre-push.harness` | `for f in scripts/verify/f0-*.sh` | não |
+| `tests/test_harness_oracles.py` | `glob("f0-*.sh")` | não |
+| `AGENTS.md` › *How to operate* | `for f in scripts/verify/f0-*.sh` | não |
+
+É violação do princípio **VI** em efeito: o oráculo existe, mas a conformidade
+da 017 não é exigida por nenhum código de saída. O verde 17/17 registrado na
+convergência só foi obtido porque o operador acrescentou o glob à mão.
+
+A causa é estrutural, não descuido: o glob foi escrito quando só existia a
+Fase 0, e **nada assere que ele acompanhe as fases seguintes**. Repetir-se-ia
+em `f2-*`, `f3-*` e assim por diante.
+
+### Ajuste autorizado (forma exata)
+
+Acréscimo de um segundo laço, **preservando o primeiro literal intacto**:
+
+```
+for f in scripts/verify/f[1-9]-*.sh; do "$f" || exit 1; done
+```
+
+em `ci.yml` (jobs `verify` e `harness`), em `lefthook.yml` (`pre-push.harness`,
+antes de `trivy`/`pip-audit`, preservando a ordem que `f0-009` FR-003 exige) e,
+como par de padrões de glob, em `tests/test_harness_oracles.py`. `AGENTS.md`
+acompanha na porta de entrada.
+
+`f[1-9]` cobre da Fase 1 à Fase 9 de uma vez: a classe fecha, não o caso.
+
+### Fronteira: nenhuma
+
+Levantamento mecânico sobre os 17 oráculos (`grep -n "scripts/verify/f0-"`):
+seis asseram o **prefixo** `for f in scripts/verify/f0-` (`f0-004` FR-017,
+`f0-005` FR-012, `f0-006` FR-012, `f0-007` FR-012, `f0-008` FR-011, `f0-009`
+FR-005/FR-009) e um assere o **literal cheio** `for f in scripts/verify/f0-*.sh`
+(`f0-003` FR-010). `f0-005` FR-005 exige a cadeia `f0-` em
+`test_harness_oracles.py`. **Acrescentar** preserva os oito; substituir por
+glob genérico reprovaria sete oráculos convergidos.
+
+O literal `f0-*.sh` permanece como **código executado**, nunca como comentário:
+um trecho comentado satisfaria o `grep` sem rodar nada — verde falso, que é o
+defeito que esta ADR corrige, não uma forma dele.
+
+### Alternativa rejeitada
+
+Generalizar para `scripts/verify/f?-*.sh` num único laço: exigiria ponto de
+fronteira em sete oráculos convergidos + regeneração do manifest para obter
+**o mesmo veredito**. Mesma doutrina da ADR-041 ao rejeitar a varredura dos
+~15 sítios classe A: *mesmo veredito, mais palavras*.
+
+### Consequências
+
+- Custo medido: `f1-017` respeita `FKX_ORACLE_NESTED` (0,06 s aninhado contra
+  13,08 s isolado). CI ganha ~13 s por job (teto de 10 min intacto); a promoção
+  a pytest ganha ~0,06 s.
+- A asserção que **impede a reincidência** não cabe aqui: acrescentá-la a um
+  oráculo da Fase 0 modificaria oráculo de item anterior (Regra 5). Vai como
+  FR herdada pela `018` — ADR-045, FR-γ.
+- Até a `018` convergir, a cobertura de fase é conveniência sem oráculo. É
+  dívida nomeada, com dono e prazo, não omissão.
+
+---
+
+## ADR-044 — Generalização do teorema ADR-034 §6: verificador de resultado não vive no `pre-commit`
+
+**Data**: 2026-09-10 · **Item**: nenhum (checkpoint não-item pré-`018`) ·
+**Estado**: aceita · **Decisão do mantenedor**: sessão 2026-09-10 ("prossiga")
+· **Evidência**: `docs/plan/audit/f1-checkpoint-pre-018.md` §3 (mensagem do
+commit `d4a5d3a` declarando a impossibilidade; 6 de 141 commits declarando
+`--no-verify`) · **Efeito**: autoriza o Bloco B, com **um** ponto de fronteira.
+
+### O teorema, já provado uma vez
+
+A ADR-034 §6 estabeleceu, sobre o `pip-audit`:
+
+> "Um gate de vulnerabilidade em `pre-commit` converte 'corrigir a
+> vulnerabilidade' em operação impossível."
+
+A 014 pagou o teorema **só para aquele caso** (ADR-036 move `pip-audit` ao
+`pre-push`). O enunciado, porém, não é sobre vulnerabilidades — é sobre a
+natureza do verificador:
+
+> **Verificador de _resultado_ no `pre-commit` torna o portão vermelho da
+> Regra 2 impossível. Verificador de _forma_ não.**
+
+`uv run pytest -q` é verificador de resultado, e continua no `pre-commit`. Logo
+o commit 🔴 — que a Regra 2 exige reprovando — **não pode** passar no hook. O
+agente da 017 registrou o fato na própria mensagem de `d4a5d3a`:
+
+> *"Commit com --no-verify: o hook pytest reprova o vermelho por desenho;
+> ruff/format/mypy executados a mao e verdes (este registro e a prova)."*
+
+Não é preguiça de agente: é a única saída que o desenho deixa. E enquanto o
+bypass for obrigatório num ponto legítimo, ele permanece disponível — e
+indistinguível — em todos os outros.
+
+### Medição, não alegação
+
+| Métrica | Valor |
+|---|---|
+| Commits no repositório | 141 |
+| Commits que **declaram** `--no-verify` no corpo | 6 |
+| Commits que usaram e **não** declararam | indeterminável |
+
+A terceira linha é o argumento. Git não registra que um hook foi pulado: `6` é
+**piso, não contagem**. Uma regra cuja adesão não é mensurável não é regra —
+é convenção (princípio VI).
+
+### Ajuste autorizado (forma exata)
+
+1. `lefthook.yml`: `uv run pytest -q` sai de `pre-commit` e entra em
+   `pre-push`, **depois** do harness e antes de `trivy`/`pip-audit`.
+   `pre-commit` fica com o trio estático — `ruff check` → `ruff format --check`
+   → `mypy --strict` — que julga **forma** e nunca contradiz um vermelho.
+2. `scripts/verify/f0-014-dependabot.sh` FR-008: a lista literal exigida na
+   seção `pre-commit` perde `uv run pytest`; a FR passa a exigi-lo **presente
+   no arquivo e ausente do `pre-commit`**, exatamente como já faz com
+   `pip-audit`. Descrição CANON: "pytest e pip-audit no pre-push, fora do
+   pre-commit". Resto da FR intacto.
+3. `manifest.sha256`: linha 14 regenerada citando esta ADR.
+
+### Fronteira: 1 ponto (`f0-014` FR-008)
+
+Décima primeira execução do procedimento ADR-017. `f0-009` FR-003 **não** é
+tocada: ela assere ordem por número de linha (`ruff < format < mypy < pytest`),
+que a nova disposição preserva, e presença no arquivo — nunca a seção. Verificado
+por leitura do código da FR, não por suposição.
+
+### O que esta ADR não resolve (limite honesto)
+
+O **push** do 🔴 (checkpoint §6, ponto 1) continua barrado: `pre-push` roda
+harness + pytest, ambos vermelhos por desenho. Ali `--no-verify` segue
+estruturalmente necessário até que a expectativa seja **invertida**
+deterministicamente — não suprimida. O desenho vai na ADR-045 (FR-α/FR-β), e
+usa a semântica que a própria 017 entregou: não conformidade **declarada** é
+conformidade (`harness.run` → `Veredito`).
+
+E o limite de fundo permanece o da ADR-009: *"Não é possível proibir
+`--no-verify`. É uma flag do cliente git."* O que se remove é a **necessidade**
+dela; o que se neutraliza vive no servidor (10 checks sem-bypass, ADR-035).
+
+### Custo aceito, declarado
+
+Teste quebrado passa a reprovar no `push`, não no `commit`. Com a disciplina de
+2 pontos de push (§6), a latência de feedback cresce de um commit para um
+ciclo. É o preço de tornar o 🔴 possível sem bypass, e é menor que o preço de
+manter um bypass obrigatório no caminho crítico da Regra 2.
+
+---
+
+## ADR-045 — As normas do checkpoint saem da prosa: §5 e §6 viram asserção herdada pela `018`
+
+**Data**: 2026-09-10 · **Item**: nenhum (checkpoint não-item pré-`018`) ·
+**Estado**: aceita · **Decisão do mantenedor**: sessão 2026-09-10 ("prossiga")
+· **Evidência**: `docs/plan/audit/f1-checkpoint-pre-018.md` §4 (`grep` em
+`decisions.md` e nos 17 oráculos → nenhuma das duas normas é ADR nem asserção)
+· **Efeito**: fixa três FRs que a `018` herda; nada é aplicado aqui.
+
+### O achado
+
+`docs/plan/audit/f1-checkpoint-pre-fase1.md` §5 (forma fixa do fallback
+`--no-verify`) e §6 (disciplina de push em 2 pontos) são **prosa em documento
+de auditoria**. Verificação mecânica:
+
+```
+grep -n "Regra de fallback\|disciplina de push" docs/plan/decisions.md  -> vazio
+grep -rn "checkpoint-pre-fase1" scripts/verify/*.sh                     -> vazio
+```
+
+Pelo princípio VI não são exigíveis; pelo princípio I são julgamento de sessão.
+São exatamente boas regras sem oráculo — a forma de defeito que a ADR-006
+tornou mecanicamente detectável para hashes e que aqui reaparece para normas.
+
+### Decisão: promover, e dar dono
+
+As duas normas passam a ser vinculantes por esta ADR (não pela auditoria), e a
+`018` herda a asserção. Molde ADR-016 (FR de cadência): um item carrega FR fora
+do seu tema quando o tema não tem item próprio e a dívida tem prazo.
+
+**Alternativa rejeitada — spec própria inserida em `018`**: obrigaria a emendar
+o mapa da ADR-040 e renumerar oito itens (`018`–`024` → `019`–`025`) para
+entregar o mesmo veredito. Precedente de recusa: ADR-041.
+
+### FRs transferidas à `018` (forma exata, asseridas em `f1-018-*.sh`)
+
+| FR | Asserção |
+|---|---|
+| **FR-α** | *vermelho declarado*: no ciclo do item, as reprovações observadas no portão 🔴 são **exatamente** as declaradas em `evidence/red.txt`. Falha não declarada = regressão real. Nenhuma falha = vermelho fabricado. Ambas reprovam. |
+| **FR-β** | *vermelho reproduzível*: o oráculo materializa a árvore do commit 🔴 em worktree descartável e reexecuta. Se passar, o 🔴 era falso. Hoje `f1-017` FR-009 só compara posição de linha no `git log` (`test(harness).*017` antes de `feat(harness).*017`): prova a **ordem**, jamais a **genuinidade**. |
+| **FR-γ** | *cobertura de fase*: `ci.yml`, `lefthook.yml` e `test_harness_oracles.py` enumeram `f[1-9]-*` além de `f0-*`; um oráculo de fase nova é executado pelo portão no ciclo em que nasce. Fecha a reincidência da ADR-043. |
+
+FR-α e FR-β são a razão pela qual o resíduo de `--no-verify` deixa de ser
+discricionário: o bypass não precisa ser proibido se o vermelho que ele produz
+for **reproduzível por terceiros a partir do histórico**. A prova migra da
+alegação do agente para a árvore do commit.
+
+### Consequências
+
+- A `018` (`core/constitution.py`) entrega o seu tema **mais** três FRs de
+  governança. O contrato do item registra a herança, como manda a Regra 8.
+- §5 e §6 do checkpoint pré-Fase 1 permanecem válidas e passam a ser citáveis
+  por esta ADR; a revisão datada (pós-`020`) segue de pé.
+- Enquanto FR-α/FR-β não convergirem, `evidence/red.txt` continua sendo
+  alegação. Dívida nomeada, com dono (`018`) e prazo (Fase 1).

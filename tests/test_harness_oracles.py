@@ -1,6 +1,7 @@
 """Promoção 1:1 dos oráculos shell a pytest — Fase 0, item 005 (FR-005).
 
-Cada f0-*.sh é orquestrado via subprocess com FKX_ORACLE_NESTED=1.
+Cada f0-*.sh é orquestrado via subprocess com FKX_ORACLE_NESTED=1;
+f[1-9]-*.sh entra pelo mesmo caminho desde a ADR-043 (cobertura de fase).
 """
 
 import pathlib
@@ -9,7 +10,12 @@ import subprocess
 
 import pytest
 
-ORACLES = sorted(pathlib.Path("scripts/verify").glob("f0-*.sh"))
+_VERIFY = pathlib.Path("scripts/verify")
+# Dois padrões, uma razão (ADR-043): o literal `f0-*.sh` é congelado por
+# f0-005 FR-005; `f[1-9]-*.sh` cobre as fases que ele não alcança.
+ORACLES = sorted(
+    p for pattern in ("f0-*.sh", "f[1-9]-*.sh") for p in _VERIFY.glob(pattern)
+)
 
 
 def _canon_ids(oracle: pathlib.Path) -> list[str]:

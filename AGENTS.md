@@ -6,13 +6,14 @@ CLI `fkx`. Um motor que desenvolve software em vez de escrevê-lo sob demanda: a
 decisões são regras determinísticas, e o julgamento probabilístico só roteia entre
 elas. Serve qualquer stack, porque não assume nenhuma.
 
-**Estado**: Fase 1 (Harness & Indexação) em voo — 017 `core/harness.py` convergida (harness 17/17 verde); Fase 0 16/16. Servidor: `pasqualinigui/fluksos-x` (público) com proteção em `main`+`develop` (10 checks obrigatórios, sem-bypass) — `feature/*`+PR em `main`, linha de integração única, `develop` é espelho (ADR-032). Self-check dos oráculos é serial (ADR-031). Ferramentas ativas: ruff 0.16.6 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12 + CI completo + `packages/core` + `packages/cli` (`fkx --help/--version`); automação de release (PSR 10.6.2 + OIDC PyPI, `click` por override mínimo — ADR-034); atualização de dependências (Dependabot uv+actions, automerge pelo portão, `pip-audit` no `pre-push` — ADR-036); `docker-compose` sob demanda (`postgres` 18.6 + `redis` 8.8.2, profiles `observability`/`llm`, `restart: "no"` — ADR-039); mapa da árvore (`docs/tree.md` + gerador + auditoria 013–016 — 016).
+**Estado**: Fase 1 (Harness & Indexação) em voo — 017 `core/harness.py` convergida (harness 17/17 verde); Fase 0 16/16. Servidor: `pasqualinigui/fluksos-x` (público) com proteção em `main`+`develop` (10 checks obrigatórios, sem-bypass) — `feature/*`+PR em `main`, linha de integração única, `develop` é espelho (ADR-032). Self-check dos oráculos é serial (ADR-031). Ferramentas ativas: ruff 0.16.6 + mypy 2.3.1 strict + pip-audit 2.10.1/Trivy 0.74.0 + Lefthook 2.1.12 + CI completo + `packages/core` + `packages/cli` (`fkx --help/--version`); automação de release (PSR 10.6.2 + OIDC PyPI, `click` por override mínimo — ADR-034); atualização de dependências (Dependabot uv+actions, automerge pelo portão, `pip-audit` no `pre-push` — ADR-036); `docker-compose` sob demanda (`postgres` 18.6 + `redis` 8.8.2, profiles `observability`/`llm`, `restart: "no"` — ADR-039); mapa da árvore (`docs/tree.md` + gerador + auditoria 013–016 — 016). Checkpoint pré-`018`: o portão enumera `f0-*` **e** `f[1-9]-*` (ADR-043) e o `pre-commit` julga só forma — `pytest` foi para o `pre-push` para que o commit 🔴 não exija bypass (ADR-044); a `018` herda FR-α/FR-β/FR-γ (ADR-045).
 
 ## How to operate
 
 ```bash
-# harness completo — o oráculo do projeto
+# harness completo — o oráculo do projeto (dois laços: ADR-043)
 for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done
+for f in scripts/verify/f[1-9]-*.sh; do "$f" --quiet || exit 1; done
 
 # um item isolado, com relatório legível
 scripts/verify/f0-001-foundation.sh
@@ -66,9 +67,9 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Os dez princípios, com critério de violação e origem | `.specify/memory/constitution.md` |
 | Convenções de registro, linhas de trabalho e o que nunca entra | `CONTRIBUTING.md` |
 | Plano geral das 5 fases e a estrutura final | `docs/plan/implementation_plan.md` |
-| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..015) |
-| O que uma auditoria encontrou | `docs/plan/audit/f0-*.md` |
-| Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md` |
+| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..045) |
+| O que uma auditoria encontrou | `docs/plan/audit/f0-*.md`, `f1-*.md` |
+| Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md`, `f1-*` |
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
 | Bootstrap zero-context (primeira mensagem) | `docs/guides/agent-bootstrap.md` |

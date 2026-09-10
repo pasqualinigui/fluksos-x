@@ -1,4 +1,4 @@
-# Harness de verificação — Fase 0
+# Harness de verificação — Fase 0 e seguintes
 
 Oráculos de conformidade do bootstrap do motor. Cada item da Fase 0 contribui com
 um script, e o harness completo é a execução de todos em sequência.
@@ -33,8 +33,12 @@ scripts/verify/
 ├── f0-004-uv-workspace.sh     # item 004 (0.1) — UV workspace — base física (pyproject.toml + uv.lock + .venv + .python-version)
 ├── f0-005-pytest.sh           # item 005 (0.4) — Pytest 9.1.1 — harness TDD + manifest (FR-001..015)
 ├── f0-006-ruff.sh             # item 006 (0.2) — Ruff 0.16.5 — linter + formatter (FR-001..014)
-└── ...                        # até f0-016
+├── ...                        # até f0-016
+└── f1-017-harness.sh          # item 017 (1.1) — core/harness.py — feedforward + feedback
 ```
+
+O prefixo é a fase (`f0-`, `f1-`, …); o número é a posição na ordem de execução
+(ADR-011, estendida à Fase 1 pela ADR-040). A numeração **não** reinicia por fase.
 
 ## Contrato de interface
 
@@ -90,6 +94,7 @@ scripts/verify/f0-001-foundation.sh
 
 # harness completo, parando no primeiro item não conforme
 for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done
+for f in scripts/verify/f[1-9]-*.sh; do "$f" --quiet || exit 1; done
 
 # enumerar asserções sem executar
 scripts/verify/f0-001-foundation.sh --list
@@ -107,6 +112,8 @@ scripts/verify/f0-001-foundation.sh --list
 | `f0-006-ruff.sh` | 14 | Ruff 0.16.5 — linter + formatter (FR-001..014, `ruff check`/`format` idempotente) |
 | `f0-007-mypy.sh` | 16 | MyPy 2.3.1 strict — type checker (FR-001..016, `mypy --strict` determinístico, 007) |
 | `f0-008-pip-audit.sh` | 16 | pip-audit 2.10.1 + Trivy 0.74.0 — auditoria (FR-001..016, `pip-audit`/`trivy fs`, 008) |
+| `f0-009`…`f0-016` | 9–17 | Lefthook, CI completo, `packages/core`, `packages/cli`, release, Dependabot, docker-compose, `docs/tree.md` |
+| `f1-017-harness.sh` | 12 | `core/harness.py` — feedforward (recusa sem processo, exit 2) + feedback (returncode preservado, sinal nunca verde), zero nova-tentativa, literais `0/1/2` (017) |
 
 ### Integridade por resumo criptográfico (item 002, ADR-006)
 
@@ -140,3 +147,19 @@ dependências do projeto ainda não foram instaladas.
 
 A partir de `005`, os hashes de todos os oráculos vivem em `scripts/verify/manifest.sha256`
 (formato `sha256sum -c`). Cada novo item acrescenta sua linha; divergência sobe para ADR.
+
+## Cobertura de fase — por que dois laços (ADR-043)
+
+O primeiro laço é **literal congelado**: oito asserções em sete oráculos
+convergidos (`f0-003` FR-010 exige o literal cheio; `f0-004`, `f0-005`,
+`f0-006`, `f0-007`, `f0-008` e `f0-009` exigem o prefixo `for f in
+scripts/verify/f0-`). Trocá-lo por um glob genérico reprova os sete.
+
+O segundo laço (`f[1-9]-*`) existe porque o primeiro **não alcança fase
+nenhuma além da 0** — e foi exatamente assim que `f1-017` convergiu sem que
+CI, `pre-push` ou a promoção a pytest jamais o executassem. A regra vale para
+todo executor do harness: quem enumera oráculos enumera as duas formas.
+
+O literal `f0-*.sh` precisa permanecer **código executado**, jamais comentário:
+um trecho comentado satisfaz o `grep` da asserção sem rodar nada — verde falso,
+que é o defeito corrigido, não uma forma dele.
