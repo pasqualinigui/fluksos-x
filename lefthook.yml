@@ -23,6 +23,10 @@ pre-push:
   commands:
     harness:
       run: 'for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done'
+    harness-fases:
+      # Cobertura das fases seguintes (ADR-043). O laço acima é literal
+      # congelado por f0-003 FR-010; este alcança f1..f9, que ele não alcança.
+      run: 'for f in scripts/verify/f[1-9]-*.sh; do "$f" --quiet || exit 1; done'
     trivy:
       run: 'sh -c "if command -v trivy >/dev/null 2>&1; then trivy fs --severity HIGH,CRITICAL .; elif command -v docker >/dev/null 2>&1 && docker image inspect aquasec/trivy:0.74.0 >/dev/null 2>&1; then docker run --rm -v $PWD:/w -w /w aquasec/trivy:0.74.0 fs --severity HIGH,CRITICAL .; else echo trivy-skip-sem-Docker-009-FR-004; exit 0; fi"'
     pip-audit:

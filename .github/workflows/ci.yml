@@ -89,8 +89,15 @@ jobs:
       - name: Run harness
         # Glob, nunca lista fixa: um item novo acrescenta o seu oráculo e o
         # pipeline o executa sem editar este arquivo (f0-003 FR-010).
+        # Dois laços, uma razão (ADR-043): o primeiro é literal congelado por
+        # oito asserções em sete oráculos convergidos; o segundo dá cobertura
+        # às fases seguintes, que o primeiro jamais alcançaria. A 017 convergiu
+        # sem portão porque este arquivo só enumerava a Fase 0.
         run: |
           for f in scripts/verify/f0-*.sh; do
+            "$f" || exit 1
+          done
+          for f in scripts/verify/f[1-9]-*.sh; do
             "$f" || exit 1
           done
 
@@ -114,8 +121,12 @@ jobs:
       - name: Sync frozen
         run: uv sync --frozen --all-packages
       - name: Run harness quiet
+        # Mesma cobertura de fase do job `verify` (ADR-043).
         run: |
           for f in scripts/verify/f0-*.sh; do
+            "$f" --quiet || exit 1
+          done
+          for f in scripts/verify/f[1-9]-*.sh; do
             "$f" --quiet || exit 1
           done
 

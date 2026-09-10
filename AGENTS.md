@@ -11,8 +11,9 @@ elas. Serve qualquer stack, porque não assume nenhuma.
 ## How to operate
 
 ```bash
-# harness completo — o oráculo do projeto
+# harness completo — o oráculo do projeto (dois laços: ADR-043)
 for f in scripts/verify/f0-*.sh; do "$f" --quiet || exit 1; done
+for f in scripts/verify/f[1-9]-*.sh; do "$f" --quiet || exit 1; done
 
 # um item isolado, com relatório legível
 scripts/verify/f0-001-foundation.sh
@@ -66,9 +67,9 @@ máquina — identidade de autoria vive em escopo local do repositório.
 | Os dez princípios, com critério de violação e origem | `.specify/memory/constitution.md` |
 | Convenções de registro, linhas de trabalho e o que nunca entra | `CONTRIBUTING.md` |
 | Plano geral das 5 fases e a estrutura final | `docs/plan/implementation_plan.md` |
-| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..015) |
-| O que uma auditoria encontrou | `docs/plan/audit/f0-*.md` |
-| Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md` |
+| Por que uma decisão foi tomada | `docs/plan/decisions.md` (ADR-001..045) |
+| O que uma auditoria encontrou | `docs/plan/audit/f0-*.md`, `f1-*.md` |
+| Evidência de pesquisa por item | `docs/plan/research/f0-NNN-*.md`, `f1-*` |
 | Contrato de interface do harness | `specs/001-git-branching-strategy/contracts/oracle-cli.md` |
 | Como o harness cresce pelos itens | `scripts/verify/README.md` |
 | Bootstrap zero-context (primeira mensagem) | `docs/guides/agent-bootstrap.md` |
