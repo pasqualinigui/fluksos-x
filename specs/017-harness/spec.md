@@ -26,6 +26,12 @@ Obedece aos princípios ratificados (constitution 1.0.0): **I** determinismo (re
 
 *(sessões registradas aqui pelo `/speckit-clarify`; research traz 3 itens propostos com default: erro `HarnessError`, literais `0/1/2` puros, não-POSIX com erro nomeado.)*
 
+### Session 2026-09-10
+
+- Q: Nome do erro do módulo — `HarnessError(FkxError)` novo ou `FkxError` genérico? → A: `HarnessError(FkxError)` novo (recomendação acatada).
+- Q: Granularidade dos exits de erro — literais `0/1/2` puros ou `EX_USAGE`/`EX_SOFTWARE`? → A: literais `0/1/2` puros (recomendação acatada).
+- Q: Comportamento em plataforma não-POSIX — erro nomeado fail-closed ou sem asserção? → A: erro nomeado fail-closed (recomendação acatada).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Executar comando externo com veredito nomeado (Priority: P1)
@@ -78,7 +84,7 @@ Como QA do motor, uso os exit codes do `harness.py` dentro e fora dos oráculos 
 - Processo morto por sinal/OOM (`-9`, `137`): falha nomeada com o número do sinal — nunca verde, nunca traceback nu.
 - Timeout expirado: kill + veredito de expiração com a saída parcial como evidência (fail-closed, research Q3).
 - Comando que escreve só em stderr / saída vazia: vazio é evidência julgada (guarda contra vazio, como `f0-015/016`), nunca aprovação por ausência.
-- Plataforma não-POSIX: [NEEDS CLARIFICATION: comportamento em Windows — erro nomeado fail-closed (default) ou sem asserção (limite honesto puro)?]
+- Plataforma não-POSIX: falha fechada com `HarnessError` nomeado antes de qualquer execução (CLARIFY 2026-09-10) — sem asserção de comportamento além da recusa.
 - Segredo em saída capturada: mascarado no veredito (Lei Zero precede o registro).
 
 ## Requirements *(mandatory)*
@@ -90,13 +96,13 @@ Como QA do motor, uso os exit codes do `harness.py` dentro e fora dos oráculos 
 - **FR-003**: O sistema MUST emitir exit codes que espelham o contrato do oráculo: `0` conforme · `1` não conforme · `2` erro de uso (remap proibido, Regra 8).
 - **FR-004**: O sistema MUST NOT re-executar para buscar verde: zero retry em qualquer caminho (ADR-019 §3, `010` FR-010).
 - **FR-005**: Todo veredito MUST nomear o requisito violado (ou atendido) e a evidência observada (princípio X); traceback Python MUST NOT ser a evidência.
-- **FR-006**: O erro do módulo MUST seguir a taxonomia da 011 (um tipo por módulo) — [NEEDS CLARIFICATION: `HarnessError(FkxError)` novo (default) ou reusar `FkxError` genérico?]
-- **FR-007**: Granularidade dos exits de erro — [NEEDS CLARIFICATION: literais `0/1/2` puros (default) ou `EX_USAGE`/`EX_SOFTWARE` como valores preferidos dentro das classes `2`/`1`?]
+- **FR-006**: O erro do módulo MUST ser `HarnessError(FkxError)` novo, seguindo a taxonomia por módulo da 011 (CLARIFY 2026-09-10).
+- **FR-007**: O sistema MUST emitir os literais `0/1/2` puros, sem granularidade `EX_USAGE`/`EX_SOFTWARE` (CLARIFY 2026-09-10; composição por construção, Regra 8).
 - **FR-008**: O sistema MUST prover oráculo `scripts/verify/f1-017-*.sh` sob o contrato `oracle-cli.md` (identidade FR↔asserção documentada, determinismo 2×, somente leitura, self-check `f0-001…f0-016` em série conforme ADR-031 + `sha256sum -c` do manifest, 17ª linha do manifest).
 - **FR-009**: `specs/README.md` MUST conter `017` `✅` com hash do commit de convergência, e `tasks.md` MUST fechar com zero tarefas `[ ]` e par vermelho→verde em commits separados.
 - **FR-010**: Fronteira paga pelo procedimento: `f0-011` FR-002 ajustada **exclusivamente** na Fase C verde via ADR prévia (10ª execução do molde ADR-017); nenhum outro oráculo anterior tocado.
 - **FR-011**: O sistema MUST NOT adicionar dependência: stdlib puro (`subprocess/os/sys`); `uv.lock` sem pacote novo (Escada).
-- **FR-012**: POSIX assumido e declarado; comportamento em não-POSIX conforme o CLARIFY da FR de borda (limite honesto da ADR-025 §3).
+- **FR-012**: POSIX assumido e declarado; em plataforma não-POSIX o sistema MUST falhar fechado com erro nomeado (`HarnessError`) antes de qualquer execução (CLARIFY 2026-09-10).
 
 ### Key Entities *(include if feature involves data)*
 

@@ -245,3 +245,26 @@ Push com `--no-verify` é admitido **exclusivamente** quando, nesta ordem:
 
 Uso fora desta forma é achado em auditoria. Revisão datada: pós-020, junto
 dos tetos <5s (E4).
+
+---
+
+## 6. Disciplina de push por item (2 pontos fixos)
+
+> Origem: pergunta do mantenedor em 2026-09-10 ("push a cada documento é o
+> padrão?"). Resposta normativa — nem push-por-documento, nem "spec inteira
+> antes do push": o determinismo exige **durabilidade do vermelho antes do
+> verde existir**, e só isso exige rede.
+
+**Regra**: cada item empurra (`push`) a branch em exatamente 2 pontos do ciclo:
+
+1. **TESTS 🔴** — o commit vermelho, imediatamente após criado. Fundamento:
+   a prova vermelho→verde (Regra 2) é irrecuperável; se a estação morre entre
+   🔴 e 🟢 com o vermelho só local, a prova morre junto. Push no 🔴 torna o
+   ordenamento independente da máquina — e dá veredito servidor sobre o
+   vermelho (um vermelho que passa em tudo não é vermelho).
+2. **CONVERGE** — push + PR; o servidor mergeia sobre os 10 checks (ADR-035).
+
+Todas as demais etapas (RESEARCH, SPECIFY, CLARIFY, PLAN, TASKS) vivem em
+commits locais, empurrados juntos no ponto 1. Exceção: sinal antecipado do CI
+pedido pelo mantenedor. Cada push fora destes pontos sem esse pedido é achado
+em auditoria. Revisão datada: pós-020, junto das §§4–5.

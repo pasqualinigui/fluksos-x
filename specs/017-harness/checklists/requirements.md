@@ -3,7 +3,7 @@
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-10
 **Feature**: [spec.md](../spec.md)
-**Validation**: 2026-09-10, iteração 1 (3 [NEEDS CLARIFICATION], dentro do teto — seguem ao CLARIFY)
+**Validation**: 2026-09-10, iteração 1 (3 [NEEDS CLARIFICATION], dentro do teto) → CLARIFY 2026-09-10 (3/3 acatados) → **15/16**, resta só o FAIL aceito e registrado abaixo
 
 ## Content Quality
 
@@ -14,7 +14,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — 3 marcadores (FR-006, FR-007, borda não-POSIX), todos críticos e sem default arbitrário seguro → `/speckit-clarify`
+- [x] No [NEEDS CLARIFICATION] markers remain — PASS (3/3 resolvidos no CLARIFY 2026-09-10, todas as recomendações acatadas)
 - [X] Requirements are testable and unambiguous — PASS (cada FR tem caminho de asserção no oráculo)
 - [X] Success criteria are measurable — PASS (100%, contagens, <5s, 0/1/2)
 - [X] Success criteria are technology-agnostic (no implementation details) — PASS pela norma da casa (SC-004/005 padrão harness/manifest/tasks desde a 003)
